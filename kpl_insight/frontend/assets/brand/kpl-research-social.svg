@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640">
+<title>KPL赛研 · KPL赛研 KPL赛事数据分析与复盘</title>
+<defs><pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse"><path d="M60 0H0V60" fill="none" stroke="#d1e4e8" opacity=".055"/></pattern><linearGradient id="line"><stop stop-color="#d1f287"/><stop offset="1" stop-color="#67d8d0"/></linearGradient></defs>
+<rect width="1280" height="640" fill="#101c25"/><rect width="1280" height="640" fill="url(#grid)"/>
+<g font-family="Microsoft YaHei,Segoe UI,sans-serif" fill="#f1f5eb">
+<rect x="86" y="42" width="7" height="35" rx="3" fill="#d1f287"/>
+<text x="110" y="71" font-size="44" font-weight="800">KPL赛研</text>
+<text x="1194" y="70" text-anchor="end" font-size="18" letter-spacing="3" fill="#9db7ba">KPL RESEARCH</text>
+<text x="86" y="160" font-size="84" font-weight="850" letter-spacing="-2">KPL赛研</text><text x="86" y="269" font-size="84" font-weight="850" letter-spacing="-2">KPL赛事数据分析与复盘</text>
+<text x="86" y="332" font-size="27" fill="#b6c9c8">下载到自己电脑上的KPL数据平台</text>
+<rect x="86" y="321" width="1108" height="209" rx="22" fill="#1a2b34" stroke="#3a5057"/>
+<path d="M106 423.0H1174" stroke="#8da4aa" stroke-dasharray="5 10" opacity=".4"/>
+<polyline points="86.0,419.3 106.7,425.8 386.3,437.6 469.1,434.2 572.7,442.1 707.3,444.1 728.0,434.1 862.6,478.3 986.9,481.7 1100.8,494.3 1194.0,496.9" fill="none" stroke="url(#line)" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="86" y="565" font-size="24" fill="#91aaa9">真实归档曲线重绘 · 模型估算</text>
+<text x="86" y="570" font-size="32" font-weight="750" fill="#d1f287">下载到自己的电脑 · 查比赛 / 看曲线 / 做复盘</text>
+<text x="86" y="602" font-size="24" fill="#a7bdbe">github.com/hccccc01333/kpl-research</text>
+</g></svg>

@@ -3,11 +3,11 @@
   "files": [
     {
       "path": "404.html",
-      "sha256": "1ea1fc1b9910c0ce350c835d2c15e5e432f3a60f80198f9d4ba508c6e374512c"
+      "sha256": "9c320fa4e24a771c5c5842e9297b135dfcb89e6fefedece54447c9a37c4689dd"
     },
     {
       "path": "about.html",
-      "sha256": "bc029367ac201c6e45b3544bf1307c8c20a656bf341f67a2703fd6c2214b6040"
+      "sha256": "b02b84427d2462f52f8652ff94f44af8f80f0bbb5ab9837bfcb06beaf504f248"
     },
     {
       "path": "bp-studio.html",
@@ -15,7 +15,7 @@
     },
     {
       "path": "bp.html",
-      "sha256": "19740f4c462d15e1470d2fa55bae7636610387af62134859ebcf19fc2c5663cd"
+      "sha256": "300bfd635e5ba27ca6c65064c8bb7b3e8033458af5b1756278d290df1787f7a0"
     },
     {
       "path": "bracket-forecast.html",
@@ -23,7 +23,7 @@
     },
     {
       "path": "bracket.html",
-      "sha256": "6bba5c55bba87f2a579a2da2b83c02a6a18eb006983727547b74824cc415071a"
+      "sha256": "001ecb8ac8aed825a93798557c688f55baca5182404a7b49cde4a56660b15f78"
     },
     {
       "path": "coach.html",
@@ -31,27 +31,27 @@
     },
     {
       "path": "combos.html",
-      "sha256": "8205f0277fd16c68cea5d8d33f22f3686706e1545d8a54d01c6dda6d38d7d5a4"
+      "sha256": "e5d01da231acb9f0150443c5e320162af291824ac631f7237ef963ad088d004e"
     },
     {
       "path": "comeback.html",
-      "sha256": "42f806e622487cfb6a21b1c64b426438bfd56964a37ec6a18ca4fa4cedce1aa3"
+      "sha256": "f947a3569b5d8de39d4f4290dab7c6b0540f69a4751f9c6a285fdecfcfe6c91c"
     },
     {
       "path": "compare-lane.html",
-      "sha256": "f0fb6499c5fd6078673b390b0e6dd33f126c76e813db4e83bc8e137583092090"
+      "sha256": "7202aac58d4d2abb4e03c75dd1a2843a5479989ff7a55bc4fa520de2175a840f"
     },
     {
       "path": "compare-player.html",
-      "sha256": "caa52f2546fd139350fec4f9f7535555e0f378a8da2afb529c51fe808f3e5cfb"
+      "sha256": "9931cc1c92b4a687d52979767af12ba92f53f8146f85722397455d7fbd106c20"
     },
     {
       "path": "compare-team.html",
-      "sha256": "d2c44d5f451788025e5fa988f4b047dd099564280a6bee9cce51649cf8ad62b3"
+      "sha256": "f87afb3a5ef08caac95cee8f863f31636515eb4fd1cb142bcfddd8a1459e2db0"
     },
     {
       "path": "compare.html",
-      "sha256": "fc7bce7b8d698d595f9fdbdd7c9879dbed682fdaee6bea0dea3779d4d33541b7"
+      "sha256": "0e764816d0f8419ac4807cfb8f67c36eae106f80b6a822fa3590249770839f09"
     },
     {
       "path": "find.html",
@@ -63,11 +63,11 @@
     },
     {
       "path": "game.html",
-      "sha256": "0450d98dca19dc2308492c0699a5b9ab5a26318415769292607659c9885dcb93"
+      "sha256": "bc844507980bfe5ba81fea5fe15d6d95f1e870b0ffd4cc7f475154bd1a4d1a69"
     },
     {
       "path": "h2h.html",
-      "sha256": "d866d5793e99362c4bb8a3a841b28a9fa8444344f91e11dace5d8e3f98227e25"
+      "sha256": "5587b59f36c2a7612dd8a269bf9acde22801336e561fa2b64b391bcbd4f3c910"
     },
     {
       "path": "hero-performance.html",
@@ -75,23 +75,23 @@
     },
     {
       "path": "hero.html",
-      "sha256": "c9cbd4abe3e947dff53b25c9431d148828f05799bb3139c6a5916b118671a5b4"
+      "sha256": "cbdbcf91ff0a8561391f98ee3a472eedd5cd15be0661f5c3bde34236466d5f6d"
     },
     {
       "path": "heroes.html",
-      "sha256": "c67ed04b1b02ba71645a27b2c2f212ee47434aff3629f7570610beac662376b4"
+      "sha256": "15fa4e01d79fadfd201e89558679be33757f6700a972a5e6a67b6db9674dcea9"
     },
     {
       "path": "honors.html",
-      "sha256": "010df114ed1495a0027a5d0f85e87e7cdfcbcc174b0b6556ed2294070b435a45"
+      "sha256": "7b71bcc479d3bb4606fc8d61db02a423c48c2e75682e3fc32e48a8f06bef1750"
     },
     {
       "path": "index.html",
-      "sha256": "1ba0379b985deace588590508962e06753c123ea0536bcd1b592718e2781da42"
+      "sha256": "c1825cc1a7874e0c3ffc0484943e9287af1d663e30cfe0703a0605c1eb2d0d8c"
     },
     {
       "path": "match.html",
-      "sha256": "d854def20da26600eb63feb742f76ce6100bf4cce62d179b1467583f5e82ae66"
+      "sha256": "ccb5cdd55b5fd78b8e1d22a7a218281f6cfd20124e961fe2bd1c02fba4bb20fd"
     },
     {
       "path": "picks.html",
@@ -99,19 +99,19 @@
     },
     {
       "path": "player.html",
-      "sha256": "6403b563d4207e7c04a9fe2b63b9230346b5d90964614a674511464feade984c"
+      "sha256": "90b9869a4bc2c3cdc8cc7367c0fb08edfba7a13ab17e1f3436b37e09b64e4581"
     },
     {
       "path": "players.html",
-      "sha256": "96f4c328fc6555c5c32ddbe53013f153ef45bd6789d3a077e025f3c6c4cb407d"
+      "sha256": "1a2c9b938ffc9475e1bb069eb64f9db4359411d9add92feda0847b2366eda1e7"
     },
     {
       "path": "predict.html",
-      "sha256": "4080d908ca866560777f7643b06671774f1c0df10ee4ca278c1a5278d047ae08"
+      "sha256": "256ba71a6913a741b640d188c6ff3327f927e3fc8e2b3f765d69f7157d73a065"
     },
     {
       "path": "query.html",
-      "sha256": "2ec4698d030a9d51b704d53b560ed5fed9d4f95d8d09d29795f600a2b33260f3"
+      "sha256": "418ff42816daf930cc5c60eb687f6c1596368e996535955fcd205eb1cec7d052"
     },
     {
       "path": "records.html",
@@ -123,7 +123,7 @@
     },
     {
       "path": "schedule.html",
-      "sha256": "789978dbf307c8690d21d7922d32997f23441c172119e75d369ec8fec9e572b2"
+      "sha256": "c50d28674bf7bd8ba56c61ece492cf008c130e616f57242326f795ca7b73121f"
     },
     {
       "path": "series.html",
@@ -147,7 +147,7 @@
     },
     {
       "path": "teams.html",
-      "sha256": "ad583ba6b9725936aacdaa8bfd94da1dbef1a49da4d01ef0d6ad514d2dfe3a82"
+      "sha256": "9c639767871f9c747c7350ecc87c40349e91f5726a59732afedcd7c8e46f4d85"
     },
     {
       "path": "updates.html",
