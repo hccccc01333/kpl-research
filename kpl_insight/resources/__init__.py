@@ -1,1 +1,1 @@
-"""KPL Insight resources tools."""
+"""KPL Research resources tools."""

@@ -3,155 +3,155 @@
   "files": [
     {
       "path": "404.html",
-      "sha256": "d9635d72a11785240eebc41ad73e2e2647f2d46d3b750813f4b6a05630e8ca56"
+      "sha256": "1ea1fc1b9910c0ce350c835d2c15e5e432f3a60f80198f9d4ba508c6e374512c"
     },
     {
       "path": "about.html",
-      "sha256": "289e2b572aff6f966ea8372c1cb7c7f7e2fd444340bf785bef4bc82e844f03b5"
+      "sha256": "bc029367ac201c6e45b3544bf1307c8c20a656bf341f67a2703fd6c2214b6040"
     },
     {
       "path": "bp-studio.html",
-      "sha256": "7df5101013fc406a72b5d900958a45293fb8c6d710e58d05f146d3b991bf40e2"
+      "sha256": "296eacd9fd71ab54dc72aafc4074e2c89cac0b18f35ac1d5aae91ab49b6eaf42"
     },
     {
       "path": "bp.html",
-      "sha256": "410e5722016545def5220d399e020a7e9960927515798a7d841e78d8347c8227"
+      "sha256": "19740f4c462d15e1470d2fa55bae7636610387af62134859ebcf19fc2c5663cd"
     },
     {
       "path": "bracket-forecast.html",
-      "sha256": "685d222bfaa33b3d90f8c10524921d4328938642e44bf1bc42f5d8d19be54991"
+      "sha256": "9158d15ed35e349c39931f68b498291d8873723eedd8b198aa14d9b441663350"
     },
     {
       "path": "bracket.html",
-      "sha256": "d0c55265d47ea582bb5d5a43f50ec9afd1088cd0243fe3cbf15f55b893a5b2ba"
+      "sha256": "6bba5c55bba87f2a579a2da2b83c02a6a18eb006983727547b74824cc415071a"
     },
     {
       "path": "coach.html",
-      "sha256": "9d53af96e00d0b0c3cea072e910a48a6c3d349d3cc90d71e0a09ef5daa19d41a"
+      "sha256": "db37c4cee8ffc02f30be1928fb52a8a05c8c18afe3d6596fb46b95d7c8c3e283"
     },
     {
       "path": "combos.html",
-      "sha256": "f33d4b52466deda8cba5696f59fe331e231cc9187ce52f58a543dfd83506a6b5"
+      "sha256": "8205f0277fd16c68cea5d8d33f22f3686706e1545d8a54d01c6dda6d38d7d5a4"
     },
     {
       "path": "comeback.html",
-      "sha256": "682c488bc4c9feb7dda7c069ccc917ca0d03e4e47cccd5e8ee30c13cb967d768"
+      "sha256": "42f806e622487cfb6a21b1c64b426438bfd56964a37ec6a18ca4fa4cedce1aa3"
     },
     {
       "path": "compare-lane.html",
-      "sha256": "a07b9bc7732e851650a06dfc50cea906caa54ac9dd7b4f59e8710788cc1d3691"
+      "sha256": "f0fb6499c5fd6078673b390b0e6dd33f126c76e813db4e83bc8e137583092090"
     },
     {
       "path": "compare-player.html",
-      "sha256": "26ff3f9d6d20d04ceab587f05338b670e8e5f3f831644f464d5802c8f7ade7e9"
+      "sha256": "caa52f2546fd139350fec4f9f7535555e0f378a8da2afb529c51fe808f3e5cfb"
     },
     {
       "path": "compare-team.html",
-      "sha256": "412127c43b31dd35efa4a7316e741775aede83e56d123352b611ab743afceb4b"
+      "sha256": "d2c44d5f451788025e5fa988f4b047dd099564280a6bee9cce51649cf8ad62b3"
     },
     {
       "path": "compare.html",
-      "sha256": "8a33f706cd1975d622531876a09880c2cc0c2ee9e6161531bd0183d5350e581e"
+      "sha256": "fc7bce7b8d698d595f9fdbdd7c9879dbed682fdaee6bea0dea3779d4d33541b7"
     },
     {
       "path": "find.html",
-      "sha256": "c6ba6cdc818e3c93c7e1c3e3ddb9048b69b72681f55ddf70390d2d54ea69ea97"
+      "sha256": "01fbef1befa4f1afef7697afc7347aa1e2e55873a5c131ff2f064ab26d73df5a"
     },
     {
       "path": "forecast.html",
-      "sha256": "ab27867e181aaafb4cb70b3d68efa768cfc018b35f97aab265c993858af32c12"
+      "sha256": "a14e054d3c2cedc1e79ffb145772bd20dab266b564e8f2f43357ba7dfd45ba73"
     },
     {
       "path": "game.html",
-      "sha256": "c42e976ceb529890f1e865943b80a14c96fb2a0976e396d6fb5acc810239b039"
+      "sha256": "0450d98dca19dc2308492c0699a5b9ab5a26318415769292607659c9885dcb93"
     },
     {
       "path": "h2h.html",
-      "sha256": "c1b8100613ff0824e95ce7cd21a28fe34dca759e60ebeb6cd2fcf0f95b350263"
+      "sha256": "d866d5793e99362c4bb8a3a841b28a9fa8444344f91e11dace5d8e3f98227e25"
     },
     {
       "path": "hero-performance.html",
-      "sha256": "20a88e9efc1f5cfe31b534c79ed6ab62e715251fb420a56bc42a9440169564e9"
+      "sha256": "7b08fac28ecddb0c3c3849bc5331ad697e518f0acdb20e7dd5edf3b695c70620"
     },
     {
       "path": "hero.html",
-      "sha256": "426967b781eb7f260ca5d74d92860b3293e0c2635d5e7a1e02400c2f71004ba4"
+      "sha256": "c9cbd4abe3e947dff53b25c9431d148828f05799bb3139c6a5916b118671a5b4"
     },
     {
       "path": "heroes.html",
-      "sha256": "79a89607ab9297d0f40b7ad18b64a898a906552992cc2c81f169f9138bc5aa8e"
+      "sha256": "c67ed04b1b02ba71645a27b2c2f212ee47434aff3629f7570610beac662376b4"
     },
     {
       "path": "honors.html",
-      "sha256": "0a9574daa213e3b498cc3f8e4b93bccb402444e63275ba8eb375d9edaabae9d3"
+      "sha256": "010df114ed1495a0027a5d0f85e87e7cdfcbcc174b0b6556ed2294070b435a45"
     },
     {
       "path": "index.html",
-      "sha256": "46ea268821649300695584e7a206355c73706959f374b71e5d7746f7e06a84d8"
+      "sha256": "1ba0379b985deace588590508962e06753c123ea0536bcd1b592718e2781da42"
     },
     {
       "path": "match.html",
-      "sha256": "8e22c8adacc7db9d92bf48254270778a63c1b7238c2a6d0c102d0fa91dd7bf6d"
+      "sha256": "d854def20da26600eb63feb742f76ce6100bf4cce62d179b1467583f5e82ae66"
     },
     {
       "path": "picks.html",
-      "sha256": "33989eef2be3cd92fc281d28b874db86702e3fc6b067fa652773a2132c9364c6"
+      "sha256": "6d154bb2ee3ef41b8f49043a6ec66bf53f85d21c95f6dfe8d0a843100d2f28fc"
     },
     {
       "path": "player.html",
-      "sha256": "8b68cbfb5dc9570e6131e08b8708f16167030a5ba7afb06c886a35be9a9828b3"
+      "sha256": "6403b563d4207e7c04a9fe2b63b9230346b5d90964614a674511464feade984c"
     },
     {
       "path": "players.html",
-      "sha256": "4882c3942f64f84b9e30b3d0aa4d1c04e4352707cba920af8492fc49a46fde68"
+      "sha256": "96f4c328fc6555c5c32ddbe53013f153ef45bd6789d3a077e025f3c6c4cb407d"
     },
     {
       "path": "predict.html",
-      "sha256": "bb2b6b8561893465d02bf3f73c1ee318409d3773a128701a9ef00f4e5cccc61f"
+      "sha256": "4080d908ca866560777f7643b06671774f1c0df10ee4ca278c1a5278d047ae08"
     },
     {
       "path": "query.html",
-      "sha256": "6c43ec5945ffff976eb03358d7a532235219f0ce3311093a7d0b0827c91812bc"
+      "sha256": "2ec4698d030a9d51b704d53b560ed5fed9d4f95d8d09d29795f600a2b33260f3"
     },
     {
       "path": "records.html",
-      "sha256": "a8f1e4753fb873265cc69114a55a8158d6abca110970c749a978178f048fd5c6"
+      "sha256": "908a60b6802bb0bb421898dbf1dc48ed0855232873a019f34ae338294b22a939"
     },
     {
       "path": "sandbox.html",
-      "sha256": "5f15e2cf99fee5c50bee7eea7ae524c1283a34dab10f5fab7ccaa61db4c1494d"
+      "sha256": "e93095c24cca22fb2c4654fb35959329784bdf47e21711c59b7a4153c5bb5f16"
     },
     {
       "path": "schedule.html",
-      "sha256": "7009179f6142c30039e7d164de4c015bb93716098ea5e4dee1f58f750d4c81fc"
+      "sha256": "789978dbf307c8690d21d7922d32997f23441c172119e75d369ec8fec9e572b2"
     },
     {
       "path": "series.html",
-      "sha256": "6abce113d710bda536de9b3e3d49d582f976a168f85fa76b5b821ca4ce7e9de4"
+      "sha256": "a9204d7d3ceaeed81742a17823edf7038a5f3b4f39628ec163c38a6d47535cd5"
     },
     {
       "path": "simulator.html",
-      "sha256": "81d1ef3ed67e392e5d4a5e5360790fa45b5c4af16338308b5ac50b4af67353eb"
+      "sha256": "007a77815d024094caca2ad667dc6510920144a2ca7f851eef9c9226238d96f6"
     },
     {
       "path": "stage.html",
-      "sha256": "e1fd9237b093d5a183575321d9ad97bb37b6e52a80e9df8bb7591cc22356cb7c"
+      "sha256": "917bc03a6cc1883f3cee25ea03119f663ea236b19c707b4319ac4f9b1dae8bd6"
     },
     {
       "path": "team-bp.html",
-      "sha256": "1a44f32e2e81496ebaec1cafe6fdf3740400b06a0210a53dddf3000ce54448f3"
+      "sha256": "2da1d441d0797c7dd2dcc2c1f80e8509323b3deaa50f7d97322878f6564568f8"
     },
     {
       "path": "team.html",
-      "sha256": "f404109696cac4c37a20b64b7ee71e6d6bea40dcba3425a004b333b66689c510"
+      "sha256": "7523943bcb454ffe0fcddd493d88137bc0c6f601e98d41dcea50c379c18035df"
     },
     {
       "path": "teams.html",
-      "sha256": "b94a6c4d29d83fc1497e5184eab840127217d80ff6216604b085a8c556839424"
+      "sha256": "ad583ba6b9725936aacdaa8bfd94da1dbef1a49da4d01ef0d6ad514d2dfe3a82"
     },
     {
       "path": "updates.html",
-      "sha256": "f01c260a707a3668971f83acea45abae4ccf0445d0d63e37f6ae5be010a95274"
+      "sha256": "d8e2aad872786c17ca38b3c0327d77afbf4796c8d6035bc7e461375feb85cf20"
     },
     {
       "path": "assets/arena-3d.js",
@@ -207,7 +207,7 @@
     },
     {
       "path": "assets/coach_app.js",
-      "sha256": "b727cebd39a1e8456034c0de23e292a0d782589d61bfe3d551a98d4a670d55e9"
+      "sha256": "a900e34e9917fdda8b9f5c4259e9a1262e40e0429d2be2c2df65f612f401aa7f"
     },
     {
       "path": "assets/coach_data.js",
@@ -219,11 +219,11 @@
     },
     {
       "path": "assets/common.js",
-      "sha256": "6e87da6427db0c110c5471c1ada8439f1767fddbc74cb6e71773583d46f3c4ce"
+      "sha256": "e27c233904ceacb42c8cf5e3a5884395b8aa083bb150107e5c581002b8f53187"
     },
     {
       "path": "assets/compare.js",
-      "sha256": "0eeaac2c659923617e110660e966c5cd29d510491c43ac4888522e2529c8e016"
+      "sha256": "0d405fde19b2dcfa42649cac00d167a8c3806cb094e23f8919836f358fb11ec8"
     },
     {
       "path": "assets/coverage.js",
@@ -467,7 +467,7 @@
     },
     {
       "path": "assets/hero_perf_app.js",
-      "sha256": "c50eda5f727875f77f98963d7e41cde64c36398dc3c543fc767d02961d8319e1"
+      "sha256": "632a0de8f8ab73d49f58c538d5f12e7b005bc7f7652d75fd5b55ec178a8e3fd8"
     },
     {
       "path": "assets/honors.js",
@@ -759,7 +759,7 @@
     },
     {
       "path": "assets/pages.css",
-      "sha256": "ec819a4fe3c4e6c9cb9d86d7851aac3fa44a5be763e64e8e14c1814fd1d7098e"
+      "sha256": "5b5b6255501c55c224be0e1e3821766d6bc25ad50109156a59d2d4186bda2e8e"
     },
     {
       "path": "assets/picks.js",
@@ -1075,7 +1075,7 @@
     },
     {
       "path": "assets/replay.js",
-      "sha256": "15e647985db1b5a837421c1e47c27d0d46747a13ed78638e2881a52b42d2fa39"
+      "sha256": "f01ebdb01a17bff0e1d5c99e22188d279b8449bf79357432aa52fce1804c04ff"
     },
     {
       "path": "assets/sandbox.css",
@@ -1111,7 +1111,7 @@
     },
     {
       "path": "assets/share.js",
-      "sha256": "44eb41a3deae78b935b249a706c09e8c0d9503b049825248229bd4feed42adb3"
+      "sha256": "ca423e513c11a9ecf73182bbb10c430a916660366e6df1532161a16b60f62f50"
     },
     {
       "path": "assets/shots/01-schedule.png",
@@ -1187,7 +1187,7 @@
     },
     {
       "path": "assets/style.css",
-      "sha256": "d9832bf1672833062974922e7f542ab3603f02e56e627af0db06f7525889205d"
+      "sha256": "dbda0361118b6e351a439988536c70e77cf021d4c535a827ca4260cd23108f6f"
     },
     {
       "path": "assets/team_bp/index.js",
@@ -1227,7 +1227,7 @@
     },
     {
       "path": "assets/team_bp_app.js",
-      "sha256": "3aefdada2718082fd262afb19839ee1d6279a472b827957d3cdc1f6fe82c091f"
+      "sha256": "cc9d8ea635208367ee65848c8f965ff250b80b6a67a0bb4f25e48311eb2bfe22"
     },
     {
       "path": "assets/team_data.js",
@@ -1243,7 +1243,7 @@
     },
     {
       "path": "assets/updates.js",
-      "sha256": "7a19e81e8fc00a903d48f1fbbf9085eb2e1831f03f4a97565d9dc24e4e513482"
+      "sha256": "fb2a2b3fe858784037eef247c938bb54bc79986d6c7e8f3bf39762a1c7de6055"
     },
     {
       "path": "assets/v55.css",
@@ -1261,5 +1261,7 @@
       "path": "assets/vendor/three.module-0.170.0.js",
       "sha256": "08fd7545d13d2c7fb65ab691530a802dafefd638596501854f267d0fb13c39e7"
     }
-  ]
+  ],
+  "brand": "KPL赛研",
+  "brand_updated_at": "2026-11-02"
 }

@@ -1,5 +1,5 @@
 var CP = (window.KPL && KPL.chartPalette) ? KPL.chartPalette() : {grid:'#E3E5EA',axis:'#D9DCE2',label:'#6E7480',line:'#2E6FD0',mark:'#F02F55',onLine:'#191B23',dot:'#FFFFFF'};
-/* 峡谷有数 · 单局复盘工作台（V4 阶段二）
+/* KPL赛研 · 单局复盘工作台（V4 阶段二）
    一条时间轴同时驱动：模型胜率 / 经济 / 资源 / 选手 / 邻近事件。
    数据由 build_replay_frames.py 预生成（assets/replay/<matchId>.json），按需加载。 */
 window.KPL_REPLAY = (function () {

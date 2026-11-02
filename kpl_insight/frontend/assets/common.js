@@ -1,4 +1,4 @@
-/* 峡谷有数 · 产品站公共层（v3）
+/* KPL赛研 · 产品站公共层（v3）
    工具函数 / 图标 / 顶栏（含搜索）/ 页脚 / 动效 / 共用组件（曲线、对位、卡片、倒计时） */
 window.KPL = (function () {
   "use strict";
@@ -309,25 +309,25 @@ window.KPL = (function () {
     var links = navGroupHtml(page, real || page);
     return '<div class="wrap topbar-in">' +
       '<a class="brand" href="index.html"><span class="brand-mark">K</span>' +
-      '<span class="brand-name">峡谷有数</span><span class="brand-sub">KPL INSIGHT</span></a>' +
+      '<span class="brand-name">KPL赛研</span><span class="brand-sub">KPL RESEARCH</span></a>' +
       '<div class="search-wrap"><div class="search-box">' + icon("search", 16) +
       '<input id="siteSearch" placeholder="搜索战队 / 选手 / 英雄" autocomplete="off" spellcheck="false"></div>' +
       '<div class="search-pop" id="searchPop"></div></div>' +
       '<nav class="nav" id="siteNav">' + links + "</nav>" +
       '<button class="nav-toggle" id="navToggle" type="button" aria-label="打开导航" ' +
       'aria-expanded="false" aria-controls="siteNav">' + icon("menu", 19) + "</button>" +
-      '<a class="gh-ico" href="https://github.com/hccccc01333/kpl-insight" target="_blank" rel="noopener" ' +
+      '<a class="gh-ico" href="https://github.com/hccccc01333/kpl-research" target="_blank" rel="noopener" ' +
       'title="GitHub · 查看源码与 Star" aria-label="GitHub · 查看源码与 Star">' + icon("github", 19) + "</a></div>";
   }
   function footer() {
     return '<div class="wrap footer-in"><div>' +
-      '<div class="foot-brand">峡谷有数 <span class="mono">/ KPL INSIGHT</span></div>' +
+      '<div class="foot-brand">KPL赛研 <span class="mono">/ KPL RESEARCH</span></div>' +
       '<p class="foot-note">数据来自腾讯王者荣耀职业联赛公开接口，为个人搭建的赛事数据产品（非官方、与腾讯无关联）。' +
       '统计均为自算口径：胜率类为历史区间估计，赛程与比分以官方发布为准。' +
       '了解数据口径与更新方式 → <a href="about.html" style="color:var(--gold)">数据说明</a></p></div>' +
       '<div class="foot-right mono"><div>数据更新 <b>' + esc(D ? D.generatedAt : "—") + "</b></div>" +
-      '<a href="https://github.com/hccccc01333/kpl-insight" target="_blank" rel="noopener">GitHub · Star ↗</a>' +
-      '<a href="https://github.com/hccccc01333/kpl-insight/issues" target="_blank" rel="noopener">反馈与贡献 ↗</a>' +
+      '<a href="https://github.com/hccccc01333/kpl-research" target="_blank" rel="noopener">GitHub · Star ↗</a>' +
+      '<a href="https://github.com/hccccc01333/kpl-research/issues" target="_blank" rel="noopener">反馈与贡献 ↗</a>' +
       '<a href="updates.html">更新日志</a>' +
       '<a href="about.html">数据说明 · 免责</a></div></div>';
   }

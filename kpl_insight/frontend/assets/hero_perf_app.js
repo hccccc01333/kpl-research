@@ -1,4 +1,4 @@
-/* 峡谷有数 · 英雄表现工作台
+/* KPL赛研 · 英雄表现工作台
    数据：assets/hero_perf/index.js + assets/hero_perf/shard_*.js
    口径：选手 × 英雄 × 系列赛；P50/P75/P90 为同位置同英雄描述性参考。 */
 (function () {

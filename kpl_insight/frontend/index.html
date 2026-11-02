@@ -4,11 +4,11 @@
 <script src="assets/theme.js?v=20261030b"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>峡谷有数 · KPL Insight · KPL 数据分析与比赛复盘项目</title>
-<meta name="description" content="峡谷有数：源码公开的 KPL 赛事数据分析与复盘工具。先在线体验，再自行部署、修改和扩展，做出适合自己的 KPL 数据工具，限非商业使用。">
+<title>KPL赛研 · KPL赛事数据分析与复盘平台</title>
+<meta name="description" content="KPL赛研：源码公开的 KPL 赛事数据分析与复盘工具。下载后在自己电脑上查比赛、看曲线、做复盘，也可自行修改与扩展，限非商业使用。">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230A111C'/%3E%3Crect x='3' y='3' width='26' height='26' rx='4' fill='none' stroke='%23F6C021' stroke-width='2'/%3E%3Ctext x='16' y='22' font-family='Arial,sans-serif' font-size='16' font-weight='bold' fill='%23F6C021' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
-<link rel="stylesheet" href="assets/style.css?v=85">
-<link rel="stylesheet" href="assets/pages.css?v=20261027f">
+<link rel="stylesheet" href="assets/style.css?v=20261102-brand">
+<link rel="stylesheet" href="assets/pages.css?v=20261102-brand">
 <link rel="stylesheet" href="assets/v55.css?v=87">
 <style>
 /* 我的 KPL：仅在存在收藏时出现，无收藏整块隐藏（不留空壳） */
@@ -31,8 +31,8 @@
 #kplDataBanner .kdb-age{opacity:.82;font-size:12px;flex:none}
 </style>
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="峡谷有数">
-<meta property="og:title" content="峡谷有数 · KPL Insight · KPL 数据分析与比赛复盘项目">
+<meta property="og:site_name" content="KPL赛研">
+<meta property="og:title" content="KPL赛研 · KPL赛事数据分析与复盘平台">
 <meta property="og:description" content="先体验，再自己部署和修改，做出适合自己的 KPL 数据工具。源码公开，限非商业使用。">
 <meta property="og:image" content="https://hccccc01333.github.io/KPLdata-site/assets/shots/insight-current.jpg">
 <meta name="twitter:card" content="summary_large_image">
@@ -50,16 +50,16 @@
 
 <section class="world-hero" aria-labelledby="worldTitle">
   <div class="world-copy">
-    <p class="world-eyebrow">KPL INSIGHT &nbsp; / &nbsp; DATA MEETS THE GAME</p>
+    <p class="world-eyebrow">KPL RESEARCH &nbsp; / &nbsp; DATA MEETS THE GAME</p>
     <h1 class="world-title" id="worldTitle">胜负之间，<span>看见每一道轨迹。</span></h1>
     <p class="world-deck">从这套源码出发，做出自己的 KPL 数据工具。<br>先体验，再自行部署、修改和扩展，限非商业使用。</p>
     <div class="world-actions">
       <a class="world-link" href="schedule.html">查看赛程 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></a>
-      <a class="world-link secondary" href="https://github.com/hccccc01333/kpl-insight" target="_blank" rel="noopener">GitHub · Star <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></a>
+      <a class="world-link secondary" href="https://github.com/hccccc01333/kpl-research" target="_blank" rel="noopener">GitHub · Star <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></a>
     </div>
   </div>
   <div class="world-hero-bottom">
-    <div class="world-identity"><b>THE GAME IS ALIVE.</b>峡谷有数 · 可自行部署与扩展的 KPL 数据工具</div>
+    <div class="world-identity"><b>THE GAME IS ALIVE.</b>KPL赛研 · 可在自己电脑上运行的 KPL 数据平台</div>
     <a class="world-scroll" href="#arenaData">向下探索 <i aria-hidden="true"></i></a>
     <div class="world-scenes" aria-label="探索赛事内容">
       <button type="button" data-target="#focusBlock"><b>01 / COMPETE</b>赛场焦点</button>
@@ -74,7 +74,7 @@
 
 <section class="home-hero" aria-labelledby="homeTitle">
   <div>
-    <p class="home-eyebrow">峡谷有数 · KPL INSIGHT</p>
+    <p class="home-eyebrow">KPL赛研 · KPL RESEARCH</p>
     <h1 id="homeTitle">看比赛，也看懂比赛。<br><span>让每一次胜负有迹可循。</span></h1>
     <p class="home-description">从赛程赛果到选手表现，从阵容选择到关键转折。把分散的赛事数据放在一起，找到你想看的比赛，读懂你关心的赛场。</p>
     <div class="home-actions">
@@ -237,9 +237,9 @@
     </div>
   </section>
 
-  <section class="project-strip" aria-label="参与峡谷有数项目">
+  <section class="project-strip" aria-label="参与KPL赛研项目">
     <div><span class="project-label mono">BUILD WITH THE COMMUNITY</span><h2>基于已有源码，做出自己的工具。</h2><p>在线体验赛程查询、选手与英雄表现、BP 和比赛复盘，再下载或 Fork 源码，按自己的需求部署、修改和扩展。可以独立维护自己的非商业版本，也欢迎分享改进。网站主要展示归档数据与已有历史预测；实时采集与预测需本地配置程序、数据和有效模型。具体使用、修改与分发条件以仓库许可为准。</p></div>
-    <div class="project-actions"><a class="world-link" href="https://github.com/hccccc01333/kpl-insight" target="_blank" rel="noopener">查看源码 · Star ↗</a><a href="https://github.com/hccccc01333/kpl-insight/issues" target="_blank" rel="noopener">反馈与交流 ↗</a></div>
+    <div class="project-actions"><a class="world-link" href="https://github.com/hccccc01333/kpl-research" target="_blank" rel="noopener">查看源码 · Star ↗</a><a href="https://github.com/hccccc01333/kpl-research/issues" target="_blank" rel="noopener">反馈与交流 ↗</a></div>
   </section>
 </main>
 
@@ -251,9 +251,9 @@
 <script src="assets/schedule_all.js?v=85"></script>
 <script src="assets/coverage.js?v=85"></script>
 <script src="assets/replay/index.js?v=85"></script>
-<script src="assets/updates.js?v=20261027f"></script>
-<script src="assets/common.js?v=20261027f"></script>
-<script src="assets/share.js?v=85"></script>
+<script src="assets/updates.js?v=20261102-brand"></script>
+<script src="assets/common.js?v=20261102-brand"></script>
+<script src="assets/share.js?v=20261102-brand"></script>
 <script>
 (function () {
   "use strict";

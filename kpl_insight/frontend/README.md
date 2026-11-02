@@ -1,6 +1,6 @@
 # 项目默认前端
 
-本目录包含峡谷有数的 HTML、CSS、JavaScript、第三方前端库与已归档展示数据，随项目一并提供。无需 Node、前端构建、模型权重或安装研究环境。
+本目录包含KPL赛研的 HTML、CSS、JavaScript、第三方前端库与已归档展示数据，随项目一并提供。无需 Node、前端构建、模型权重或安装研究环境。
 
 在项目根目录执行 `python start.py`，或 Windows 下双击 `启动网站.bat`。启动后自动打开浏览器；按 Ctrl+C 停止。使用 `python start.py --port 8001` 更换端口，`--no-browser` 只启动服务。
 

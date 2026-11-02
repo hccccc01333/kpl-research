@@ -1,5 +1,5 @@
 var CP = (window.KPL && KPL.chartPalette) ? KPL.chartPalette() : {grid:'#E3E5EA',axis:'#D9DCE2',label:'#6E7480',line:'#2E6FD0',mark:'#F02F55',onLine:'#191B23'};
-/* 峡谷有数 · 对比引擎（V5 阶段四「对比工具拆分」）
+/* KPL赛研 · 对比引擎（V5 阶段四「对比工具拆分」）
    ------------------------------------------------------------------
    原 compare.html 的三模式内联脚本抽成公共引擎，并新增「位置」模式。
    每个对比入口页各自 init 一个模式（一次加载只跑一个）：

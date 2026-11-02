@@ -69,7 +69,7 @@ class LocalHandler(SimpleHTTPRequestHandler):
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="启动峡谷有数前端（无需模型或第三方依赖）")
+    parser = argparse.ArgumentParser(description="启动KPL赛研前端（无需模型或第三方依赖）")
     parser.add_argument("--port", type=int, default=8000)
     parser.add_argument("--site-dir", type=Path, default=site_directory())
     parser.add_argument("--no-browser", action="store_true")
@@ -87,7 +87,7 @@ def main(argv: list[str] | None = None) -> int:
     server.control = RuntimeControl(site)
     server.control_token = secrets.token_hex(32)
     url = f"http://127.0.0.1:{server.server_port}/"
-    print(f"KPL Insight: {url}\nFrontend: {site}\nCtrl+C to stop.", flush=True)
+    print(f"KPL Research: {url}\nFrontend: {site}\nCtrl+C to stop.", flush=True)
     if not args.no_browser:
         threading.Timer(0.3, webbrowser.open, args=(url,)).start()
     try:

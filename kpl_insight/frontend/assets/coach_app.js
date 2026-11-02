@@ -1,4 +1,4 @@
-/* 峡谷有数 · 教练任期与 BP 指纹 */
+/* KPL赛研 · 教练任期与 BP 指纹 */
 (function () {
   "use strict";
   var K = window.KPL;

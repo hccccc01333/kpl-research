@@ -20,7 +20,7 @@ class FrontendTests(unittest.TestCase):
         )
         try:
             line = process.stdout.readline().strip()
-            self.assertTrue(line.startswith("KPL Insight: http://127.0.0.1:"), line)
+            self.assertTrue(line.startswith("KPL Research: http://127.0.0.1:"), line)
             url = line.split(": ", 1)[1]
             for route in ("", "schedule.html", "match.html", "assets/common.js", "assets/schedule_all.js"):
                 with urlopen(url + route, timeout=10) as response:

@@ -142,10 +142,10 @@
     g.textAlign = "left";
     g.fillStyle = D_INK;
     g.font = font(28, 800);
-    g.fillText("峡谷有数", 124, 92);
+    g.fillText("KPL赛研", 124, 92);
     g.fillStyle = D_MUTED;
     g.font = font(19);
-    g.fillText("KPL INSIGHT", 124, 122);
+    g.fillText("KPL RESEARCH", 124, 122);
 
     if (spec.kind) {
       g.font = font(22, 600);

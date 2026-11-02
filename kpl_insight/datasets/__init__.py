@@ -1,1 +1,1 @@
-"""KPL Insight datasets tools."""
+"""KPL Research datasets tools."""

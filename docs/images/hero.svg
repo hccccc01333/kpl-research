@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="460" viewBox="0 0 1600 460" role="img" aria-labelledby="title desc">
-  <title id="title">峡谷有数 · KPL Insight</title>
+  <title id="title">KPL赛研 · KPL Research</title>
   <desc id="desc">用数据读懂 KPL，一起让项目更好。赛事查询、战队选手、英雄 BP、比赛复盘。</desc>
   <defs>
     <linearGradient id="background" x2="1" y2="1">
@@ -17,9 +17,9 @@
   <rect width="1600" height="460" rx="24" fill="url(#background)"/>
   <rect x="950" width="650" height="460" rx="24" fill="url(#grid)"/>
   <rect x="64" y="54" width="7" height="26" rx="3.5" fill="#66dfff"/>
-  <text x="89" y="74" font-family="Segoe UI,Arial,sans-serif" font-size="21" font-weight="650" letter-spacing="4" fill="#91bada">KPL INSIGHT</text>
+  <text x="89" y="74" font-family="Segoe UI,Arial,sans-serif" font-size="21" font-weight="650" letter-spacing="4" fill="#91bada">KPL RESEARCH</text>
   <g font-family="Microsoft YaHei,PingFang SC,Noto Sans CJK SC,sans-serif" fill="#edf5ff">
-    <text x="64" y="204" font-size="88" font-weight="800" letter-spacing="6">峡谷有数</text>
+    <text x="64" y="204" font-size="88" font-weight="800" letter-spacing="6">KPL赛研</text>
     <text x="68" y="266" font-size="32" font-weight="500" letter-spacing="2">用数据读懂 KPL，一起让项目更好。</text>
     <text x="68" y="355" font-size="22" fill="#b2c6df" letter-spacing="1">赛事查询</text>
     <circle cx="181" cy="347" r="3" fill="#66dfff"/>

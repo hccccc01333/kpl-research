@@ -1,54 +1,54 @@
 <p align="center">
-  <a href="https://kpldata-site.hccccc01333.workers.dev/">
+  <a href="https://hccccc01333.github.io/KPLdata-site/">
     <picture>
       <source media="(max-width: 600px)" srcset="docs/images/hero-mobile.svg">
-      <img src="docs/images/hero.svg" alt="峡谷有数 · KPL Insight — 从赛事数据开始，看懂每一场 KPL" width="100%">
+      <img src="docs/images/hero.svg" alt="KPL赛研 · KPL Research — 从赛事数据开始，看懂每一场 KPL" width="100%">
     </picture>
   </a>
 </p>
 
 <p align="center">
-  <a href="https://github.com/hccccc01333/kpl-insight/actions/workflows/ci.yml"><img src="https://github.com/hccccc01333/kpl-insight/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://github.com/hccccc01333/kpl-research/actions/workflows/ci.yml"><img src="https://github.com/hccccc01333/kpl-research/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="pyproject.toml"><img src="https://img.shields.io/badge/Python-3.14-3572A5?logo=python&amp;logoColor=white" alt="Python 3.14"></a>
   <a href="docs/licensing.md"><img src="https://img.shields.io/badge/License-Noncommercial-D93D43" alt="非商业使用许可"></a>
-  <a href="https://kpldata-site.hccccc01333.workers.dev/"><img src="https://img.shields.io/badge/Website-Online-25865B" alt="在线静态网站"></a>
+  <a href="https://hccccc01333.github.io/KPLdata-site/"><img src="https://img.shields.io/badge/Website-Online-25865B" alt="在线静态网站"></a>
 </p>
 
 <p align="center">
-  <strong><a href="https://kpldata-site.hccccc01333.workers.dev/">打开网站</a></strong>
+  <strong><a href="https://hccccc01333.github.io/KPLdata-site/">打开网站</a></strong>
   &nbsp; · &nbsp; <a href="#主要功能">了解功能</a>
   &nbsp; · &nbsp; <a href="docs/getting-started.md">开发文档</a>
-  &nbsp; · &nbsp; <a href="https://github.com/hccccc01333/kpl-insight/issues">反馈与交流</a>
+  &nbsp; · &nbsp; <a href="https://github.com/hccccc01333/kpl-research/issues">反馈与交流</a>
 </p>
 
-# 峡谷有数 · KPL Insight
+# KPL赛研 · KPL赛事数据分析与复盘平台
 
-**峡谷有数是一套源码公开的 KPL 赛事数据分析与复盘工具，供你自行部署、修改和扩展，做出适合自己的 KPL 数据工具，限非商业使用。** 从查询赛程、战队和选手表现，到查看比赛中的胜率变化、模拟系列赛结果，希望让比赛数据不只停留在赛后统计，而成为理解比赛的另一种方式。
+**KPL赛研是一套可在自己电脑上运行、可自行扩展的 KPL 赛事数据分析与复盘平台，源码公开，限非商业使用。** 从查询赛程、战队和选手表现，到查看比赛中的胜率变化、模拟系列赛结果，希望让比赛数据不只停留在赛后统计，而成为理解比赛的另一种方式。
 
-项目起于我在 **2024 年对 KPL 数据分析和比赛预测的探索**。从研究赛事页面与接口、编写采集脚本开始，逐步加入数据整理、预测模型、比赛复盘和网站展示，形成现在的峡谷有数。2024 年是早期探索阶段，并不代表现在的网站和全部功能在当时已经完成。
+项目起于我在 **2024 年对 KPL 数据分析和比赛预测的探索**。从研究赛事页面与接口、编写采集脚本开始，逐步加入数据整理、预测模型、比赛复盘和网站展示，形成现在的KPL赛研。2024 年是早期探索阶段，并不代表现在的网站和全部功能在当时已经完成。
 
 你可以直接打开网站，查一场比赛、比较两支队伍，或者研究一名选手在不同英雄上的表现。想了解实现过程，也可以继续阅读接口采集、特征构建、模型训练、校准与评估的说明。
 
-你可以先通过在线网站了解已有功能，再下载或 Fork 源码，在自己的电脑上部署，并按自己的需求修改页面、增加分析或扩展功能。也可以借助 AI 阅读代码、检查环境和辅助开发，最终由自己验证结果。
+本地平台是主要使用方式，线上网站是可选体验入口。下载或 Fork 源码后，可以在自己的电脑上运行，并按需求修改页面、增加分析或扩展功能；不需要购买域名或租用云服务器。也可以借助 AI 阅读代码、检查环境和辅助开发，最终由自己验证结果。
 
 在线网站用于体验已有功能。你可以独立维护自己的非商业版本，不要求提交 PR；愿意分享改进时，也欢迎通过 Issue 或 PR 参与。使用、修改和分发须遵守仓库许可，保留适用的许可与署名说明。
 
-[在线体验](https://kpldata-site.hccccc01333.workers.dev/) · [主要功能](#主要功能) · [接口探索](#数据接口是怎样独立探索出来的) · [技术架构](#技术架构与技术栈) · [项目沿革](#从-2024-年到现在) · [开始使用](#开始使用) · [用 AI 扩展功能](#用-ai-扩展你想要的功能)
+[在线体验](https://hccccc01333.github.io/KPLdata-site/) · [主要功能](#主要功能) · [接口探索](#数据接口是怎样独立探索出来的) · [技术架构](#技术架构与技术栈) · [项目沿革](#从-2024-年到现在) · [开始使用](#开始使用) · [用 AI 扩展功能](#用-ai-扩展你想要的功能)
 
-> 文档更新：2026-10-29。本文描述当前项目实现；公开网站按版本发布，具体功能和数据以实际部署为准。网站展示的历史数据、比赛日采集程序和模型训练环境分别维护。
+> 文档更新：2026-11-02。本文描述当前项目实现；公开网站按版本发布，具体功能和数据以实际部署为准。网站展示的历史数据、比赛日采集程序和模型训练环境分别维护。
 
 > **实时胜率需要本地启动。** 在线网站主要提供已归档的数据、历史预测与复盘展示，不提供打开网页即可持续运行的云端实时预测服务。要跟踪正在进行的比赛，需在自己的电脑上运行采集与预测程序，准备有效模型，并保持程序运行和网络连接。**只启动静态网页、下载体验包或打开工作台，都不等于启动实时采集与预测。**
 
 
 ## 快速开始
 
-**先体验已有功能：** 打开[在线网站](https://kpldata-site.hccccc01333.workers.dev/)，无需安装。
+**先体验已有功能：** 打开[在线网站](https://hccccc01333.github.io/KPLdata-site/)，无需安装。
 
-**自己部署：先在本机浏览归档数据，再按需修改和扩展。**
+**下载到自己电脑：先浏览归档数据，再按需修改和扩展。**
 
 ```bash
-git clone https://github.com/hccccc01333/kpl-insight.git
-cd kpl-insight
+git clone https://github.com/hccccc01333/kpl-research.git
+cd kpl-research
 python start.py
 ```
 
@@ -71,7 +71,7 @@ python start.py
 - **一场 BO7 可能打成什么比分？** 单局胜率和整个系列赛的比分分布，是两个相互关联的问题。
 - **分析结果能否核对？** 一句结论应当能回到具体比赛、数据范围和方法说明。
 
-峡谷有数围绕这些问题，将采集、整理、建模和展示连接起来。你可以只使用查询功能，也可以继续深入分析与模型部分。
+KPL赛研围绕这些问题，将采集、整理、建模和展示连接起来。你可以只使用查询功能，也可以继续深入分析与模型部分。
 
 ## 值得关注的设计
 
@@ -86,10 +86,10 @@ python start.py
 ## 界面预览
 
 <p align="center">
-  <a href="https://kpldata-site.hccccc01333.workers.dev/">
+  <a href="https://hccccc01333.github.io/KPLdata-site/">
     <picture>
       <source media="(max-width: 600px)" srcset="docs/images/overview-mobile.jpg">
-      <img src="docs/images/overview.jpg" alt="峡谷有数首页实际界面" width="100%">
+      <img src="docs/images/overview.jpg" alt="KPL赛研首页实际界面" width="100%">
     </picture>
   </a>
 </p>
@@ -345,7 +345,7 @@ BP 指比赛中的英雄禁用与选择。这一部分分成“某一局怎么�
 <summary><strong>展开功能说明、操作步骤与截图</strong></summary>
 
 <p align="center">
-  <img src="docs/images/mobile-20261027.jpg" alt="峡谷有数手机首页实拍，展示移动导航、搜索和赛程入口" width="320">
+  <img src="docs/images/mobile-20261027.jpg" alt="KPL赛研手机首页实拍，展示移动导航、搜索和赛程入口" width="320">
 </p>
 
 *手机宽度的本地版本实拍。复杂表格与多指标研究更适合电脑，手机可以先从搜索、赛程和单局详情开始。*
@@ -638,7 +638,7 @@ https://prod.comp.smoba.qq.com/leaguesite/battle/open
 - **2026 年 10 月 25 日**：当前公开仓库保留初始提交，随后加入系列赛证据报告、固定基准及案例修复记录。
 - **2026 年 10 月 26–27 日**：继续更新界面、选手 × 英雄工作台、战队 BP 风格、教练档案与早期历史补充集。
 
-更多阶段介绍见[开发历程与版本记录](docs/project-history.md)，也可以浏览[公开提交历史](https://github.com/hccccc01333/kpl-insight/commits/main/)与[版本发布](https://github.com/hccccc01333/kpl-insight/releases)。
+更多阶段介绍见[开发历程与版本记录](docs/project-history.md)，也可以浏览[公开提交历史](https://github.com/hccccc01333/kpl-research/commits/main/)与[版本发布](https://github.com/hccccc01333/kpl-research/releases)。
 
 </details>
 
@@ -656,7 +656,7 @@ https://prod.comp.smoba.qq.com/leaguesite/battle/open
 
 ### 普通观众：直接打开网站
 
-访问[峡谷有数](https://kpldata-site.hccccc01333.workers.dev/)，无需安装或注册。
+访问[KPL赛研](https://hccccc01333.github.io/KPLdata-site/)，无需安装或注册。
 
 可以从“赛程 → 某场系列赛 → 单局详情”开始；想研究选手则从“选手 → 英雄表现 → 具体比赛”进入。有时间轴数据的比赛再继续进行分钟复盘。
 
@@ -698,8 +698,8 @@ python -m kpl_insight monitor --league-id 20260004 --interval 3 --no-auto-train
 公开仓库使用 **Python 3.14**。先克隆、创建并激活虚拟环境：
 
 ```bash
-git clone https://github.com/hccccc01333/kpl-insight.git
-cd kpl-insight
+git clone https://github.com/hccccc01333/kpl-research.git
+cd kpl-research
 python -m venv .venv
 ```
 
@@ -755,7 +755,7 @@ python -m unittest discover -s tests -v
 
 ### 仓库与开发文档
 
-- [本项目仓库](https://github.com/hccccc01333/kpl-insight)：采集、整理、特征、模型、评估、系列赛报告与内置前端。
+- [本项目仓库](https://github.com/hccccc01333/kpl-research)：采集、整理、特征、模型、评估、系列赛报告与内置前端。
 - [独立站点仓库](https://github.com/hccccc01333/KPLdata-site)：线上静态站点的源文件；`kpl_insight/frontend/` 是它的打包副本，修改前端时优先改站点仓库再重新打包。
 - [架构说明](docs/architecture.md)：模块分工与数据链路。
 - [数据契约](docs/data-contracts.md)：输入、输出与格式约定。
@@ -767,14 +767,14 @@ python -m unittest discover -s tests -v
 
 ## 用 AI 扩展你想要的功能
 
-使用峡谷有数，不必只限于现有功能。如果你想增加一种筛选、一个对比视图，或者一项更符合自己看比赛习惯的分析，即使不熟悉编程，也可以尝试让 AI 编程助手在现有项目上帮助实现。
+使用KPL赛研，不必只限于现有功能。如果你想增加一种筛选、一个对比视图，或者一项更符合自己看比赛习惯的分析，即使不熟悉编程，也可以尝试让 AI 编程助手在现有项目上帮助实现。
 
 **你提出需求，AI 辅助写代码，你再用真实比赛核对结果。** 可以先在本地做一个自己用得顺手的版本；如果觉得这个功能也能帮助其他人，欢迎提交 PR（Pull Request，代码修改提案），一起完善项目。不需要先成为专业开发者，也不要求每次个人修改都提交。
 
 ### 从一个小功能开始
 
 1. **说清楚想解决的问题。** 例如“想在选手页面同时比较两名选手使用同一英雄的表现”，明确筛选条件和希望看到的结果。
-2. **让 AI 先阅读现有实现。** 页面功能从 `kpl_insight/frontend/` 或独立站点仓库入手；采集、模型和分析逻辑从[本项目仓库](https://github.com/hccccc01333/kpl-insight)入手。先确认已有数据能否支持需求，再决定怎么改。
+2. **让 AI 先阅读现有实现。** 页面功能从 `kpl_insight/frontend/` 或独立站点仓库入手；采集、模型和分析逻辑从[本项目仓库](https://github.com/hccccc01333/kpl-research)入手。先确认已有数据能否支持需求，再决定怎么改。
 3. **在本地完成一个最小版本。** 一次只增加一个功能，尽量复用已有数据与组件，不让 AI 编造缺失字段或比赛记录。
 4. **亲自检查结果。** 选择几场熟悉的比赛核对统计，检查筛选、空数据和手机显示；涉及计算逻辑时补充或运行相关测试。
 5. **愿意分享时再提交 PR。** Fork 对应仓库（在自己的 GitHub 账号下创建副本），提交修改并发起 PR，说明用途、实现方法和验证结果。也可以先通过 Issue 交流想法，减少重复开发。
@@ -782,7 +782,7 @@ python -m unittest discover -s tests -v
 可以这样向 AI 描述需求：
 
 ```text
-我正在使用峡谷有数，想在现有项目上增加［具体功能］，
+我正在使用KPL赛研，想在现有项目上增加［具体功能］，
 用于解决［使用场景中的问题］，不是重新创建一个网站。
 
 请先阅读项目 README 和相关代码，说明现有数据是否足够、
@@ -807,7 +807,7 @@ python -m unittest discover -s tests -v
 
 AI 辅助完成的代码与其他贡献一样，需要经过核对和审阅。涉及模型、统计或采集的改动，请说明方法与数据来源；不要提交密钥、私人信息或未经允许公开的数据。PR 会结合项目方向、正确性与维护成本评审，提交并不意味着一定合并。
 
-[功能建议与问题反馈](https://github.com/hccccc01333/kpl-insight/issues) · [贡献指南](CONTRIBUTING.md)
+[功能建议与问题反馈](https://github.com/hccccc01333/kpl-research/issues) · [贡献指南](CONTRIBUTING.md)
 
 ## 当前边界与后续工作
 
@@ -825,7 +825,7 @@ AI 辅助完成的代码与其他贡献一样，需要经过核对和审阅。�
 
 反馈时附上赛事或比赛标识、页面位置、数据范围和复现步骤。例如“某场 G2 的胜方与官方大场比分对不上”，会比“数据好像不对”更容易定位。
 
-[提交 Issue](https://github.com/hccccc01333/kpl-insight/issues) · [贡献指南](CONTRIBUTING.md) · [给项目一颗 Star](https://github.com/hccccc01333/kpl-insight)。
+[提交 Issue](https://github.com/hccccc01333/kpl-research/issues) · [贡献指南](CONTRIBUTING.md) · [给项目一颗 Star](https://github.com/hccccc01333/kpl-research)。
 
 ## 许可与声明
 

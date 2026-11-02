@@ -1,4 +1,4 @@
-/* 峡谷有数 · 战队 BP 风格工作台
+/* KPL赛研 · 战队 BP 风格工作台
    数据：assets/team_bp/index.js + shard_*.js
    口径：完整 20 手 BP；选用/禁用/赛果分离；BP 顺序暂不分析。 */
 (function () {

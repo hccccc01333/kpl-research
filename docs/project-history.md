@@ -1,6 +1,6 @@
 # 开发历程与版本记录
 
-峡谷有数从 KPL 数据分析与比赛预测探索起步，逐步形成赛事采集、实时胜率、本地工作台和在线数据展示。下面按阶段介绍主要工作，并提供公开版本入口。
+KPL赛研从 KPL 数据分析与比赛预测探索起步，逐步形成赛事采集、实时胜率、本地工作台和在线数据展示。下面按阶段介绍主要工作，并提供公开版本入口。
 
 ## 2024：数据分析与比赛预测探索
 
@@ -20,15 +20,15 @@
 
 可查看以下具体更新：
 
-- [初始版本 e387781](https://github.com/hccccc01333/kpl-insight/commit/e387781e96ba430c76e52b0abf02703c8885e3f8)：公开数据与模型工具。
-- [系列赛证据报告与 Benchmark 7ae5885](https://github.com/hccccc01333/kpl-insight/commit/7ae588598184989dc4801f4479dd3439269cf8e7)：加入系列赛分析及固定基准。
-- [终局摘要帧修复后的案例与测试 4eede0f](https://github.com/hccccc01333/kpl-insight/commit/4eede0f13d112f68dc6956da06fa14673fc37fce)：更新数据质量修复后的案例。
-- [分钟复盘覆盖说明 50a2804](https://github.com/hccccc01333/kpl-insight/commit/50a2804ab3de25acf08d4b7c11cf3f3d497af99d)：说明有效过程数据的覆盖范围。
-- [界面预览与参与指南 670d115](https://github.com/hccccc01333/kpl-insight/commit/670d11541d3fff19bf7e6fbc01ba2b27188e74fb)：更新界面展示与参与方式。
-- [本地实时启动与使用案例 4786013](https://github.com/hccccc01333/kpl-insight/commit/47860131fabcd5a10fd2b7d19c8850e681164b8c)：补充本地运行说明、交互演示、技术图与真实案例。
+- [初始版本 e387781](https://github.com/hccccc01333/kpl-research/commit/e387781e96ba430c76e52b0abf02703c8885e3f8)：公开数据与模型工具。
+- [系列赛证据报告与 Benchmark 7ae5885](https://github.com/hccccc01333/kpl-research/commit/7ae588598184989dc4801f4479dd3439269cf8e7)：加入系列赛分析及固定基准。
+- [终局摘要帧修复后的案例与测试 4eede0f](https://github.com/hccccc01333/kpl-research/commit/4eede0f13d112f68dc6956da06fa14673fc37fce)：更新数据质量修复后的案例。
+- [分钟复盘覆盖说明 50a2804](https://github.com/hccccc01333/kpl-research/commit/50a2804ab3de25acf08d4b7c11cf3f3d497af99d)：说明有效过程数据的覆盖范围。
+- [界面预览与参与指南 670d115](https://github.com/hccccc01333/kpl-research/commit/670d11541d3fff19bf7e6fbc01ba2b27188e74fb)：更新界面展示与参与方式。
+- [本地实时启动与使用案例 4786013](https://github.com/hccccc01333/kpl-research/commit/47860131fabcd5a10fd2b7d19c8850e681164b8c)：补充本地运行说明、交互演示、技术图与真实案例。
 
 ## 持续扩展
 
 近期继续完善选手 × 英雄分析、同位置分位数参照、战队 BP 风格、教练档案和历史数据。不同工具的数据范围和发布时间可能不同，使用时请查看页面的覆盖与更新说明。
 
-[公开提交历史](https://github.com/hccccc01333/kpl-insight/commits/main/) · [版本发布](https://github.com/hccccc01333/kpl-insight/releases) · [返回 README](../README.md)
+[公开提交历史](https://github.com/hccccc01333/kpl-research/commits/main/) · [版本发布](https://github.com/hccccc01333/kpl-research/releases) · [返回 README](../README.md)

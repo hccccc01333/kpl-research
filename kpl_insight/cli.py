@@ -23,7 +23,7 @@ COMMANDS = {
 
 def main():
     parser = argparse.ArgumentParser(
-        prog="kpl-insight", description="峡谷有数 · KPL Insight（非商业使用）",
+        prog="kpl-insight", description="KPL赛研 · KPL Research（非商业使用）",
         epilog="子命令参数：python -m kpl_insight <command> --help",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )

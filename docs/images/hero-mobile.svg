@@ -1,11 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="760" height="360" viewBox="0 0 760 360" role="img" aria-labelledby="title desc">
-  <title id="title">峡谷有数 · KPL Insight</title>
+  <title id="title">KPL赛研 · KPL Research</title>
   <desc id="desc">用数据读懂 KPL，一起让项目更好。赛事查询、战队选手、英雄 BP、比赛复盘。</desc>
   <rect width="760" height="360" rx="20" fill="#080d27"/>
   <rect x="42" y="35" width="5" height="21" rx="2.5" fill="#66dfff"/>
-  <text x="61" y="52" font-family="Segoe UI,Arial,sans-serif" font-size="18" font-weight="600" letter-spacing="3" fill="#b2c6df">KPL INSIGHT</text>
+  <text x="61" y="52" font-family="Segoe UI,Arial,sans-serif" font-size="18" font-weight="600" letter-spacing="3" fill="#b2c6df">KPL RESEARCH</text>
   <g font-family="Microsoft YaHei,PingFang SC,Noto Sans CJK SC,sans-serif" fill="#edf5ff">
-    <text x="42" y="148" font-size="72" font-weight="800" letter-spacing="4">峡谷有数</text>
+    <text x="42" y="148" font-size="72" font-weight="800" letter-spacing="4">KPL赛研</text>
     <text x="44" y="201" font-size="27">用数据读懂 KPL，一起让项目更好。</text>
     <text x="44" y="265" font-size="22" fill="#b2c6df">赛事查询 · 战队选手 · 英雄 BP · 比赛复盘</text>
   </g>

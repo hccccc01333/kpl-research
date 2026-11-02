@@ -26,7 +26,7 @@
 ## 3. 可以交给 AI 的需求
 
 ```text
-请先阅读峡谷有数网站 README、AGENTS.md（若有）及 assets/replay.js。
+请先阅读KPL赛研网站 README、AGENTS.md（若有）及 assets/replay.js。
 我想在现有复盘时间轴增加“上一采样点 / 下一采样点”按钮。
 
 请先说明现有选帧与重绘逻辑，再给出最小修改方案。

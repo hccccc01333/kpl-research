@@ -29,8 +29,8 @@ analyze-series = "kpl_insight.analysis.cli:main"
 
 [project.urls]
 Homepage = "https://hccccc01333.github.io/KPLdata-site/"
-Repository = "https://github.com/hccccc01333/kpl-insight"
-Issues = "https://github.com/hccccc01333/kpl-insight/issues"
+Repository = "https://github.com/hccccc01333/kpl-research"
+Issues = "https://github.com/hccccc01333/kpl-research/issues"
 
 [tool.setuptools.packages.find]
 include = ["kpl_insight*"]
