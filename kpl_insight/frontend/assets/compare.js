@@ -398,11 +398,20 @@ window.KPL_COMPARE = (function () {
       return [CX + Math.cos(a) * r, CY + Math.sin(a) * r];
     }
     var s = '<svg viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="对比雷达图">';
-    for (var ring = 1; ring <= 4; ring++) {
+    s += '<defs>';
+    series.forEach(function (se, si) {
+      s += '<radialGradient id="radarGrad' + si + '" cx="50%" cy="50%" r="70%">' +
+        '<stop offset="0%" stop-color="' + se.color + '" stop-opacity=".30"/>' +
+        '<stop offset="100%" stop-color="' + se.color + '" stop-opacity=".10"/></radialGradient>';
+    });
+    s += '</defs>';
+    for (var ring = 1; ring <= 5; ring++) {
       var rr = R * ring / 4;
       var ringPts = dims.map(function (_, i) { return pt(i, rr).map(function (v) { return v.toFixed(1); }).join(","); }).join(" ");
-      s += '<polygon points="' + ringPts + '" fill="' + (ring === 4 ? "rgba(157,178,204,.03)" : "none") +
-        '" stroke=' + CP.grid + ' stroke-width="1"/>';
+      var isP50 = ring === 3;
+      s += '<polygon points="' + ringPts + '" fill="' + (ring === 5 ? "rgba(157,178,204,.035)" : "none") +
+        '" stroke=' + CP.grid + ' stroke-width="' + (isP50 ? 1.4 : 1) + '"' +
+        (isP50 ? ' stroke-dasharray="5 5"' : "") + '/>';
     }
     dims.forEach(function (dim, i) {
       var p = pt(i, R);
@@ -416,8 +425,8 @@ window.KPL_COMPARE = (function () {
       var pts = dims.map(function (dim, i) {
         return pt(i, R * dim.values[ci].score / 100).map(function (v) { return v.toFixed(1); }).join(",");
       }).join(" ");
-      s += '<polygon points="' + pts + '" fill="' + se.color + '" fill-opacity=".12" stroke="' + se.color +
-        '" stroke-width="2" stroke-linejoin="round"/>';
+      s += '<polygon points="' + pts + '" fill="url(#radarGrad' + ci + ')" stroke="' + se.color +
+        '" stroke-width="2.5" stroke-linejoin="round"/>';
       dims.forEach(function (dim, i) {
         var p = pt(i, R * dim.values[ci].score / 100);
         var tip = se.name + " · " + dim.label + "：" + dim.fmt(dim.values[ci].raw) +
@@ -432,7 +441,9 @@ window.KPL_COMPARE = (function () {
         return pt(i, R * r / 100).map(function (v) { return v.toFixed(1); }).join(",");
       }).join(" ");
       s += '<polygon points="' + avgPts + '" fill="none" stroke="' + CP.label +
-        '" stroke-width="1.5" stroke-dasharray="5 5" stroke-linejoin="round" opacity=".9"/>';
+        '" stroke-width="1.5" stroke-dasharray="5 5" stroke-linejoin="round" opacity=".9"/>' +
+        '<text x="' + CX + '" y="' + (CY - R * 0.5 - 7).toFixed(1) + '" text-anchor="middle" font-size="10" ' +
+        'fill=' + CP.label + ' font-family="Inter,monospace">' + (samePos ? "P50" : "均值") + "</text>";
     }
     s += "</svg>";
     $("#radar").innerHTML = s;
@@ -479,12 +490,14 @@ window.KPL_COMPARE = (function () {
         } else if (samePos) {
           var ds = dim.values[0].score - dim.values[1].score;
           diff = '<td class="num mono" style="color:' + (ds >= 0 ? "#1F8A53" : "#D5374B") + '">' +
+            '<span class="cmp-arrow">' + (ds >= 0 ? "▲" : "▼") + "</span>" +
             (ds >= 0 ? "+" : "−") + Math.abs(Math.round(ds)) + " 分位</td>";
         } else {
           var dv = raws[0] - raws[1];
           // 指标格式可能自带符号（如 +1289），这里先剥掉再统一加差值的正负号
           var absTxt = String(dim.fmt(Math.abs(dv))).replace(/^[+＋\-−]/, "");
           diff = '<td class="num mono" style="color:' + (dv >= 0 ? "#1F8A53" : "#D5374B") + '">' +
+            '<span class="cmp-arrow">' + (dv >= 0 ? "▲" : "▼") + "</span>" +
             (dv >= 0 ? "+" : "−") + absTxt + "</td>";
         }
       }

@@ -8,7 +8,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='5' fill='%230A111C'/%3E%3Crect x='3' y='3' width='26' height='26' rx='4' fill='none' stroke='%23F6C021' stroke-width='2'/%3E%3Ctext x='16' y='22' font-family='Arial,sans-serif' font-size='16' font-weight='bold' fill='%23F6C021' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="assets/style.css?v=20261102-brand">
 <link rel="stylesheet" href="assets/pages.css?v=20261102-brand">
-<link rel="stylesheet" href="assets/v55.css?v=87">
+<link rel="stylesheet" href="assets/v55.css?v=92">
 <style>
 .combo-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
 @media(max-width:900px){.combo-grid{grid-template-columns:1fr}}
@@ -38,30 +38,28 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="KPL赛研">
 <meta property="og:title" content="英雄组合 · KPL赛研">
-<meta property="og:description" content="KPL 赛事数据产品：赛程比分、战队/选手/英雄数据、BP 分析、逐局复盘与实时胜率预测。2019–2026 全历史。">
+<meta property="og:description" content="KPL 赛事数据产品：赛程比分、战队/选手/英雄数据、BP 分析、逐局复盘与实时胜率预测。2016–2026 全历史。">
 <meta property="og:image" content="https://hccccc01333.github.io/KPLdata-site/assets/brand/kpl-research-social.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="assets/arena.css?v=1">
-<link rel="stylesheet" href="assets/arena-world.css?v=20261026">
-<script src="assets/arena-world.js?v=20261030a" type="module"></script>
-<link rel="stylesheet" href="assets/card-motion.css?v=1">
-<script src="assets/card-motion.js?v=1" type="module"></script>
 <link rel="stylesheet" href="assets/light.css?v=20261030a">
 <link rel="stylesheet" href="assets/theme.css?v=20261030b">
+<link rel="stylesheet" href="assets/site-v2.css?v=20261112a">
+<link rel="stylesheet" href="assets/misc-v2.css?v=20261112a">
 </head>
-<body data-page="combos.html">
+<body data-page="combos.html" class="v2-page misc-page combos-page">
 <header id="siteHeader" class="topbar"></header>
 
-<header class="page-hero">
-  <div class="wrap">
-    <div class="ph-kicker mono">COMBOS · 英雄组合</div>
-    <h1>英雄组合</h1>
-    <p>哪些英雄配在一起最能赢？基于 2019–2026 全部比赛的组合统计：同队同局出场即算一组，
-      并用<b>协同加成</b>算法区分「真的化学反应」与「只是强英雄堆在一起」。</p>
-    <div class="ph-meta mono">
-      <span>范围对局 <b id="cGames">—</b></span><i>/</i>
-      <span>收录组合 <b id="cCount">—</b></span><i>/</i>
-      <span>数据时钟 <b id="genAt">—</b></span>
+<header class="lg-hero">
+  <div class="lg-hero-gridlines" aria-hidden="true"></div>
+  <div class="v2-wrap">
+    <div class="v2-kicker"><i></i>COMBOS<b>·</b>英雄组合</div>
+    <h1 class="v2-h1">英雄组合</h1>
+    <p class="v2-lead">哪些英雄配在一起最能赢？基于 2016–2026 全部比赛的组合统计：同队同局出场即算一组，并用<b>协同加成</b>算法区分「真的化学反应」与「只是强英雄堆在一起」。</p>
+    <div class="v2-stats lg-kpis" style="margin-top:26px">
+      <div class="v2-stat"><b class="v2-mono" id="cGames">—</b><span>范围对局</span></div>
+      <div class="v2-stat"><b class="v2-mono" id="cCount">—</b><span>收录组合（双人 / 三人）</span></div>
+      <div class="v2-stat"><b class="v2-mono" id="genAt">—</b><span>数据时钟</span></div>
     </div>
   </div>
 </header>
@@ -106,7 +104,7 @@
 
 <script src="assets/data.js?v=85"></script>
 <script src="assets/seasons.js?v=85"></script>
-<script src="assets/common.js?v=20261102-brand"></script>
+<script src="assets/common.js?v=20261110-curve"></script>
 <script>
 (function () {
   "use strict";

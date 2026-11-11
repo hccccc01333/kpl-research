@@ -1,0 +1,304 @@
+/* ==========================================================================
+   KPL 赛研 · 榜单/图鉴页共用 V2 基础（players / heroes）
+   ========================================================================== */
+
+.board-page { background: var(--v2-bg); color: var(--v2-ink); }
+
+/* 数据范围 --------------------------------------------------------------- */
+.board-page .scopebar {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: flex-end !important;
+  justify-content: flex-start !important;
+  flex-wrap: wrap !important;
+  gap: 12px 16px;
+  margin-top: clamp(14px, 1.8vw, 20px);
+  padding: 14px 16px !important;
+  border-radius: 16px !important;
+  border: 1px solid var(--v2-line) !important;
+  background: var(--v2-card) !important;
+  box-shadow: var(--v2-shadow-sm) !important;
+}
+.board-page .scopebar > * { margin-left: 0 !important; }
+.board-page .scopebar .scope-meta { margin-left: auto !important; }
+.board-page .scopebar .scope-lab {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  flex: none;
+  font-family: var(--v2-mono);
+  font-size: 9.5px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--v2-ink-3);
+  padding-bottom: 11px;
+}
+.board-page .scopebar .scope-lab svg { width: 13px; height: 13px; }
+.board-page .scopebar .fld { display: flex; flex-direction: column; gap: 6px; min-width: 0; flex: 0 0 auto; }
+.board-page .scopebar .fld > span,
+.board-page .filterbar .fld > span {
+  font-family: var(--v2-mono);
+  font-size: 9px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--v2-ink-3);
+  padding-left: 2px;
+}
+.board-page .scopebar select,
+.board-page .filterbar select {
+  appearance: none;
+  height: 36px;
+  min-width: 132px;
+  padding: 0 30px 0 11px;
+  border-radius: 9px;
+  border: 1px solid var(--v2-line);
+  background:
+    linear-gradient(45deg, transparent 50%, var(--v2-ink-3) 50%) calc(100% - 14px) 15px / 4px 4px no-repeat,
+    linear-gradient(135deg, var(--v2-ink-3) 50%, transparent 50%) calc(100% - 10px) 15px / 4px 4px no-repeat,
+    var(--v2-card);
+  color: var(--v2-ink);
+  font-family: var(--v2-sans);
+  font-size: 12.5px;
+  cursor: pointer;
+}
+html.dark-site .board-page .scopebar select,
+html.dark-site .board-page .filterbar select { color-scheme: dark; }
+.board-page .scopebar .scope-meta {
+  padding-bottom: 10px;
+  font-family: var(--v2-mono);
+  font-size: 10px;
+  color: var(--v2-ink-3);
+}
+
+/* 简报 ------------------------------------------------------------------- */
+.board-page .brief {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 12px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  border: 1px solid var(--v2-line);
+  background: var(--v2-card-soft);
+  color: var(--v2-ink-3);
+  font-size: 11.5px;
+  line-height: 1.75;
+}
+.board-page .brief .ico { flex: none; color: var(--v2-blue); font-size: 9px; margin-top: 3px; }
+.board-page .brief p { margin: 0; }
+.board-page .brief b { color: var(--v2-ink-2); font-weight: 700; }
+
+/* 筛选条 ----------------------------------------------------------------- */
+.board-page .filterbar {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: flex-end !important;
+  flex-wrap: wrap !important;
+  gap: 12px 16px;
+  margin: clamp(14px, 1.8vw, 18px) 0;
+  padding: 12px 16px !important;
+  border-radius: 14px !important;
+  border: 1px solid var(--v2-line) !important;
+  background: var(--v2-card) !important;
+  box-shadow: var(--v2-shadow-sm) !important;
+}
+.board-page .filterbar > * { margin-left: 0 !important; }
+.board-page .filterbar .fld { display: flex; flex-direction: column; gap: 6px; }
+.board-page .filterbar .fld.grow { flex: 1 1 220px; min-width: 180px; }
+.board-page .filterbar input.search {
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 9px;
+  border: 1px solid var(--v2-line);
+  background: var(--v2-card);
+  color: var(--v2-ink);
+  font-family: var(--v2-sans);
+  font-size: 12.5px;
+  outline: none;
+  min-width: 180px;
+}
+.board-page .filterbar input.search::placeholder { color: var(--v2-ink-3); }
+.board-page .filterbar input.search:focus { border-color: var(--v2-line-2); box-shadow: 0 0 0 3px rgba(var(--v2-blue-rgb), .12); }
+.board-page .filterbar .block-note {
+  font-family: var(--v2-mono);
+  font-size: 9.5px;
+  color: var(--v2-ink-3);
+  padding-bottom: 9px;
+}
+.board-page .filterbar .btn.ghost.sm {
+  height: 32px;
+  padding: 0 13px;
+  border-radius: 8px;
+  border: 1px solid var(--v2-line);
+  background: transparent;
+  color: var(--v2-ink-2);
+  font-family: var(--v2-sans);
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-left: auto !important;
+}
+.board-page .filterbar .btn.ghost.sm:hover { background: var(--v2-inset); color: var(--v2-ink); }
+
+/* 区块标题 --------------------------------------------------------------- */
+.board-page .block-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px 20px;
+  flex-wrap: wrap;
+  margin: clamp(24px, 3vw, 34px) 0 12px;
+}
+.board-page .block-head h2 {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 17px;
+  font-weight: 800 !important;
+  letter-spacing: -.02em;
+  color: var(--v2-ink);
+}
+.board-page .block-head h2 i {
+  display: inline-block;
+  width: 3px;
+  height: 15px;
+  margin-right: 2px;
+  border-radius: 2px;
+  background: var(--v2-gold);
+  box-shadow: none;
+  transform: none;
+}
+.board-page .block-head h2 em {
+  font-style: normal;
+  font-family: var(--v2-mono);
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: .01em;
+  color: var(--v2-ink-3);
+}
+
+/* 面板 / 表格 ------------------------------------------------------------ */
+.board-page .panel {
+  padding: 18px 20px !important;
+  border-radius: 18px !important;
+  border: 1px solid var(--v2-line) !important;
+  background: var(--v2-card) !important;
+  box-shadow: var(--v2-shadow-sm) !important;
+}
+.board-page .panel-title {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--v2-line);
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--v2-ink);
+}
+.board-page .panel-title em {
+  font-style: normal;
+  font-family: var(--v2-mono);
+  font-size: 9.5px;
+  color: var(--v2-ink-3);
+}
+.board-page .tbl { width: 100%; border-collapse: collapse; }
+.board-page .tbl th {
+  text-align: left;
+  font-family: var(--v2-mono);
+  font-size: 9.5px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: var(--v2-ink-3);
+  padding: 11px 10px;
+  border-bottom: 1px solid var(--v2-line);
+  white-space: nowrap;
+}
+.board-page .tbl th.num, .board-page .tbl td.num { text-align: right; }
+.board-page .tbl td {
+  padding: 10px;
+  border-bottom: 1px solid var(--v2-line);
+  font-size: 12px;
+  color: var(--v2-ink-2);
+}
+.board-page .tbl tbody tr:hover { background: var(--v2-inset); }
+.board-page .tbl tbody tr:last-child td { border-bottom: 0; }
+.board-page .table-panel { padding: 6px 18px 10px !important; }
+
+/* 分段控件 --------------------------------------------------------------- */
+.board-page .seg {
+  display: inline-flex !important;
+  flex-wrap: wrap !important;
+  gap: 2px;
+  padding: 3px !important;
+  border-radius: 10px !important;
+  border: 1px solid var(--v2-line) !important;
+  background: var(--v2-inset) !important;
+  position: relative;
+}
+.board-page .seg button {
+  appearance: none;
+  border: 0 !important;
+  background: transparent;
+  color: var(--v2-ink-3);
+  height: 28px;
+  padding: 0 11px;
+  border-radius: 7px;
+  font-family: var(--v2-sans);
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.board-page .seg button:hover { color: var(--v2-ink-2); }
+/* 选中态：arena.css / v55.css 用 `html.v55 .seg button.on`（0,3,2）把旧主题的
+   蓝底/深字写死了，这里用 body 前缀提到同优先级并靠文件顺序压过去。 */
+body.board-page .seg button.on,
+body.board-page .seg .on,
+body.board-page .seg button[aria-pressed="true"] {
+  color: var(--v2-ink) !important;
+  background: var(--v2-card) !important;
+  background-image: none !important;
+  box-shadow: var(--v2-shadow-sm), 0 0 0 1px var(--v2-line) !important;
+}
+html.dark-site body.board-page .seg button.on,
+html.dark-site body.board-page .seg .on,
+html.dark-site body.board-page .seg button[aria-pressed="true"] {
+  color: var(--v2-ink) !important;
+  background: #17233a !important;
+  box-shadow: 0 0 0 1px var(--v2-line-2) !important;
+}
+.board-page .motion-tabs::before, .board-page .motion-tabs::after { display: none !important; }
+
+/* 分页 / 空态 ------------------------------------------------------------ */
+.board-page .board-more {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 22px 0 6px;
+}
+.board-page .board-more .v2-btn { height: 38px; padding: 0 24px; border-radius: 999px; }
+.board-page .board-more-note {
+  font-family: var(--v2-mono);
+  font-size: 9.5px;
+  color: var(--v2-ink-3);
+}
+.board-page .empty-tip {
+  grid-column: 1 / -1;
+  padding: 34px 16px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--v2-ink-3);
+}
+.board-page .motion-card, .board-page .motion-surface { transform: none !important; }
+.board-page .reveal { opacity: 1 !important; transform: none !important; }
+
+@media (max-width: 760px) {
+  .board-page .scopebar .scope-meta { margin-left: 0 !important; padding-bottom: 0; }
+  .board-page .filterbar .btn.ghost.sm { margin-left: 0 !important; }
+  .board-page .filterbar .fld.grow { flex: 1 1 100%; }
+}

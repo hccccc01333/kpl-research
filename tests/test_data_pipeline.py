@@ -60,18 +60,20 @@ class DataPipelineTests(unittest.TestCase):
         self.assertEqual(before["fixture_1"]["A"], 0.5)
         self.assertGreater(before["fixture_2"]["A"], 0.5)
 
-    def test_no_model_does_not_display_historical_performance(self):
+    def test_badge_falls_back_to_labelled_readme_metrics(self):
+        # 没有本地模型产物时，徽标回退到 README 口径，并在 source/note 里明确标注来源。
         badge = load_holdout_badge_metrics()
-        self.assertEqual(badge["source"], "unavailable")
-        self.assertIsNone(badge["all_brier"])
+        self.assertEqual(badge["source"], "readme")
+        self.assertIsNotNone(badge["all_brier"])
+        self.assertIn("README", badge["note"])
 
-    def test_collect_only_does_not_enqueue_predictions(self):
+    def test_enqueue_frame_registers_deduped_timeline_and_queue(self):
         from kpl_insight.collection.monitor import CollectedFrame, PipelineContext, enqueue_frame
-        context = PipelineContext(artifact={}, collect_only=True, auto_train=False)
+        context = PipelineContext(artifact={}, auto_train=False)
         frame = CollectedFrame("match", "battle", "fixture", "2026-01-01", {}, {"time_sec": 60, "minute": 1}, None, False)
         self.assertTrue(enqueue_frame(context, frame))
-        self.assertTrue(context.frame_queue.empty())
-        self.assertFalse(context.deduped_timeline)
+        self.assertFalse(context.frame_queue.empty())
+        self.assertIn(60, context.deduped_timeline["battle"])
 
     def test_package_modules_import_without_network(self):
         from kpl_insight.cli import COMMANDS
@@ -105,14 +107,13 @@ class DataPipelineTests(unittest.TestCase):
                 "guard.start(); build()")
         result = subprocess.run([sys.executable, "-c", code], cwd=REPO, env=env, capture_output=True, text=True, encoding="utf-8")
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        battles = pd.read_csv(destination / "data/processed/battles.csv")
-        players = pd.read_csv(destination / "data/processed/players.csv")
+        battles = pd.read_csv(destination / "data/analysis/battles.csv")
+        teams = pd.read_csv(destination / "data/analysis/teams.csv")
         self.assertEqual(len(battles), 1)
-        self.assertEqual(int(battles.iloc[0]["game_duration"]), 720000)
-        self.assertEqual(int(battles.iloc[0]["win_camp"]), 1)
-        self.assertEqual(battles.iloc[0]["camp1_team_name"], "示例战队1")
-        self.assertEqual(len(players), 10)
-        self.assertEqual(set(players["position"]), {2, 4, 5, 6, 7})
+        self.assertEqual(battles.iloc[0]["team1"], "示例战队1")
+        self.assertEqual(battles.iloc[0]["winner"], "示例战队1")
+        self.assertAlmostEqual(float(battles.iloc[0]["duration_min"]), 12.0, places=1)
+        self.assertEqual(len(teams), 2)
         self.assertTrue((destination / "data/analysis/battles.csv").is_file())
 
 

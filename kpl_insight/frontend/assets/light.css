@@ -113,3 +113,8 @@ html.v55.light-site #kplLocalRuntime button { background:#fff; color:var(--brand
 html.v55.light-site #kplLocalRuntime pre { background:#fff; }
 html.v55.light-site #kplLocalRuntime summary { color:var(--brand); }
 html.v55.light-site #kplLocalRuntime [data-local-error] { color:#a33d31; }
+
+.feature-tags { display:flex; flex-wrap:wrap; gap:6px; margin:-8px 0 14px; }
+.feature-tag { font-style:normal; font-size:11px; line-height:1; padding:5px 9px; border-radius:999px;
+  border:1px solid var(--line2); color:var(--muted); background:#f7f9fc; white-space:nowrap; }
+.feature-card p { margin-bottom:12px; }

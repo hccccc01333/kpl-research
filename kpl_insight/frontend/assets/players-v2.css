@@ -1,0 +1,155 @@
+/* ==========================================================================
+   KPL 赛研 · 选手榜单（players）V2
+   ========================================================================== */
+
+.players-page .player-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: clamp(12px, 1.6vw, 16px) !important;
+}
+
+.players-page .player {
+  display: flex !important;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  border-radius: 16px;
+  border: 1px solid var(--v2-line) !important;
+  background: var(--v2-card) !important;
+  box-shadow: var(--v2-shadow-sm) !important;
+  min-width: 0;
+  color: var(--v2-ink);
+  transition: border-color .18s, transform .18s, box-shadow .18s;
+  opacity: 1 !important;
+  transform: none;
+}
+.players-page .player:hover {
+  border-color: var(--v2-line-2) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: var(--v2-shadow-lg) !important;
+}
+
+.players-page .player .p-ava {
+  width: 52px;
+  height: 52px;
+  flex: none;
+  border-radius: 14px;
+  object-fit: cover;
+  background: var(--v2-inset);
+  border: 1px solid var(--v2-line);
+}
+.players-page .player .p-ava.ph {
+  display: grid;
+  place-items: center;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--v2-ink-3);
+}
+
+/* 排名序号（按当前筛选/排序后的顺序） ------------------------------------ */
+.players-page .player .p-rank {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  margin-right: -2px;
+  border-radius: 8px;
+  font-family: var(--v2-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--v2-ink-3);
+  letter-spacing: -.02em;
+}
+.players-page .player .p-rank.top {
+  width: 28px;
+  height: 28px;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--v2-ink);
+  background: var(--v2-inset);
+  border: 1px solid var(--v2-line);
+}
+.players-page .player .p-rank.t1 { color: var(--v2-gold); border-color: rgba(var(--v2-gold-rgb), .45); background: rgba(var(--v2-gold-rgb), .08); }
+.players-page .player .p-rank.t2 { color: var(--v2-blue); border-color: rgba(var(--v2-blue-rgb), .35); background: rgba(var(--v2-blue-rgb), .07); }
+.players-page .player .p-rank.t3 { color: var(--v2-red); border-color: rgba(var(--v2-red-rgb), .3); background: rgba(var(--v2-red-rgb), .06); }
+
+.players-page .player .p-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
+.players-page .player .p-top { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; min-width: 0; }
+.players-page .player .p-name { display: flex; align-items: center; gap: 7px; min-width: 0; }
+.players-page .player .p-name .nm {
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: -.01em;
+  color: var(--v2-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.players-page .player .p-name em {
+  font-style: normal;
+  flex: none;
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--v2-ink-3);
+  border: 1px solid var(--v2-line);
+  border-radius: 4px;
+  padding: 1px 5px;
+  white-space: nowrap;
+}
+.players-page .player .p-kda {
+  flex: none;
+  font-family: var(--v2-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -.02em;
+  color: var(--v2-ink);
+  white-space: nowrap;
+}
+.players-page .player .p-kda small {
+  font-size: 8.5px;
+  font-weight: 500;
+  color: var(--v2-ink-3);
+  letter-spacing: .06em;
+  margin-left: 3px;
+}
+.players-page .player .p-team {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  font-size: 10.5px;
+  color: var(--v2-ink-3);
+}
+.players-page .player .p-team img {
+  width: 15px;
+  height: 15px;
+  flex: none;
+  border-radius: 4px;
+  object-fit: contain;
+  background: var(--v2-inset);
+}
+.players-page .player .p-team b {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--v2-ink-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.players-page .player .p-team span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--v2-ink-3);
+}
+
+@media (max-width: 1120px) {
+  .players-page .player-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+}
+@media (max-width: 680px) {
+  .players-page .player-grid { grid-template-columns: 1fr !important; }
+  .players-page .player { padding: 14px; }
+}

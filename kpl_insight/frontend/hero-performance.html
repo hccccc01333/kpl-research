@@ -8,28 +8,27 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='5' fill='%230A111C'/%3E%3Crect x='3' y='3' width='26' height='26' rx='4' fill='none' stroke='%23F6C021' stroke-width='2'/%3E%3Ctext x='16' y='22' font-family='Arial,sans-serif' font-size='16' font-weight='bold' fill='%23F6C021' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="assets/style.css?v=20261102-brand">
 <link rel="stylesheet" href="assets/pages.css?v=20261102-brand">
-<link rel="stylesheet" href="assets/v55.css?v=87">
+<link rel="stylesheet" href="assets/v55.css?v=92">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="KPL赛研">
 <meta property="og:title" content="英雄表现 · KPL赛研">
 <meta property="og:description" content="逐系列赛看选手 × 英雄：出场、胜负、伤害、经济、参团与同位置同英雄 P50/P75/P90 对标，并能下钻到比赛证据。">
 <link rel="stylesheet" href="assets/arena.css?v=1">
-<link rel="stylesheet" href="assets/arena-world.css?v=20261026">
-<script src="assets/arena-world.js?v=20261030a" type="module"></script>
-<link rel="stylesheet" href="assets/card-motion.css?v=1">
-<script src="assets/card-motion.js?v=1" type="module"></script>
 <link rel="stylesheet" href="assets/light.css?v=20261030a">
 <link rel="stylesheet" href="assets/theme.css?v=20261030b">
+<link rel="stylesheet" href="assets/site-v2.css?v=20261112a">
+<link rel="stylesheet" href="assets/misc-v2.css?v=20261112a">
 </head>
-<body data-page="hero-performance.html">
+<body data-page="hero-performance.html" class="v2-page misc-page hp-page">
 <header id="siteHeader" class="topbar"></header>
 
-<header class="page-hero">
-  <div class="wrap">
-    <div class="ph-kicker mono">PLAYER × HERO · 逐系列赛</div>
-    <h1>英雄表现</h1>
-    <p>把一名选手的每个英雄按<b>系列赛</b>展开：单系列赛里一个英雄只用一次，0% 或 100% 只展示事实，不据此判断英雄强弱。趋势看跨系列赛的滚动窗口，并同时给出<b>同位置同英雄 P50 / P75 / P90</b> 参考；基准不足会显式标注，不跨年代偷偷补样本。</p>
-    <p class="mono" style="font-size:12px;opacity:.78;margin-top:10px">当前覆盖站内 2019–2026 历史；2016–2018 外部历史已完成质检，尚未接入本页。</p>
+<header class="lg-hero">
+  <div class="lg-hero-gridlines" aria-hidden="true"></div>
+  <div class="v2-wrap">
+    <div class="v2-kicker"><i></i>PLAYER × HERO<b>·</b>逐系列赛</div>
+    <h1 class="v2-h1">英雄表现</h1>
+    <p class="v2-lead">把一名选手的每个英雄按<b>系列赛</b>展开：单系列赛里一个英雄只用一次，0% 或 100% 只展示事实，不据此判断英雄强弱。趋势看跨系列赛的滚动窗口，并同时给出<b>同位置同英雄 P50 / P75 / P90</b> 参考；基准不足会显式标注，不跨年代偷偷补样本。</p>
+    <p class="v2-note" style="margin-top:12px">当前覆盖站内 2016–2026 历史；2016–2018 外部历史已完成质检，尚未接入本页。</p>
   </div>
 </header>
 
@@ -63,7 +62,7 @@
       3. 同赛事池不足 3 人 / 20 局时，显式回退到同位置同英雄全历史，并标注“基准已扩大”；仍不足则停止评级；<br>
       4. 每分钟伤害 / 经济只除以该字段有效的出场分钟；源数据里伤害 / 经济为 0 视为缺失，不按 0 摊薄；参团率按有效出场局数加权，队内 0 击杀时无定义；<br>
       5. 单系列赛 1 局 0% / 100% 只展示事实；变化结论至少需要 6 个系列赛，且仍只作描述，不作因果；<br>
-      6. 当前覆盖 2019–2026 站内历史；2016–2018 外部历史尚未接入本页，避免把不完整字段混入同一基准池。
+      6. 当前覆盖 2016–2026 站内历史；2016–2018 外部历史尚未接入本页，避免把不完整字段混入同一基准池。
     </div>
   </div>
 </main>
@@ -72,7 +71,7 @@
 
 <script src="assets/data.js?v=85"></script>
 <script src="assets/seasons.js?v=85"></script>
-<script src="assets/common.js?v=20261102-brand"></script>
+<script src="assets/common.js?v=20261110-curve"></script>
 <script src="assets/hero_perf/index.js?v=20261027c"></script>
 <script src="assets/hero_perf_app.js?v=20261027c"></script>
 </body>

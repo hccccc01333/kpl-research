@@ -1,0 +1,522 @@
+/* ==========================================================================
+   KPL 赛研 · 数据查询（query.html）V2 视觉迁移
+   只作用于 body.query-page；原 query.html 内联 <style> 全部并入本文件并 V2 化，
+   共享文件（site-v2 / board-v2 / pages / arena / light …）一律不改，只做覆盖。
+   ========================================================================== */
+
+html.v55 body.v2-page.query-page {
+  background: var(--v2-bg) !important;
+  color: var(--v2-ink);
+  /* 页面内联 / JS 里仍有 var(--muted) 等旧令牌，这里对齐 V2 */
+  --muted: var(--v2-ink-3);
+  --ink: var(--v2-ink);
+  --ink2: var(--v2-ink-2);
+  --line: var(--v2-line);
+  --line2: var(--v2-line-2);
+  --card: var(--v2-card);
+  --card2: var(--v2-card-soft);
+  --inset: var(--v2-inset);
+  --gold: var(--v2-gold);
+  --red: var(--v2-red);
+  --mono: var(--v2-mono);
+}
+
+.query-page .query-main { padding-bottom: 64px; }
+
+/* [hidden] 必须真的隐藏：.v2-btn 的 display:inline-flex 会盖掉 UA 的 [hidden] */
+html.v55 body.v2-page.query-page [hidden] { display: none !important; }
+
+/* ---- 数据范围（scopebar，common.js 生成） ------------------------------ */
+html.v55 body.v2-page.query-page .scopebar {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: flex-end !important;
+  justify-content: flex-start !important;
+  flex-wrap: wrap !important;
+  gap: 12px 16px;
+  margin: 0 0 2px;
+  padding: 14px 16px !important;
+  border-radius: 16px !important;
+  border: 1px solid var(--v2-line) !important;
+  background: var(--v2-card) !important;
+  box-shadow: var(--v2-shadow-sm) !important;
+}
+.query-page .scopebar > * { margin-left: 0 !important; }
+.query-page .scopebar .scope-lab {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  flex: none;
+  padding-bottom: 11px;
+  font-family: var(--v2-mono);
+  font-size: 9.5px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--v2-ink-3) !important;
+}
+.query-page .scopebar .scope-lab svg { width: 13px; height: 13px; }
+.query-page .scopebar .fld { display: flex; flex-direction: column; gap: 6px; flex: 0 0 auto; min-width: 0; }
+.query-page .scopebar .fld > span:first-child {
+  padding-left: 2px;
+  font-family: var(--v2-mono);
+  font-size: 9px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--v2-ink-3);
+}
+html.v55 body.v2-page.query-page .scopebar select {
+  appearance: none;
+  height: 36px;
+  min-width: 132px;
+  padding: 0 30px 0 11px;
+  border-radius: 9px !important;
+  border: 1px solid var(--v2-line) !important;
+  background:
+    linear-gradient(45deg, transparent 50%, var(--v2-ink-3) 50%) calc(100% - 14px) 15px / 4px 4px no-repeat,
+    linear-gradient(135deg, var(--v2-ink-3) 50%, transparent 50%) calc(100% - 10px) 15px / 4px 4px no-repeat,
+    var(--v2-card) !important;
+  color: var(--v2-ink) !important;
+  font-family: var(--v2-sans);
+  font-size: 12.5px;
+  cursor: pointer;
+}
+html.v55.dark-site body.v2-page.query-page .scopebar select,
+html.v55.dark-site body.v2-page.query-page .filterbar select { color-scheme: dark; }
+.query-page .scopebar .scope-meta {
+  margin-left: auto !important;
+  padding-bottom: 10px;
+  font-family: var(--v2-mono);
+  font-size: 10px;
+  color: var(--v2-ink-3);
+}
+
+/* ---- 筛选条（类型分段 / 搜索 / 最少局数 / 导出） ----------------------- */
+html.v55 body.v2-page.query-page .filterbar {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: flex-end !important;
+  justify-content: flex-start !important;
+  flex-wrap: wrap !important;
+  gap: 12px 14px;
+  margin: 12px 0 14px;
+  padding: 12px 16px !important;
+  border-radius: 16px !important;
+  border: 1px solid var(--v2-line) !important;
+  background: var(--v2-card) !important;
+  box-shadow: var(--v2-shadow-sm) !important;
+}
+.query-page .filterbar > * { margin-left: 0 !important; }
+.query-page .filterbar .fld { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.query-page .filterbar .fld.grow { flex: 1 1 260px; }
+.query-page .filterbar .fld > span:first-child {
+  padding-left: 2px;
+  font-family: var(--v2-mono);
+  font-size: 9px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--v2-ink-3);
+  white-space: nowrap;
+}
+html.v55 body.v2-page.query-page .filterbar select {
+  appearance: none;
+  height: 36px;
+  min-width: 120px;
+  padding: 0 30px 0 11px;
+  border-radius: 9px !important;
+  border: 1px solid var(--v2-line) !important;
+  background:
+    linear-gradient(45deg, transparent 50%, var(--v2-ink-3) 50%) calc(100% - 14px) 15px / 4px 4px no-repeat,
+    linear-gradient(135deg, var(--v2-ink-3) 50%, transparent 50%) calc(100% - 10px) 15px / 4px 4px no-repeat,
+    var(--v2-card) !important;
+  color: var(--v2-ink) !important;
+  font-family: var(--v2-sans);
+  font-size: 12.5px;
+  cursor: pointer;
+}
+html.v55 body.v2-page.query-page .filterbar input.search {
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 9px !important;
+  border: 1px solid var(--v2-line) !important;
+  background: var(--v2-card) !important;
+  color: var(--v2-ink) !important;
+  font-family: var(--v2-sans);
+  font-size: 12.5px;
+  outline: none;
+  width: 100%;
+}
+html.v55 body.v2-page.query-page .filterbar input.search::placeholder { color: var(--v2-ink-3); }
+html.v55 body.v2-page.query-page .filterbar input.search:focus {
+  border-color: var(--v2-line-2) !important;
+  box-shadow: 0 0 0 3px rgba(var(--v2-blue-rgb), .12);
+}
+.query-page .filterbar #qNote {
+  padding-bottom: 10px;
+  font-family: var(--v2-mono);
+  font-size: 10px;
+  color: var(--v2-ink-3);
+  white-space: nowrap;
+}
+.query-page .filterbar .v2-btn { height: 36px; }
+/* SQL 模式下隐藏搜索/位置/最少局数/口径/找局链接，只留下分段 */
+.query-page .filterbar.sqlmode :is(.fld, .block-note, a) { display: none !important; }
+
+/* ---- 类型分段（JS 通过 .on 切换） -------------------------------------- */
+html.v55 body.v2-page.query-page .filterbar .seg {
+  display: inline-flex !important;
+  flex: none;
+  flex-wrap: nowrap !important;
+  gap: 2px;
+  padding: 3px !important;
+  border-radius: 11px !important;
+  border: 1px solid var(--v2-line) !important;
+  background: var(--v2-inset) !important;
+  overflow: visible !important;
+  margin-left: 0 !important;
+}
+html.v55 body.v2-page.query-page .filterbar .seg button {
+  appearance: none;
+  float: none;
+  border: 0 !important;
+  border-left: 0 !important;
+  background: transparent !important;
+  color: var(--v2-ink-3) !important;
+  height: 30px;
+  padding: 0 14px;
+  border-radius: 8px;
+  font-family: var(--v2-sans);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: none !important;
+  transition: color .16s, background-color .16s, box-shadow .16s;
+}
+html.v55 body.v2-page.query-page .filterbar .seg button:hover { color: var(--v2-ink-2) !important; }
+html.v55 body.v2-page.query-page .filterbar .seg button.on {
+  color: var(--v2-ink) !important;
+  background: var(--v2-card) !important;
+  box-shadow: var(--v2-shadow-sm), 0 0 0 1px var(--v2-line) !important;
+}
+html.v55.dark-site body.v2-page.query-page .filterbar .seg button.on {
+  background: #17233a !important;
+  box-shadow: 0 0 0 1px var(--v2-line-2) !important;
+}
+
+/* ---- 结果表容器 / 表格 ------------------------------------------------- */
+html.v55 body.v2-page.query-page .q-wrap {
+  margin-top: 0;
+  padding: 4px 6px;
+  border-radius: 16px !important;
+  border: 1px solid var(--v2-line) !important;
+  background: var(--v2-card) !important;
+  box-shadow: var(--v2-shadow-sm) !important;
+  overflow: auto !important;
+  max-height: 70vh;
+  overscroll-behavior: contain;
+}
+.query-page .q-table {
+  width: 100%;
+  min-width: 820px;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.query-page .q-table th,
+.query-page .q-table td {
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--v2-line) !important;
+  text-align: right;
+  white-space: nowrap;
+}
+.query-page .q-table th:first-child,
+.query-page .q-table td:first-child,
+.query-page .q-table th.left,
+.query-page .q-table td.left { text-align: left; }
+.query-page .q-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  font-family: var(--v2-mono);
+  font-size: 9.5px;
+  font-weight: 500;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--v2-ink-3);
+  background: var(--v2-card);
+  border-bottom: 1px solid var(--v2-line-2) !important;
+  cursor: pointer;
+  user-select: none;
+}
+.query-page .q-table thead th:hover { color: var(--v2-gold); }
+.query-page .q-table thead th.sorted { color: var(--v2-gold); }
+.query-page #sqlHead th { cursor: default; }
+.query-page #sqlHead th:hover { color: var(--v2-ink-3); }
+.query-page .q-table tbody td {
+  font-variant-numeric: tabular-nums;
+  color: var(--v2-ink-2);
+}
+.query-page .q-table tbody tr:hover { background: var(--v2-inset) !important; }
+.query-page .q-table tbody tr:last-child td { border-bottom: 0 !important; }
+.query-page .q-table .cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--v2-ink);
+  text-decoration: none;
+}
+.query-page .q-table .cell:hover { color: var(--v2-blue); }
+.query-page .q-table .cell img {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--v2-inset);
+}
+.query-page .q-table .rk { font-family: var(--v2-mono); color: var(--v2-ink-3); }
+.query-page .q-table .best { color: var(--v2-gold); font-weight: 800; }
+.query-page .q-table td[colspan] { text-align: center !important; color: var(--v2-ink-3) !important; padding: 30px 16px !important; }
+
+/* ---- SQL 控制台 -------------------------------------------------------- */
+.query-page #sqlPanel { margin-top: 22px; }
+.query-page .block-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px 24px;
+  flex-wrap: wrap;
+  margin: 0 0 14px;
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+.query-page .block-head h2 {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 17px;
+  font-weight: 800 !important;
+  letter-spacing: -.02em;
+  color: var(--v2-ink);
+}
+.query-page .block-head h2 i {
+  display: inline-block;
+  width: 3px !important;
+  height: 15px !important;
+  margin-right: 2px;
+  border-radius: 2px !important;
+  background: var(--v2-gold) !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+.query-page .block-head h2 em {
+  font-style: normal;
+  font-family: var(--v2-mono);
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--v2-ink-3);
+  margin-left: 2px;
+}
+.query-page .block-head .block-note { font-family: var(--v2-mono); font-size: 10px; color: var(--v2-ink-3); }
+
+html.v55 body.v2-page.query-page .panel {
+  padding: 18px 20px !important;
+  border-radius: 18px !important;
+  border: 1px solid var(--v2-line) !important;
+  background: var(--v2-card) !important;
+  box-shadow: var(--v2-shadow-sm) !important;
+}
+.query-page #sqlApp > .panel { padding: 16px 18px !important; }
+.query-page #sqlApp > .panel + .panel { margin-top: 14px; }
+.query-page #sqlPanel .panel-title { margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--v2-line); }
+.query-page #sqlOff { padding: 30px 24px !important; text-align: center; }
+.query-page #sqlOff code {
+  display: inline-block;
+  padding: 6px 14px !important;
+  border-radius: 8px !important;
+  border: 1px solid var(--v2-line) !important;
+  background: var(--v2-card-soft) !important;
+  color: var(--v2-gold) !important;
+  font-family: var(--v2-mono) !important;
+  font-size: 12.5px;
+}
+
+/* 概览小卡 */
+.query-page .sql-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 10px;
+}
+.query-page .sql-chip {
+  min-width: 0;
+  padding: 11px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--v2-line);
+  background: var(--v2-card-soft);
+}
+.query-page .sql-chip span {
+  display: block;
+  font-family: var(--v2-mono);
+  font-size: 9px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--v2-ink-3);
+}
+.query-page .sql-chip b {
+  display: block;
+  margin-top: 3px;
+  font-family: var(--v2-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 15.5px;
+  font-weight: 800;
+  color: var(--v2-ink);
+}
+.query-page .sql-chip b.gold { color: var(--v2-gold); }
+.query-page #sqlDbNote { margin-top: 10px !important; font-family: var(--v2-mono); font-size: 10px; color: var(--v2-ink-3); }
+
+/* 代码编辑器：亮/暗两套 token，保证两个主题都能读 */
+.query-page {
+  --sql-bg: #f7f9fd;
+  --sql-ink: #1c2940;
+  --sql-line: #d7e1ef;
+  --sql-ring: rgba(var(--v2-blue-rgb), .14);
+}
+html.v55.dark-site .query-page {
+  --sql-bg: #060b14;
+  --sql-ink: #dbe7f7;
+  --sql-line: rgba(203, 220, 244, .16);
+  --sql-ring: rgba(var(--v2-blue-rgb), .22);
+}
+html.v55 body.v2-page.query-page .sql-area {
+  display: block;
+  width: 100%;
+  min-height: 148px;
+  padding: 13px 16px;
+  border-radius: 12px !important;
+  border: 1px solid var(--sql-line) !important;
+  background: var(--sql-bg) !important;
+  color: var(--sql-ink) !important;
+  font-family: "Cascadia Code", "Cascadia Mono", Consolas, ui-monospace, "PingFang SC", "Microsoft YaHei", monospace !important;
+  font-size: 12.5px !important;
+  line-height: 1.75 !important;
+  tab-size: 2;
+  caret-color: var(--v2-blue);
+  outline: none;
+  resize: vertical;
+}
+html.v55 body.v2-page.query-page .sql-area:focus {
+  border-color: var(--v2-line-2) !important;
+  box-shadow: 0 0 0 3px var(--sql-ring);
+}
+html.v55 body.v2-page.query-page .sql-area::selection { background: rgba(var(--v2-blue-rgb), .22); }
+
+/* 编辑器操作行 */
+.query-page .sql-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+.query-page .sql-actions .v2-btn { height: 34px; }
+.query-page #sqlHint { font-family: var(--v2-mono); font-size: 10px; color: var(--v2-ink-3); }
+
+/* 示例 / 已保存查询 */
+.query-page .sql-samples { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.query-page .sql-samples button {
+  padding: 6px 13px;
+  border-radius: 999px;
+  border: 1px solid var(--v2-line);
+  background: var(--v2-card-soft);
+  color: var(--v2-ink-2);
+  font-family: var(--v2-sans);
+  font-size: 11.5px;
+  cursor: pointer;
+  transition: color .16s, border-color .16s, background-color .16s;
+}
+.query-page .sql-samples button:hover {
+  color: var(--v2-ink);
+  border-color: var(--v2-line-2);
+  background: var(--v2-inset);
+}
+.query-page .sql-samples button[title] { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.query-page #sqlSaved:empty { display: none; }
+
+/* 错误提示 / 结果元信息 */
+.query-page #sqlErr {
+  margin-top: 12px;
+  padding: 11px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(var(--v2-red-rgb), .38);
+  background: rgba(var(--v2-red-rgb), .08);
+  color: var(--v2-red);
+  font-family: var(--v2-mono);
+  font-size: 11.5px;
+  line-height: 1.75;
+  white-space: pre-wrap;
+}
+.query-page #sqlMeta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 12px 0 8px !important;
+  font-family: var(--v2-mono);
+  font-size: 10.5px;
+  color: var(--v2-ink-3);
+}
+.query-page #sqlMeta b { font-weight: 700; color: var(--v2-ink); }
+.query-page #sqlApp .q-wrap { max-height: 62vh; margin-top: 2px; }
+
+/* 数据表列表 */
+.query-page #sqlTables .sql-tbl {
+  padding: 11px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--v2-line);
+  background: var(--v2-card-soft);
+  cursor: pointer;
+  transition: border-color .16s, background-color .16s, transform .16s;
+}
+.query-page #sqlTables .sql-tbl:hover {
+  border-color: var(--v2-line-2);
+  background: var(--v2-inset);
+  transform: translateY(-1px);
+}
+.query-page #sqlTables .sql-tbl b {
+  display: block;
+  font-family: var(--v2-mono);
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--v2-ink);
+}
+.query-page #sqlTables .sql-tbl small {
+  display: block;
+  margin-top: 4px;
+  font-family: var(--v2-mono);
+  font-size: 10px;
+  line-height: 1.6;
+  color: var(--v2-ink-3);
+}
+
+/* ---- 响应式 ------------------------------------------------------------ */
+@media (max-width: 900px) {
+  .query-page .scopebar .scope-meta { margin-left: 0 !important; padding-bottom: 0; }
+  .query-page .filterbar #qNote { padding-bottom: 0; }
+  html.v55 body.v2-page.query-page .filterbar .seg { overflow-x: auto !important; max-width: 100%; }
+}
+@media (max-width: 760px) {
+  html.v55 body.v2-page.query-page .scopebar { gap: 12px; padding: 12px 14px !important; }
+  .query-page .scopebar .fld { flex: 1 1 130px; }
+  .query-page .scopebar select { width: 100%; min-width: 0; }
+  html.v55 body.v2-page.query-page .filterbar { gap: 12px; padding: 12px 14px !important; }
+  .query-page .filterbar .fld { flex: 1 1 140px; }
+  .query-page .filterbar select { width: 100%; min-width: 0; }
+  .query-page .filterbar .v2-btn { flex: 1 1 44%; width: auto; }
+  .query-page .filterbar #qNote { width: 100%; }
+  .query-page .sql-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .query-page #sqlApp > .panel { padding: 14px !important; }
+  .query-page .sql-area { min-height: 120px; font-size: 12px !important; }
+  .query-page .sql-actions .v2-btn { flex: 1 1 auto; }
+}
+@media (max-width: 520px) {
+  .query-page .sql-grid { grid-template-columns: minmax(0, 1fr); }
+  html.v55 body.v2-page.query-page .q-wrap { max-height: 68vh; }
+}

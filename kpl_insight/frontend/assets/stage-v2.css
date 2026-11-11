@@ -1,0 +1,413 @@
+/* ==========================================================================
+   KPL 赛研 · 赛段对比（stage）V2
+   —— 只换视觉层：DOM 结构、数据口径、筛选 / 表格 / URL 同步逻辑保持原样。
+   —— 旧主题（pages.css / v55.css / arena.css / light.css）优先级很高
+      （大量 !important），本文件统一用 `html.v55 body.stage-page.v2-page`
+      前缀 + !important 逐项覆盖，按区块分组。
+   ========================================================================== */
+
+/* ---------- 0. 页面基底 --------------------------------------------------- */
+html.v55 body.stage-page.v2-page {
+  background: var(--v2-bg) !important;
+  color: var(--v2-ink);
+  font-family: var(--v2-sans);
+  -webkit-font-smoothing: antialiased;
+}
+html.v55 body.stage-page.v2-page main.stage-main {
+  padding-bottom: clamp(40px, 5vw, 72px);
+  min-width: 0;
+}
+html.v55 body.stage-page.v2-page main.stage-main > * { min-width: 0; }
+html.v55 body.stage-page.v2-page #kplLocalRuntime { margin: 14px auto 16px !important; }
+
+/* ---------- 1. 头版：赛段概览数字带（#overview 由内联脚本填充 4 格） ------- */
+html.v55 body.stage-page.v2-page .lg-hero .v2-lead b {
+  color: var(--v2-ink);
+  font-weight: 700;
+}
+html.v55 body.stage-page.v2-page .stage-kpis {
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 1px !important;
+  margin-top: 26px !important;
+  padding-top: clamp(16px, 1.8vw, 22px) !important;
+  border-top: 1px solid var(--v2-line) !important;
+}
+html.v55 body.stage-page.v2-page .stage-kpis .hd-cell {
+  display: flex !important;
+  flex-direction: column;
+  min-width: 0;
+  margin: 0 !important;
+  padding: 0 20px !important;
+  border: 0 !important;
+  border-left: 1px solid var(--v2-line) !important;
+  border-radius: 0 !important;
+  background: none !important;
+}
+html.v55 body.stage-page.v2-page .stage-kpis .hd-cell:first-child {
+  padding-left: 0 !important;
+  border-left: 0 !important;
+}
+html.v55 body.stage-page.v2-page .stage-kpis .hd-cell .v {
+  order: 1;
+  margin: 0 !important;
+  overflow: hidden;
+  font-family: var(--v2-mono) !important;
+  font-variant-numeric: tabular-nums;
+  font-size: clamp(20px, 2.1vw, 29px) !important;
+  font-weight: 700 !important;
+  line-height: 1.1 !important;
+  letter-spacing: -.02em;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--v2-ink) !important;
+}
+html.v55 body.stage-page.v2-page .stage-kpis .hd-cell .k {
+  order: 2;
+  margin: 6px 0 0 !important;
+  overflow: hidden;
+  font-family: var(--v2-sans) !important;
+  font-size: 11px !important;
+  font-weight: 400 !important;
+  letter-spacing: .04em;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--v2-ink-3) !important;
+}
+html.v55 body.stage-page.v2-page .stage-kpis .hd-cell .s {
+  order: 3;
+  margin: 2px 0 0 !important;
+  font-family: var(--v2-mono) !important;
+  font-size: 10px !important;
+  color: var(--v2-ink-3) !important;
+  opacity: .85;
+}
+
+/* ---------- 2. 筛选条（基线 / 对比 / 样本门槛） --------------------------- */
+html.v55 body.stage-page.v2-page .filterbar.stage-controls {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: flex-end !important;
+  justify-content: flex-start !important;
+  flex-wrap: wrap !important;
+  gap: 12px 16px;
+  margin: 0 0 6px !important;
+  padding: 14px 16px !important;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 16px !important;
+  background: var(--v2-card) !important;
+  box-shadow: var(--v2-shadow-sm) !important;
+  min-width: 0;
+}
+html.v55 body.stage-page.v2-page .filterbar.stage-controls > * { margin-left: 0 !important; }
+html.v55 body.stage-page.v2-page .stage-controls .fld {
+  display: flex !important;
+  flex-direction: column;
+  gap: 6px;
+  flex: 0 1 220px;
+  min-width: 160px !important;
+}
+html.v55 body.stage-page.v2-page .stage-controls .fld > span {
+  padding-left: 2px;
+  font-family: var(--v2-mono) !important;
+  font-size: 9px !important;
+  font-weight: 500 !important;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--v2-ink-3) !important;
+}
+html.v55 body.stage-page.v2-page .stage-controls select {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  width: 100%;
+  height: 38px;
+  min-width: 0;
+  padding: 0 32px 0 12px;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 10px !important;
+  background:
+    linear-gradient(45deg, transparent 50%, var(--v2-ink-3) 50%) calc(100% - 15px) 16px / 4px 4px no-repeat,
+    linear-gradient(135deg, var(--v2-ink-3) 50%, transparent 50%) calc(100% - 11px) 16px / 4px 4px no-repeat,
+    var(--v2-card) !important;
+  color: var(--v2-ink) !important;
+  font-family: var(--v2-sans) !important;
+  font-size: 12.5px !important;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  outline: none;
+  box-shadow: none !important;
+}
+html.light-site body.stage-page.v2-page .stage-controls select { color-scheme: light !important; }
+html.dark-site body.stage-page.v2-page .stage-controls select { color-scheme: dark !important; }
+html.light-site body.stage-page.v2-page .stage-controls select option {
+  background: var(--v2-card);
+  color: var(--v2-ink);
+}
+html.dark-site body.stage-page.v2-page .stage-controls select option {
+  background: #101a2b;
+  color: var(--v2-ink);
+}
+html.v55 body.stage-page.v2-page .stage-controls select:focus {
+  border-color: var(--v2-line-2) !important;
+  box-shadow: 0 0 0 3px rgba(var(--v2-blue-rgb), .12) !important;
+}
+html.v55 body.stage-page.v2-page .stage-controls #scopeNote {
+  margin-left: auto;
+  padding-bottom: 10px;
+  font-family: var(--v2-mono) !important;
+  font-size: 10px !important;
+  letter-spacing: 0;
+  color: var(--v2-ink-3) !important;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- 3. 区块标题 --------------------------------------------------- */
+html.v55 body.stage-page.v2-page .block.stage-block {
+  margin-top: clamp(26px, 3.2vw, 38px) !important;
+}
+html.v55 body.stage-page.v2-page .block.stage-block:first-of-type {
+  margin-top: clamp(20px, 2.4vw, 26px) !important;
+}
+html.v55 body.stage-page.v2-page .stage-block .block-head {
+  display: flex !important;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 10px 20px;
+  flex-wrap: wrap;
+  margin: 0 0 14px !important;
+  padding: 0 !important;
+  border: 0 !important;
+}
+html.v55 body.stage-page.v2-page .stage-block .block-head h2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-family: var(--v2-sans) !important;
+  font-size: 17px !important;
+  font-weight: 800 !important;
+  letter-spacing: -.02em !important;
+  color: var(--v2-ink) !important;
+}
+html.v55 body.stage-page.v2-page .stage-block .block-head h2 i {
+  display: inline-block;
+  width: 3px !important;
+  height: 15px !important;
+  margin: 0 !important;
+  border-radius: 2px !important;
+  background: var(--v2-gold) !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+html.v55 body.stage-page.v2-page .stage-block .block-head .block-note {
+  margin: 0 0 1px;
+  padding: 0;
+  font-family: var(--v2-mono) !important;
+  font-size: 10px !important;
+  letter-spacing: 0;
+  color: var(--v2-ink-3) !important;
+}
+
+/* ---------- 4. 对比表格 --------------------------------------------------- */
+html.v55 body.stage-page.v2-page .panel.table-panel.stage-table-panel {
+  padding: 4px 18px 8px !important;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 18px !important;
+  background: var(--v2-card) !important;
+  box-shadow: var(--v2-shadow-sm) !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--v2-line-2) transparent;
+}
+html.v55 body.stage-page.v2-page .stage-table-panel .tbl {
+  width: 100%;
+  min-width: 660px;
+  border-collapse: collapse;
+}
+html.v55 body.stage-page.v2-page .stage-table-panel .tbl thead th {
+  padding: 12px 10px !important;
+  border-bottom: 1px solid var(--v2-line-2) !important;
+  background: none !important;
+  font-family: var(--v2-mono) !important;
+  font-size: 9.5px !important;
+  font-weight: 500 !important;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  text-align: left;
+  white-space: nowrap;
+  color: var(--v2-ink-3) !important;
+}
+html.v55 body.stage-page.v2-page .stage-table-panel .tbl th.num,
+html.v55 body.stage-page.v2-page .stage-table-panel .tbl td.num { text-align: right; }
+html.v55 body.stage-page.v2-page .stage-table-panel .tbl td {
+  padding: 10px !important;
+  border-bottom: 1px solid var(--v2-line) !important;
+  font-size: 12px !important;
+  white-space: nowrap;
+  color: var(--v2-ink-2) !important;
+}
+html.v55 body.stage-page.v2-page .stage-table-panel .tbl td.num {
+  font-family: var(--v2-mono) !important;
+  font-variant-numeric: tabular-nums;
+  color: var(--v2-ink) !important;
+}
+html.v55 body.stage-page.v2-page .stage-table-panel .tbl tbody tr:hover td {
+  background: var(--v2-inset) !important;
+}
+html.v55 body.stage-page.v2-page .stage-table-panel .tbl tbody tr:last-child td {
+  border-bottom: 0 !important;
+}
+/* 变化值：脚本内联了旧皮肤语义色（#1F8A53 / #D5374B），统一映射到 V2 蓝 / 红 */
+html.v55 body.stage-page.v2-page .stage-table-panel .tbl td[style*="#1F8A53"] {
+  color: var(--v2-blue) !important;
+}
+html.v55 body.stage-page.v2-page .stage-table-panel .tbl td[style*="#D5374B"] {
+  color: var(--v2-red) !important;
+}
+/* 明细链接：脚本内联 var(--gold)，这里收敛成 V2 行内链接 */
+html.v55 body.stage-page.v2-page .stage-table-panel .tbl a.go {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding-bottom: 1px;
+  border-bottom: 1px solid var(--v2-line-2);
+  color: var(--v2-ink-2) !important;
+  font-family: var(--v2-mono);
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+html.v55 body.stage-page.v2-page .stage-table-panel .tbl a.go:hover {
+  color: var(--v2-ink) !important;
+  border-bottom-color: var(--v2-ink-3);
+}
+html.v55 body.stage-page.v2-page .stage-table-panel .tbl td a {
+  color: var(--v2-ink) !important;
+  font-weight: 600;
+  text-decoration: none;
+}
+html.v55 body.stage-page.v2-page .stage-table-panel .tbl td a:hover { text-decoration: underline; }
+html.v55 body.stage-page.v2-page .stage-table-panel .team-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+html.v55 body.stage-page.v2-page .stage-table-panel .team-cell img {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  border-radius: 4px;
+  object-fit: contain;
+  background: var(--v2-inset);
+}
+html.v55 body.stage-page.v2-page .stage-table-panel .tbl td[colspan] {
+  padding: 34px 12px !important;
+  text-align: center;
+  font-size: 11.5px !important;
+  color: var(--v2-ink-3) !important;
+}
+
+/* 窄屏横向滚动提示（桌面隐藏） */
+html.v55 body.stage-page.v2-page .stage-scroll-hint {
+  display: none;
+  margin: -2px 2px 8px;
+  font-family: var(--v2-mono);
+  font-size: 9.5px;
+  letter-spacing: .04em;
+  color: var(--v2-ink-3);
+}
+
+/* ---------- 5. 口径说明 --------------------------------------------------- */
+html.v55 body.stage-page.v2-page .stage-note-card {
+  padding: 18px 22px !important;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 18px !important;
+  background: var(--v2-card) !important;
+  box-shadow: var(--v2-shadow-sm) !important;
+}
+html.v55 body.stage-page.v2-page .stage-note-list {
+  margin: 0 !important;
+  padding-left: 22px !important;
+  list-style: decimal !important;
+  color: var(--v2-ink-2) !important;
+  font-size: 11.5px !important;
+  line-height: 1.85 !important;
+}
+html.v55 body.stage-page.v2-page .stage-note-list li {
+  margin: 0 0 6px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  color: var(--v2-ink-2) !important;
+}
+html.v55 body.stage-page.v2-page .stage-note-list li:last-child { margin-bottom: 0 !important; }
+html.v55 body.stage-page.v2-page .stage-note-list li::marker {
+  font-family: var(--v2-mono);
+  font-size: 10px;
+  color: var(--v2-ink-3);
+}
+html.v55 body.stage-page.v2-page .stage-note-list b {
+  color: var(--v2-ink) !important;
+  font-weight: 700;
+}
+html.v55 body.stage-page.v2-page .stage-note-card .block-note {
+  font-size: 11px !important;
+  line-height: 1.8 !important;
+  color: var(--v2-ink-3) !important;
+}
+
+/* ---------- 6. 动效残留清理（card-motion / arena-world 已移除） ------------ */
+html.v55 body.stage-page.v2-page .motion-card,
+html.v55 body.stage-page.v2-page .motion-surface { transform: none !important; }
+html.v55 body.stage-page.v2-page .reveal { opacity: 1 !important; transform: none !important; }
+html.v55 body.stage-page.v2-page .motion-tabs::before,
+html.v55 body.stage-page.v2-page .motion-tabs::after { display: none !important; }
+
+/* ---------- 7. 覆盖 light.css 的旧圆角 / 旧描边 --------------------------- */
+html.light-site body.v2-page.stage-page .panel,
+html.light-site body.v2-page.stage-page .v2-card {
+  border-color: var(--v2-line) !important;
+  border-radius: 18px !important;
+  background: var(--v2-card) !important;
+  box-shadow: var(--v2-shadow-sm) !important;
+}
+html.light-site body.v2-page.stage-page .filterbar.stage-controls { border-radius: 16px !important; }
+
+/* ---------- 8. 响应式 ---------------------------------------------------- */
+@media (max-width: 900px) {
+  html.v55 body.stage-page.v2-page .stage-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    row-gap: 18px;
+  }
+  html.v55 body.stage-page.v2-page .stage-kpis .hd-cell:nth-child(odd) {
+    padding-left: 0 !important;
+    border-left: 0 !important;
+  }
+  html.v55 body.stage-page.v2-page .stage-controls #scopeNote {
+    margin-left: 0;
+    flex: 1 1 100%;
+    padding-bottom: 0;
+    white-space: normal;
+  }
+}
+@media (max-width: 760px) {
+  html.v55 body.stage-page.v2-page .filterbar.stage-controls { padding: 12px !important; gap: 10px 12px; }
+  html.v55 body.stage-page.v2-page .stage-controls .fld { flex: 1 1 100%; min-width: 0 !important; }
+  html.v55 body.stage-page.v2-page .stage-block .block-head { align-items: flex-start; }
+  html.v55 body.stage-page.v2-page .stage-block .block-head .block-note { flex-basis: 100%; margin: 0; }
+  html.v55 body.stage-page.v2-page .panel.table-panel.stage-table-panel { padding: 2px 12px 6px !important; }
+  html.v55 body.stage-page.v2-page .stage-scroll-hint { display: block; }
+  html.v55 body.stage-page.v2-page .stage-note-card { padding: 16px !important; }
+}
+@media (max-width: 560px) {
+  html.v55 body.stage-page.v2-page .stage-kpis .hd-cell { padding: 0 12px !important; }
+  html.v55 body.stage-page.v2-page .stage-kpis .hd-cell .v { font-size: 20px !important; }
+  html.v55 body.stage-page.v2-page .stage-kpis .hd-cell .k,
+  html.v55 body.stage-page.v2-page .stage-kpis .hd-cell .s { white-space: normal; }
+  html.v55 body.stage-page.v2-page .stage-table-panel .tbl { min-width: 620px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html.v55 body.stage-page.v2-page .reveal { transition: none !important; }
+}

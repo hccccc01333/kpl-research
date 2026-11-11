@@ -8,32 +8,36 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='5' fill='%230A111C'/%3E%3Crect x='3' y='3' width='26' height='26' rx='4' fill='none' stroke='%23F6C021' stroke-width='2'/%3E%3Ctext x='16' y='22' font-family='Arial,sans-serif' font-size='16' font-weight='bold' fill='%23F6C021' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="assets/style.css?v=20261102-brand">
 <link rel="stylesheet" href="assets/pages.css?v=20261102-brand">
-<link rel="stylesheet" href="assets/v55.css?v=87">
+<link rel="stylesheet" href="assets/v55.css?v=92">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="KPL赛研">
 <meta property="og:title" content="战队 BP 风格 · KPL赛研">
-<meta property="og:description" content="把战队的选人偏好、禁用资源与赛果拆开看：英雄集中度、同赛事 Lift、五种竞争状态与比赛证据。只统计完整 20 手 BP。">
+<meta property="og:description" content="把战队的选人偏好、禁用资源与赛果拆开看：英雄集中度、同赛事 Lift、五种竞争状态与比赛证据。BP 口径按赛制区分（20/18/16/14 手均为完整），残缺记录整场排除。">
 <link rel="stylesheet" href="assets/arena.css?v=1">
-<link rel="stylesheet" href="assets/arena-world.css?v=20261026">
-<script src="assets/arena-world.js?v=20261030a" type="module"></script>
-<link rel="stylesheet" href="assets/card-motion.css?v=1">
-<script src="assets/card-motion.js?v=1" type="module"></script>
 <link rel="stylesheet" href="assets/light.css?v=20261030a">
 <link rel="stylesheet" href="assets/theme.css?v=20261030b">
+<link rel="stylesheet" href="assets/site-v2.css?v=20261112a">
+<link rel="stylesheet" href="assets/team-bp-v2.css?v=20261112a">
 </head>
-<body data-page="team-bp.html">
+<body data-page="team-bp.html" class="v2-page team-bp-page">
 <header id="siteHeader" class="topbar"></header>
 
-<header class="page-hero">
-  <div class="wrap">
-    <div class="ph-kicker mono">TEAM DRAFT · 完整 20 手 BP</div>
-    <h1>战队 BP 风格</h1>
-    <p>把战队的<b>选择偏好</b>、<b>禁用资源</b>和<b>赛果</b>拆开看：常用英雄、有效英雄数、同赛事 Lift、己方 / 对手禁用与五种英雄竞争状态。偏好不等于擅长，胜率也不等于 BP 优势。</p>
-    <p class="mono" style="font-size:12px;opacity:.78;margin-top:10px">只统计双方各 5 选 / 5 禁的完整 20 手 BP；2019–2024 缺手记录不混入。BP 顺序暂不分析。</p>
+<header class="lg-hero">
+  <div class="lg-hero-gridlines" aria-hidden="true"></div>
+  <div class="v2-wrap">
+    <div class="v2-kicker"><i></i>TEAM DRAFT<b>·</b>官方 BP 序列</div>
+    <h1 class="v2-h1">战队 BP 风格</h1>
+    <p class="v2-lead">把战队的<b>选择偏好</b>、<b>禁用资源</b>和<b>赛果</b>拆开看：常用英雄、有效英雄数、同赛事 Lift、己方 / 对手禁用与五种英雄竞争状态。偏好不等于擅长，胜率也不等于 BP 优势。</p>
+    <p class="v2-note mono" style="margin-top:10px">BP 序列来自官方接口：2025 起双方各 5 选 / 5 禁（20 手），2020–2024 为 5 选 / 4 禁（18 手），更早的 14 / 16 手赛制同理。四种赛制都算完整，选用 / 禁用占比按实际手位计算；少选或双方禁用手位不一致的记录整场排除，不做补推。2019 年官方无 BP 数据。BP 顺序暂不分析。</p>
+    <div class="v2-stats lg-kpis" style="margin-top:26px">
+      <div class="v2-stat"><b class="v2-mono" id="tbpStatTeams">—</b><span>战队</span></div>
+      <div class="v2-stat"><b class="v2-mono" id="tbpStatGames">—</b><span>完整 BP 局</span></div>
+      <div class="v2-stat"><b class="v2-mono" id="tbpStatAt">—</b><span>数据更新</span></div>
+    </div>
   </div>
 </header>
 
-<main class="wrap" style="margin-top:26px">
+<main class="wrap team-bp-main">
   <div class="panel tbp-controls">
     <label class="fld"><span>战队</span><select id="tbpTeam"></select></label>
     <label class="fld"><span>数据范围</span><select id="tbpScope"><option value="all">全部赛事</option></select></label>
@@ -55,7 +59,7 @@
 
   <div class="tbp-grid">
     <div class="panel tbp-table-panel">
-      <div class="panel-title">英雄使用与偏好 <em class="mono">选用 / 联盟率 / Lift</em></div>
+      <div class="panel-title">英雄使用与偏好 <em class="mono">选用 / 联盟率 / Lift</em><span class="hp-scroll-hint tbp-scroll-hint mono">表格可横向滚动 →</span></div>
       <div class="tbp-table-wrap"><table id="tbpPicksTable"></table></div>
       <div class="block-note">选用率 = 该英雄选用手数 / 全队选用手数；联盟率 = 同范围全部战队的选用率；Lift &gt;1 表示更偏好。点击英雄查看五种竞争状态。</div>
     </div>
@@ -76,25 +80,25 @@
     </div>
   </div>
 
-  <div class="panel" style="margin-top:16px">
-    <div class="panel-title">双人组合 <em class="mono">同队同局 · 样本≥2</em></div>
+  <div class="panel">
+    <div class="panel-title">双人组合 <em class="mono">同队同局 · 样本≥2</em><span class="hp-scroll-hint tbp-scroll-hint mono">表格可横向滚动 →</span></div>
     <div id="tbpCombos"></div>
   </div>
 
-  <div class="panel" style="margin-top:16px">
+  <div class="panel">
     <div class="panel-title" id="tbpEvidenceTitle">比赛证据</div>
     <div class="tbp-evidence-wrap"><table id="tbpEvidenceTable"></table></div>
   </div>
 
-  <div class="panel" style="margin-top:16px">
-    <div class="panel-title">口径说明</div>
-    <div class="block-note">
-      1. 本页只统计双方各 5 选 / 5 禁、共 20 手的完整 BP 局；2019–2024 的缺手记录不补推、不混入基准；<br>
+  <div class="panel">
+    <div class="panel-title">口径说明 <em class="mono">边界先于结论</em></div>
+    <div class="block-note tbp-coverage-note">
+      1. 本页只统计「赛制完整」的 BP 局：每方 5 选，禁用手位为 2/3/4/5（对应 14/16/18/20 手赛制）；少选或双方禁用手位不一致的残缺记录不补推、不混入基准；2019 年官方无 BP 数据；<br>
       2. 选用与禁用分开：禁用不进入英雄胜率分母；胜率只描述赛果，不命名为“BP 优势”；<br>
       3. 同范围分位只对 ≥10 局战队计算，样本不足时停止排名；Lift 只描述偏好强度，不代表英雄强度；<br>
       4. BP 顺序 / 首抢 / 后手暂不输出：完整 BP 存在少量模板变体，规则尚未逐版本核验；<br>
       5. 组合率是同队同局共现 / 本范围局数；独立期望是两名英雄各自选用率的乘积，Lift 不代表组合因果；<br>
-      6. 当前覆盖 2024-10-02 – 2026-10-22；2016–2018 外部历史尚未接入本页。
+      6. 当前覆盖 2020-03-18 起（含残缺口径）；2016–2019 外部历史尚未接入本页。
     </div>
   </div>
 </main>
@@ -103,8 +107,25 @@
 
 <script src="assets/data.js?v=85"></script>
 <script src="assets/seasons.js?v=85"></script>
-<script src="assets/common.js?v=20261102-brand"></script>
+<script src="assets/common.js?v=20261110-curve"></script>
 <script src="assets/team_bp/index.js?v=20261027d"></script>
 <script src="assets/team_bp_app.js?v=20261027d"></script>
+<!-- V2 头版指标带：只读已有数据，不参与任何业务逻辑 -->
+<script>
+(function () {
+  "use strict";
+  var IDX = window.KPL_TEAM_BP_INDEX || {};
+  var K = window.KPL;
+  var fmt = function (v) {
+    if (v == null) return "—";
+    return K && K.fmtInt ? K.fmtInt(v) : String(v);
+  };
+  var set = function (id, v) { var el = document.getElementById(id); if (el && v != null) el.textContent = v; };
+  var cov = IDX.coverage || {};
+  set("tbpStatTeams", fmt((IDX.teams || []).length));
+  set("tbpStatGames", fmt(cov.games));
+  set("tbpStatAt", IDX.generatedAt ? String(IDX.generatedAt).slice(0, 10) : "—");
+})();
+</script>
 </body>
 </html>

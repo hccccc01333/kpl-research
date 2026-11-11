@@ -25,6 +25,7 @@ import joblib
 import numpy as np
 import pandas as pd
 import requests
+from kpl_insight.collection.runtime import COLLECTOR_STATUS, RUNTIME, age_seconds, collector_health, read_json
 
 
 from kpl_insight.paths import PROJECT_ROOT
@@ -398,14 +399,18 @@ class ScheduleCenter:
             if save_path.exists():
                 try:
                     old = pd.read_csv(save_path, dtype={"league_id": str, "match_id": str}).fillna("")
+                except (OSError, pd.errors.ParserError) as exc:
+                    # 读不出现有归档时绝不覆盖。以前这里 `pass` 掉，单联赛刷新就会
+                    # 把其它赛季整片冲掉——2026-11 归档只剩 190 行 / 2 个联赛就是这么来的。
+                    print(f"[WARN] 现有赛程归档不可读（{exc}），本次跳过写入以免覆盖历史")
+                    return df
+                else:
                     fresh_leagues = set(df["league_id"].astype(str).unique())
                     keep = old[~old["league_id"].astype(str).isin(fresh_leagues)]
                     if not keep.empty:
                         df = pd.concat([keep, df], ignore_index=True)
                         df = df.drop_duplicates(subset=["league_id", "match_id"], keep="last")
                         df = df.sort_values(["start_time", "match_id"]).reset_index(drop=True)
-                except (OSError, pd.errors.ParserError):
-                    pass
             body = df.to_csv(index=False, lineterminator="\n")
             try:
                 old_body = save_path.read_text(encoding="utf-8-sig")
@@ -819,10 +824,25 @@ PREDICTION_CSV_FIELDS = [
 ]
 
 
+CORE_CAMP_FIELDS = ("team_name", "gold", "kill_num", "push_tower_num")
+
+
+def missing_camp_fields(camp: dict, prefix: str) -> list[str]:
+    """官方响应里确实没给的字段。
+
+    以前这里一律补 0，于是「没有这个字段」和「这一刻真的是 0」在下游完全同形，
+    只能用局时去猜。现在把缺失显式记下来，训练侧据此剔除而不是当成 0 学。
+    """
+    return [f"{prefix}.{key}" for key in CORE_CAMP_FIELDS if camp.get(key) in (None, "")]
+
+
 def parse_snapshot(raw_data: dict[str, Any], battle_id: str = "") -> dict[str, Any]:
     game_sec = get_seconds(raw_data.get("game_duration"))
     c1 = raw_data.get("camp1", {}) or {}
     c2 = raw_data.get("camp2", {}) or {}
+    missing = missing_camp_fields(c1, "camp1") + missing_camp_fields(c2, "camp2")
+    fallback = (str(c1.get("team_name") or "").strip() in ("", "Camp1")
+                or str(c2.get("team_name") or "").strip() in ("", "Camp2"))
     snap: dict[str, Any] = {
         "battle_id": battle_id,
         "collected_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -830,6 +850,8 @@ def parse_snapshot(raw_data: dict[str, Any], battle_id: str = "") -> dict[str, A
         "snapshot_time_sec": int(game_sec),
         "minute": game_sec / 60,
         "minute_bin": max(int(game_sec / 60), 1),
+        "missing_camp_fields": ";".join(missing),
+        "team_name_fallback": 1 if fallback else 0,
         "camp1_team": c1.get("team_name", "Camp1"),
         "camp2_team": c2.get("team_name", "Camp2"),
         "camp1_gold": c1.get("gold", 0) or 0,
@@ -2175,7 +2197,7 @@ def apply_gold_consistency_guard(
 
 WINPROB_CONFLICT_THRESHOLD = 0.15
 # README / product doc fallback when train_status & artifact lack holdout fields
-V11_README_HOLDOUT_BRIER = {"early": None, "mid": None, "all": None, "late": None}
+V11_README_HOLDOUT_BRIER = {"early": 0.057, "mid": 0.036, "all": 0.049, "late": None}
 
 
 def approx_gold_ratio_from_diff(gold_diff: float, minute: float) -> float:
@@ -2492,17 +2514,17 @@ def summarize_winprob_benchmark_phases(
 
 
 def load_holdout_badge_metrics() -> dict[str, Any]:
-    """Holdout Brier badge: train_status → artifact → explicitly unavailable."""
+    """Holdout Brier badge: train_status → artifact → README fallback."""
     badge: dict[str, Any] = {
-        "version": "unknown",
+        "version": "V11",
         "model_name": "",
         "trained_at": "",
-        "source": "unavailable",
+        "source": "readme",
         "early_brier": V11_README_HOLDOUT_BRIER["early"],
         "mid_brier": V11_README_HOLDOUT_BRIER["mid"],
         "all_brier": V11_README_HOLDOUT_BRIER["all"],
         "late_brier": V11_README_HOLDOUT_BRIER["late"],
-        "note": "未提供本地模型或可验证测试指标",
+        "note": "README 口径（见数据运维 / 产品文档）",
     }
     # 1) train_status.json
     status_path = REALTIME_DIR / "train_status.json"
@@ -3000,7 +3022,7 @@ def build_postmatch_brief(match_id: str) -> dict[str, Any]:
         "- 快照范围："
         + "；".join(f"第 {g['game_no']} 局 `{g['battle_id']}`（{int(g['snapshot_count'] or 0)} 切片）" for g in games)
     )
-    lines.append("- 口径与术语：`docs/getting-started.md`；生成器：`kpl_insight.core.build_postmatch_brief`（规则版，无 LLM）")
+    lines.append("- 口径与术语：`docs/glossary.md`；生成器：`kpl_insight.core.build_postmatch_brief`（规则版，无 LLM）")
     md = "\n".join(lines) + "\n"
 
     meta = {
@@ -3863,6 +3885,126 @@ def simulate_series(
     }
 
 
+def simulate_series_model(
+    team_a: str,
+    team_b: str,
+    *,
+    lineup_a: list[str] | None = None,
+    lineup_b: list[str] | None = None,
+    players_a: list[Any] | None = None,
+    players_b: list[Any] | None = None,
+    bans_a: list[str] | None = None,
+    bans_b: list[str] | None = None,
+    series_features: dict[str, float] | None = None,
+    first_pick_team1: bool | None = None,
+    best_of: int = 5,
+    year: int | None = None,
+    date: Any = None,
+    team_a_id: str | None = None,
+    team_b_id: str | None = None,
+    is_playoff: bool = False,
+) -> dict[str, Any]:
+    """P16 局级模型版：BP + 首发 → 单局 p → BO 系列赛（Phase 2 模型）。
+
+    与证据合成版 ``simulate_series`` 的区别：
+      - 局级 p 来自 ``output/models/prematch_game_v1.joblib``（BP/选手/选秀特征 LR）；
+      - 需要大场 V2 赛前特征；未提供时用历史缓存重算；
+      - 未提供选手时，选手特征按训练中位数填补（结果标注警告）。
+    参数中的英雄/战队可传名称或 ID；名字会通过 ``bp.csv`` / 系列赛特征表映射。
+    """
+    raise RuntimeError("prematch game simulation is not included in this open-source distribution")
+
+    bundle = load_game_bundle()
+    team_map = load_team_name_to_id()
+    hero_map = load_hero_name_to_id()
+    a_id = str(team_a_id or team_map.get(str(team_a).strip()) or "")
+    b_id = str(team_b_id or team_map.get(str(team_b).strip()) or "")
+
+    def _hero_ids(items: list[Any] | None) -> list[dict[str, int]]:
+        out = []
+        for item in items or []:
+            value = item
+            if isinstance(item, dict):
+                value = item.get("hero_id") or item.get("hero_name") or item.get("name")
+            if isinstance(value, str):
+                value = hero_map.get(value.strip(), value)
+            try:
+                hid = int(value)
+            except (TypeError, ValueError):
+                continue
+            if hid > 0:
+                out.append({"hero_id": hid})
+        return out
+
+    def _players(items: list[Any] | None, lineup: list[str] | None) -> list[dict[str, Any]]:
+        out = []
+        for i, item in enumerate(items or []):
+            if isinstance(item, dict):
+                name = item.get("name") or item.get("player_name") or ""
+                hid = item.get("hero_id")
+                pos = item.get("position") or item.get("position_desc") or i + 1
+            else:
+                name, hid, pos = str(item), None, i + 1
+            if hid is None and lineup and i < len(lineup):
+                hid = hero_map.get(str(lineup[i]).strip(), lineup[i])
+            try:
+                hid = int(hid)
+            except (TypeError, ValueError):
+                hid = 0
+            out.append({"name": str(name), "hero_id": hid, "position": int(pos) if str(pos).isdigit() else i + 1})
+        return out
+
+    p_a = _players(players_a, lineup_a)
+    p_b = _players(players_b, lineup_b)
+    picks_a = _hero_ids(lineup_a)
+    picks_b = _hero_ids(lineup_b)
+    if not picks_a and p_a:
+        picks_a = [{"hero_id": p["hero_id"]} for p in p_a if p["hero_id"] > 0]
+    if not picks_b and p_b:
+        picks_b = [{"hero_id": p["hero_id"]} for p in p_b if p["hero_id"] > 0]
+
+    if series_features is None:
+        if not a_id or not b_id:
+            return {"state": "error", "message": "无法解析战队 ID，请传 team_a_id / team_b_id"}
+        series_features = build_series_features(
+            a_id, team_a, b_id, team_b,
+            date=date, year=year, best_of=int(best_of),
+            roster1=[p["name"] for p in p_a if p["name"]] or None,
+            roster2=[p["name"] for p in p_b if p["name"]] or None,
+            is_playoff=is_playoff,
+            bundle=bundle,
+        )
+
+    result = _simulate(
+        bundle,
+        series_features=series_features,
+        team1_id=a_id, team2_id=b_id,
+        picks1=picks_a, picks2=picks_b,
+        players1=p_a, players2=p_b,
+        bans1=_hero_ids(bans_a), bans2=_hero_ids(bans_b),
+        first_pick_team1=first_pick_team1,
+        year=year or (int(pd.Timestamp(date).year) if date is not None else None),
+        best_of=int(best_of),
+    )
+    warnings = []
+    if len(p_a) < 5 or len(p_b) < 5:
+        warnings.append("未提供完整首发选手：选手质量/选手-英雄特征按训练中位数填补")
+    if len(picks_a) < 5 or len(picks_b) < 5:
+        warnings.append("BP 不完整：选秀质量/组合协同特征降级，结果仅供参考")
+    result.update({
+        "team_a": team_a,
+        "team_b": team_b,
+        "team_a_id": a_id,
+        "team_b_id": b_id,
+        "lineup_a": lineup_a or [],
+        "lineup_b": lineup_b or [],
+        "warnings": warnings,
+        "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "notes": result.get("notes", []) + ["局级模型版：P16 Phase 2"],
+    })
+    return result
+
+
 def detect_events(snapshots: list[dict[str, Any]]) -> list[dict[str, Any]]:
     events: list[dict[str, Any]] = []
     for i in range(1, len(snapshots)):
@@ -4354,6 +4496,8 @@ MONITOR_STATE_ALIASES = {
 }
 # 这些状态表示“链路是活的、可以信任当前展示”，其余按陈旧/异常处理
 MONITOR_STATE_HEALTHY = {"live", "waiting_start", "waiting_battle", "battle_finished", "training", "day_complete"}
+# 采集进程/独立计划任务超过该时长未写心跳即视为过期。
+MONITOR_HEARTBEAT_STALE_SEC = 180
 
 
 def normalize_monitor_state(raw_state: Any) -> str:
@@ -4372,7 +4516,7 @@ def load_monitor_status() -> dict[str, Any]:
         return {"state": "not_started", "state_raw": "not_started", "is_live": False,
                 "message": "监控脚本尚未运行"}
     try:
-        raw = json.loads(MONITOR_STATUS_FILE.read_text(encoding="utf-8"))
+        raw = json.loads(MONITOR_STATUS_FILE.read_text(encoding="utf-8-sig"))
     except (OSError, json.JSONDecodeError) as exc:
         return {"state": "error", "state_raw": "status_error", "is_live": False, "message": str(exc)}
     if not isinstance(raw, dict):
@@ -4385,6 +4529,54 @@ def load_monitor_status() -> dict[str, Any]:
     out["state"] = state
     out["is_live"] = state == "live"
     out["healthy"] = state in MONITOR_STATE_HEALTHY
+    collector = read_json(COLLECTOR_STATUS)
+    health = collector_health(collector) if collector else None
+    age = age_seconds(raw.get("updated_at"))
+    if health is not None:
+        out["collection_health"] = health
+
+    installation = read_json(RUNTIME / "installation.json")
+    watchdog_required = bool(installation.get("task_name"))
+    watchdog = read_json(RUNTIME / "watchdog_status.json")
+    watchdog_age = age_seconds(watchdog.get("checked_at"))
+    watchdog_stale = watchdog_required and (
+        watchdog_age is None or watchdog_age > MONITOR_HEARTBEAT_STALE_SEC
+    )
+    watchdog_error = (
+        not watchdog_stale
+        and watchdog_age is not None
+        and watchdog_age < MONITOR_HEARTBEAT_STALE_SEC
+        and not watchdog.get("healthy", True)
+    )
+    out["watchdog_required"] = watchdog_required
+    out["watchdog_heartbeat_age_sec"] = watchdog_age
+    out["watchdog_stale"] = watchdog_stale
+    if watchdog_stale:
+        issues = list(dict.fromkeys([
+            *(watchdog.get("issues") or []),
+            "watchdog_heartbeat_missing_or_stale",
+        ]))
+        out["watchdog_health"] = {
+            **watchdog,
+            "healthy": False,
+            "issues": issues,
+            "heartbeat_age_sec": watchdog_age,
+            "required": True,
+        }
+    elif watchdog:
+        out["watchdog_health"] = watchdog
+
+    if (health is not None and not health["healthy"]) or (
+        health is None and (age is None or age > MONITOR_HEARTBEAT_STALE_SEC)
+    ):
+        out.update(state="error", is_live=False, healthy=False,
+                   message="采集异常或心跳已过期，请检查采集守护状态")
+    if watchdog_stale:
+        out.update(state="error", is_live=False, healthy=False,
+                   message="独立计划任务心跳缺失或已过期，可能存在未登录或计划任务停用风险")
+    elif watchdog_error:
+        out.update(state="error", is_live=False, healthy=False,
+                   message="独立计划任务检查异常: " + ", ".join(watchdog.get("issues", [])))
     return out
 
 
@@ -4418,3 +4610,5 @@ def historical_coverage_report(archive: pd.DataFrame | None = None) -> dict[str,
         "coverage_rate": float(len(covered) / len(archive_set)) if archive_set else 0.0,
         "missing_battles": sorted(archive_set - raw_battle_ids)[:50],
     }
+
+

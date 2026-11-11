@@ -8,37 +8,44 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2317181E'/%3E%3Ctext x='16' y='22' font-family='Arial' font-size='16' font-weight='bold' fill='%23F02F55' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="assets/style.css?v=20261102-brand">
 <link rel="stylesheet" href="assets/pages.css?v=20261102-brand">
-<link rel="stylesheet" href="assets/v55.css?v=87">
+<link rel="stylesheet" href="assets/v55.css?v=92">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="KPL赛研">
 <meta property="og:title" content="赛事纪录 · KPL赛研">
 <meta property="og:description" content="单局时长、选手击杀与死亡、团队经济差、系列赛时长与分差——按赛事与年份查看历史纪录。">
 <link rel="stylesheet" href="assets/arena.css?v=1">
-<link rel="stylesheet" href="assets/arena-world.css?v=20261026">
-<script src="assets/arena-world.js?v=20261030a" type="module"></script>
-<link rel="stylesheet" href="assets/card-motion.css?v=1">
-<link rel="stylesheet" href="assets/records-page.css?v=20261026">
-<script src="assets/card-motion.js?v=1" type="module"></script>
 <link rel="stylesheet" href="assets/light.css?v=20261030a">
 <link rel="stylesheet" href="assets/theme.css?v=20261030b">
+<link rel="stylesheet" href="assets/site-v2.css?v=20261112a">
+<link rel="stylesheet" href="assets/records-v2.css?v=20261112a">
 </head>
-<body data-page="records.html">
+<body data-page="records.html" class="v2-page records-page">
 <header id="siteHeader" class="topbar"></header>
 
-<header class="page-hero">
-  <div class="wrap">
-    <div class="ph-kicker mono">RECORDS · 赛事纪录</div>
-    <h1>赛事纪录</h1>
-    <p>历史里的极值：一局打了多久、谁单场死得最多、哪场比赛的分差最大。也可以按主题看单局——膀胱局、空砍局、尽力局、躺赢局，换个角度读比赛。</p>
+<header class="lg-hero" id="heroHead">
+  <div class="lg-hero-gridlines" aria-hidden="true"></div>
+  <div class="v2-wrap wrap">
+    <div class="v2-kicker"><i></i>RECORDS<b>·</b>赛事纪录</div>
+    <h1 class="v2-h1">赛事纪录</h1>
+    <p class="v2-lead">历史里的极值：一局打了多久、谁单场死得最多、哪场比赛的分差最大。也可以按主题看单局——膀胱局、空砍局、尽力局、躺赢局，换个角度读比赛。</p>
+    <div class="v2-stats records-kpis" style="margin-top:26px">
+      <div class="v2-stat"><b class="v2-mono">2016–2026</b><span>榜单覆盖年份</span></div>
+      <div class="v2-stat"><b class="v2-mono" id="mEarly">—</b><span>2016–2018 补充有效场次</span></div>
+      <div class="v2-stat"><b class="v2-mono" id="mEntries">—</b><span>当前榜单条目</span></div>
+      <div class="v2-stat"><b class="v2-mono" id="mScope">—</b><span>当前数据范围</span></div>
+    </div>
   </div>
 </header>
 
-<main class="wrap" style="margin-top:24px">
+<main class="wrap records-main" style="margin-top:26px">
   <div class="scopebar" id="scopeBar"></div>
 
   <aside class="records-coverage" aria-label="纪录数据覆盖范围">
     <span class="coverage-label">数据覆盖</span>
-    <div><strong>当前纪录榜：2016–2026</strong><p id="recordsCoverage">正在读取历史数据覆盖范围…</p></div>
+    <div class="coverage-body">
+      <strong>当前纪录榜：2016–2026</strong>
+      <p id="recordsCoverage">正在读取历史数据覆盖范围…</p>
+    </div>
   </aside>
 
   <div class="filterbar records-controls">
@@ -57,8 +64,8 @@
       <button data-d="max" class="on">最高</button>
       <button data-d="min">最低</button>
     </div>
-    <button class="btn ghost sm" id="recRandom" type="button">随机一条</button>
-    <div id="themeWrap" style="display:none;flex:1 1 100%;margin-top:4px">
+    <button class="v2-btn sm" id="recRandom" type="button">随机一条</button>
+    <div id="themeWrap" style="display:none">
       <div class="theme-chips" id="themeChips" role="group" aria-label="主题合集"></div>
     </div>
   </div>
@@ -66,19 +73,24 @@
   <div class="brief" id="recBrief" role="status" aria-live="polite"></div>
   <div class="rec-list" id="recList"></div>
 
-  <div class="panel" style="margin-top:20px">
-    <div class="panel-title">口径说明</div>
-    <div class="block-note">
-      1. 当前榜单合并 2019–2026 主归档与 2016–2018 补充集，仅纳入质量合格场次；早期数据来自玩加 / ScoreGG；<br>
-      2. 单局时长已排除 6 分钟以下、45 分钟以上的异常记录；经济类纪录已剔除异常记录；<br>
-      3. 系列赛纪录只统计完整且赛制明确的 BO3 及以上系列赛；<br>
-      4. 同一类型的「最低」会包含 0 次击杀、0 次死亡这类真实极值，属于正常数据；<br>
-      5. 主题合集是同一批指标的预置视角，点开可继续在单项纪录里切换范围与方向；<br>
-      6. 生涯 / 队史纪录按已收录有效历史统计，不随范围变化；队名与选手名保留来源口径，未强行合并历史别名；<br>
-      7. 2017–2018 ScoreGG 场次无选手经济、输出、承伤，时长为分钟精度；2016–2018 补充集无 MVP 字段。缺失字段不参与相应纪录；<br>
-      8. 早期赛程应有 587 场，已索引 584 场，3 场未索引；7 场比分待核对与 1 场无逐局不计入榜单。连胜 / 连败仅代表已收录记录。
+  <section class="block records-notes">
+    <div class="block-head">
+      <h2><i></i>口径说明</h2>
+      <span class="block-note mono">缺失字段不参与对应纪录 · 榜单可复算</span>
     </div>
-  </div>
+    <div class="v2-card records-note-card">
+      <ol class="records-note-list">
+        <li>当前榜单合并 2016–2026 主归档与 2016–2018 补充集，仅纳入质量合格场次；早期数据来自玩加 / ScoreGG；</li>
+        <li>单局时长已排除 6 分钟以下、45 分钟以上的异常记录；经济类纪录已剔除异常记录；</li>
+        <li>系列赛纪录只统计完整且赛制明确的 BO3 及以上系列赛；</li>
+        <li>同一类型的「最低」会包含 0 次击杀、0 次死亡这类真实极值，属于正常数据；</li>
+        <li>主题合集是同一批指标的预置视角，点开可继续在单项纪录里切换范围与方向；</li>
+        <li>生涯 / 队史纪录按已收录有效历史统计，不随范围变化；队名与选手名保留来源口径，未强行合并历史别名；</li>
+        <li>2017–2018 ScoreGG 场次无选手经济、输出、承伤，时长为分钟精度；2016–2018 补充集无 MVP 字段。缺失字段不参与相应纪录；</li>
+        <li>早期赛程应有 587 场，已索引 584 场，3 场未索引；7 场比分待核对与 1 场无逐局不计入榜单。连胜 / 连败仅代表已收录记录。</li>
+      </ol>
+    </div>
+  </section>
 </main>
 
 <footer id="siteFooter" class="footer"></footer>
@@ -87,7 +99,7 @@
 <script src="assets/seasons.js?v=85"></script>
 <script src="assets/records.js?v=20261026-history"></script>
 <script src="assets/share.js?v=20261102-brand"></script>
-<script src="assets/common.js?v=20261102-brand"></script>
+<script src="assets/common.js?v=20261110-curve"></script>
 <script>
 (function () {
   "use strict";
@@ -106,6 +118,8 @@
   if (R && R.coverage) {
     $("#recordsCoverage").textContent = "2016–2018 新增 " + K.fmtInt(R.coverage.earlyMatches) + " 场有效比赛 / " +
       K.fmtInt(R.coverage.earlyGames) + " 局，已计入全部年份与生涯统计。8 场质量异常已排除，3 场尚未索引；各指标仅使用有值样本。";
+    var mEarly = document.getElementById("mEarly");
+    if (mEarly) mEarly.textContent = K.fmtInt(R.coverage.earlyMatches) + " 场";
   }
 
   var METRICS = {
@@ -272,6 +286,10 @@
     $("#recList").innerHTML = CURRENT.length
       ? CURRENT.map(function (r, i) { return rowHTML(r, m, i); }).join("")
       : '<div class="empty-tip">当前范围暂无该纪录（可能样本不足）</div>';
+    var mEntries = document.getElementById("mEntries");
+    if (mEntries) mEntries.textContent = CURRENT.length + " 条";
+    var mScope = document.getElementById("mScope");
+    if (mScope) mScope.textContent = scopeLabel;
     K.refresh();
   }
 

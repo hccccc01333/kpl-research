@@ -1,7 +1,14 @@
-Required Notice: Copyright (c) 2026 hccccc01333
+Required Notice: Copyright (c) 2026 hccccc01333 and KPL Research contributors
 
-KPL Insight is provided under the PolyForm Noncommercial License 1.0.0.
-See LICENSE for the full terms.
+This source-available distribution uses PolyForm Noncommercial License 1.0.0
+for newly authored contributions and the distribution as a whole, to the extent
+the licensors hold the relevant rights. See LICENSE and docs/licensing.md.
+
+Portions derive from the former MIT-licensed KPL realtime win-rate platform.
+Copyright (c) 2026 Rainfun contributors. The historical MIT license is retained
+verbatim in LICENSES/MIT-legacy.txt and continues to apply to those portions.
+Historical contributors include hccccc01333 and rainfunLv42.
+Neither this reorganization nor repository visibility revokes existing MIT grants.
 
 Third-party packages and KPL/Tencent data, logos, images and trademarks retain
 their respective owners' rights. This license grants no rights to those assets.

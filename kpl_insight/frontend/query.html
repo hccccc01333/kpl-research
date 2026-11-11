@@ -8,55 +8,44 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='5' fill='%230A111C'/%3E%3Crect x='3' y='3' width='26' height='26' rx='4' fill='none' stroke='%23F6C021' stroke-width='2'/%3E%3Ctext x='16' y='22' font-family='Arial,sans-serif' font-size='16' font-weight='bold' fill='%23F6C021' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="assets/style.css?v=20261102-brand">
 <link rel="stylesheet" href="assets/pages.css?v=20261102-brand">
-<link rel="stylesheet" href="assets/v55.css?v=87">
-<style>
-.q-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}
-.q-head .seg{margin-left:0}
-.q-table{width:100%;border-collapse:collapse;font-size:13px}
-.q-table th,.q-table td{padding:8px 12px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
-.q-table th:first-child,.q-table td:first-child,.q-table th.left,.q-table td.left{text-align:left}
-.q-table thead th{font-size:11.5px;color:var(--muted);font-weight:600;cursor:pointer;user-select:none;position:sticky;top:0;background:var(--card)}
-.q-table thead th:hover{color:var(--gold)}
-.q-table thead th.sorted{color:var(--gold)}
-.q-table tbody tr:hover{background:var(--inset)}
-.q-table .cell{display:flex;align-items:center;gap:8px}
-.q-table .cell img{width:24px;height:24px;border-radius:50%;object-fit:cover;flex:none}
-.q-table .rk{font-family:var(--mono);color:var(--muted)}
-.q-table .best{color:var(--gold);font-weight:800}
-.q-wrap{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:6px 10px;overflow-x:auto;max-height:70vh}
-</style>
+<link rel="stylesheet" href="assets/v55.css?v=92">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="KPL赛研">
 <meta property="og:title" content="数据查询 · KPL赛研">
-<meta property="og:description" content="KPL 赛事数据产品：赛程比分、战队/选手/英雄数据、BP 分析、逐局复盘与实时胜率预测。2019–2026 全历史。">
+<meta property="og:description" content="KPL 赛事数据产品：赛程比分、战队/选手/英雄数据、BP 分析、逐局复盘与实时胜率预测。2016–2026 全历史。">
 <meta property="og:image" content="https://hccccc01333.github.io/KPLdata-site/assets/brand/kpl-research-social.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="assets/arena.css?v=1">
-<link rel="stylesheet" href="assets/arena-world.css?v=20261026">
-<script src="assets/arena-world.js?v=20261030a" type="module"></script>
-<link rel="stylesheet" href="assets/card-motion.css?v=1">
-<script src="assets/card-motion.js?v=1" type="module"></script>
 <link rel="stylesheet" href="assets/light.css?v=20261030a">
 <link rel="stylesheet" href="assets/theme.css?v=20261030b">
+<link rel="stylesheet" href="assets/site-v2.css?v=20261112a">
+<link rel="stylesheet" href="assets/query-v2.css?v=20261112a">
 </head>
-<body data-page="query.html">
+<body data-page="query.html" class="v2-page query-page">
 <header id="siteHeader" class="topbar"></header>
 
-<header class="page-hero">
-  <div class="wrap">
-    <div class="ph-kicker mono">QUERY · 数据查询</div>
-    <h1>数据查询中心</h1>
-    <p>把全部指标摊在表里：选数据范围 → 切类型 → 搜名字 → 点列头排序。战队、选手、英雄的自由榜单，随时导出。</p>
+<header class="lg-hero">
+  <div class="lg-hero-gridlines" aria-hidden="true"></div>
+  <div class="v2-wrap">
+    <div class="v2-kicker"><i></i>QUERY<b>·</b>数据查询</div>
+    <h1 class="v2-h1">数据查询中心</h1>
+    <p class="v2-lead">把全部指标摊在表里：选数据范围 → 切类型 → 搜名字 → 点列头排序。战队、选手、英雄的自由榜单，随时导出。</p>
+    <div class="v2-stats lg-kpis" style="margin-top:26px">
+      <div class="v2-stat"><b class="v2-mono">3 榜 + SQL</b><span>可切换视图</span></div>
+      <div class="v2-stat"><b class="v2-mono">全历史</b><span>数据范围</span></div>
+      <div class="v2-stat"><b class="v2-mono">CSV</b><span>导出当前筛选</span></div>
+    </div>
   </div>
 </header>
 
-<main class="wrap" style="margin-top:24px">
+<main class="wrap query-main" style="margin-top:24px">
   <div class="scopebar" id="scopeBar"></div>
-  <div class="filterbar">
-    <div class="seg" id="typeTabs" style="margin-left:0">
+  <div class="filterbar" id="qFilter">
+    <div class="seg" id="typeTabs">
       <button data-m="team" class="on">战队</button>
       <button data-m="player">选手</button>
       <button data-m="hero">英雄</button>
+      <button data-m="sql">SQL</button>
     </div>
     <label class="fld grow"><span>搜索</span>
       <input class="search" id="qSearch" placeholder="输入名称过滤，如：狼队 / 清清 / 戈娅">
@@ -74,19 +63,52 @@
       </select>
     </label>
     <span class="block-note mono" id="qNote"></span>
-    <a class="btn ghost sm" href="find.html">智能找局 →</a>
-    <button class="btn ghost sm" id="qExport" type="button">导出 CSV</button>
+    <a class="v2-btn sm" href="find.html">智能找局 →</a>
+    <button class="v2-btn sm" id="qExport" type="button">导出 CSV</button>
   </div>
-  <div class="q-wrap">
+  <div class="q-wrap" id="qWrap">
     <table class="q-table"><thead id="qHead"></thead><tbody id="qBody"></tbody></table>
   </div>
+
+  <section id="sqlPanel" hidden>
+    <div class="block-head"><h2><i></i>SQL 控制台</h2>
+      <span class="block-note mono">本地 SQLite 只读查询 · 仅 SELECT / WITH · 超时 6s · 最多 2000 行</span></div>
+    <div class="panel" id="sqlOff" hidden>
+      <p style="font-weight:700;color:var(--ink);margin-bottom:8px">SQL 控制台需要本地运行的服务</p>
+      <p style="color:var(--muted);font-size:13px">把仓库下载到本地，在根目录执行下面一条命令（零第三方依赖，仅 Python 3.9+）：</p>
+      <p style="margin-top:12px"><code class="mono">python server.py</code></p>
+      <p style="color:var(--muted);font-size:12px;margin-top:12px">Windows 可直接双击 <span class="mono">启动本地版.bat</span>。启动后回到本页即可查询。</p>
+    </div>
+    <div id="sqlApp" hidden>
+      <div class="panel"><div class="sql-grid" id="sqlChips"></div>
+        <div class="block-note mono" id="sqlDbNote"></div></div>
+      <div class="panel">
+        <textarea id="sqlText" class="sql-area" spellcheck="false"></textarea>
+        <div class="sql-actions">
+          <button class="v2-btn sm solid" id="sqlRun" type="button">运行查询（Ctrl+Enter）</button>
+          <button class="v2-btn sm" id="sqlCsv" type="button">导出 CSV</button>
+          <button class="v2-btn sm" id="sqlSave" type="button">★ 保存这条查询</button>
+          <span class="block-note mono" id="sqlHint"></span>
+        </div>
+        <div class="sql-samples" id="sqlSaved"></div>
+        <div class="sql-samples" id="sqlSamples"></div>
+        <div id="sqlErr" hidden></div>
+        <div class="block-note mono" id="sqlMeta"></div>
+        <div class="q-wrap"><table class="q-table"><thead id="sqlHead"></thead><tbody id="sqlBody"></tbody></table></div>
+      </div>
+      <div class="panel">
+        <div class="block-head"><h2><i></i>数据表</h2><span class="block-note mono">点击任意表 → 预览前 10 行</span></div>
+        <div class="sql-grid" id="sqlTables"></div>
+      </div>
+    </div>
+  </section>
 </main>
 
 <footer id="siteFooter" class="footer"></footer>
 
 <script src="assets/data.js?v=85"></script>
 <script src="assets/seasons.js?v=85"></script>
-<script src="assets/common.js?v=20261102-brand"></script>
+<script src="assets/common.js?v=20261110-curve"></script>
 <script>
 (function () {
   "use strict";
@@ -244,10 +266,188 @@
     var b = e.target.closest("button"); if (!b) return;
     Array.prototype.forEach.call(this.children, function (x) { x.classList.toggle("on", x === b); });
     mode = b.getAttribute("data-m");
+    var isSql = mode === "sql";
+    $("#sqlPanel").hidden = !isSql;
+    $("#qWrap").hidden = isSql;
+    $("#qFilter").classList.toggle("sqlmode", isSql);
+    $("#qExport").hidden = isSql;
+    if (isSql) {
+      $("#qNote").textContent = "本地 SQLite · 只读";
+      $("#qSearch").value = "";
+      if (!sqlInited) { sqlInited = true; initSql(); }
+      return;
+    }
+    $("#sqlPanel").hidden = true;
     sortKey = null; sortDir = -1;
     fillPos();
     render();
   });
+
+  /* ---------- SQL 控制台（本地工作台）：server.py 提供 /api，静态托管时显示启动指引 ---------- */
+  var sqlInited = false, sqlBound = false;
+  var SQL_SAMPLES = [
+    ["2026 赛季大场胜率", "SELECT team1 AS 队伍, SUM(score1) AS 胜局, SUM(score2) AS 负局,\n       ROUND(100.0*SUM(score1)/(SUM(score1)+SUM(score2)),1) AS 胜率\nFROM schedule WHERE date >= '2026-01-01'\nGROUP BY team1 HAVING 胜局+负局 > 0 ORDER BY 胜率 DESC LIMIT 12;"],
+    ["选手赛季榜（2026）", "SELECT name AS 选手, games AS 局, mvp AS MVP, kills AS 击杀,\n       ROUND(kills*1.0/MAX(games-deaths,1),2) AS 场均存活K,\n       dmgShareAvg AS 场均输出占比, winRate AS 胜率\nFROM v_player_season WHERE year = 2026 AND games >= 20\nORDER BY mvp DESC LIMIT 15;"],
+    ["单局 MVP 榜", "SELECT name, COUNT(*) AS MVP次数 FROM battle_players WHERE mvp=1\nGROUP BY name ORDER BY MVP次数 DESC LIMIT 12;"],
+    ["英雄出场与胜率", "SELECT b.hero AS 英雄, COUNT(*) AS 出场,\n       ROUND(100.0*SUM(CASE WHEN (b.camp=1 AND u.win=1) OR (b.camp=2 AND u.win=2) THEN 1 ELSE 0 END)/COUNT(*),1) AS 胜率\nFROM battle_players b JOIN battles u USING(battleId)\nGROUP BY b.hero HAVING 出场 >= 30 ORDER BY 胜率 DESC LIMIT 15;"],
+    ["英雄年度登场榜（视图）", "SELECT hero AS 英雄, year AS 年份, picks AS 登场, wins AS 胜场,\n       ROUND(100.0*wins/picks,1) AS 胜率\nFROM v_hero_pick WHERE picks >= 40 AND year >= 2024\nORDER BY year DESC, picks DESC LIMIT 15;"],
+    ["战队年度榜（视图）", "SELECT year AS 年份, team AS 战队, matches AS 大场, wins AS 胜, losses AS 负,\n       ROUND(100.0*wins/(wins+losses),1) AS 胜率\nFROM v_team_season WHERE year = 2025 AND matches >= 10\nORDER BY 胜率 DESC;"],
+    ["双人组队胜率", "SELECT a.name AS 选手A, b.name AS 选手B, COUNT(*) AS 同场,\n       SUM(CASE WHEN (a.camp=1 AND u.win=1) OR (a.camp=2 AND u.win=2) THEN 1 ELSE 0 END) AS 胜场\nFROM battle_players a\nJOIN battle_players b ON a.battleId=b.battleId AND a.camp=b.camp AND a.name<b.name\nJOIN battles u ON u.battleId=a.battleId\nJOIN schedule s ON s.matchId=u.matchId\nWHERE s.date >= '2026-01-01'\nGROUP BY a.name, b.name HAVING 同场 >= 30\nORDER BY 同场 DESC LIMIT 12;"],
+    ["英雄对位（同局对面）", "SELECT a.hero AS 英雄A, b.hero AS 英雄B, COUNT(*) AS 对位局,\n       SUM(CASE WHEN (a.camp=1 AND u.win=1) OR (a.camp=2 AND u.win=2) THEN 1 ELSE 0 END) AS A胜\nFROM battle_players a\nJOIN battle_players b ON a.battleId=b.battleId AND a.camp<>b.camp\nJOIN battles u ON u.battleId=a.battleId\nJOIN schedule s ON s.matchId=u.matchId\nWHERE s.date >= '2025-01-01'\nGROUP BY a.hero, b.hero HAVING 对位局 >= 20\nORDER BY 对位局 DESC LIMIT 12;"],
+    ["前期金差与胜负", "SELECT CASE WHEN f.goldDiff >= 0 THEN u.t1 ELSE u.t2 END AS 前期领先方,\n       CASE WHEN f.goldDiff >= 0 THEN\n         CASE WHEN u.win=1 THEN 1 ELSE 0 END ELSE\n         CASE WHEN u.win=2 THEN 1 ELSE 0 END END AS 领先方最终胜,\n       COUNT(*) AS 样本\nFROM (SELECT battleId, goldDiff, ROW_NUMBER() OVER (PARTITION BY battleId ORDER BY m) rn\n      FROM frames WHERE m BETWEEN 4 AND 6) f\nJOIN battles u USING(battleId)\nWHERE f.rn = 1 GROUP BY 前期领先方;"],
+    ["让二追三的系列赛", "SELECT matchId, team1, team2, score1, score2, date FROM schedule\nWHERE (score1=3 AND score2=2) OR (score1=2 AND score2=3)\nORDER BY date DESC LIMIT 12;"],
+    ["平均经济差曲线", "SELECT CAST(m AS INT) AS 分钟, ROUND(AVG(goldDiff)/1000,2) AS 平均金差k, COUNT(*) AS 样本\nFROM frames GROUP BY CAST(m AS INT) ORDER BY 分钟 LIMIT 40;"],
+    ["教练生涯样本", "SELECT coach AS 教练, series AS 系列, seriesWins AS 胜, games AS 局, bpGames AS BP局\nFROM coach_stats ORDER BY series DESC LIMIT 12;"],
+    ["场均承伤榜（末帧）", "SELECT mp.name AS 选手, mp.hero AS 英雄, COUNT(*) AS 局,\n       ROUND(AVG(mp.tank)/10000,1) AS 场均承伤w\nFROM minute_players mp\nWHERE mp.m = (SELECT MAX(m2.m) FROM minute_players m2 WHERE m2.battleId = mp.battleId)\nGROUP BY mp.name HAVING 局 >= 5 ORDER BY 场均承伤w DESC LIMIT 12;"],
+    ["单局承伤对比曲线", "SELECT CAST(m AS INT) AS 分钟,\n       ROUND(SUM(CASE WHEN camp=1 THEN tank ELSE 0 END)/5.0/10000,2) AS 蓝方均承伤w,\n       ROUND(SUM(CASE WHEN camp=2 THEN tank ELSE 0 END)/5.0/10000,2) AS 红方均承伤w\nFROM minute_players WHERE battleId = '48251408_41_1793354660'\nGROUP BY CAST(m AS INT) ORDER BY 分钟 LIMIT 40;"]
+  ];
+  function initSql() {
+    if (!sqlBound) { sqlBound = true; bindSql(); }
+    loadSql();
+  }
+  function bindSql() {
+    $("#sqlSamples").innerHTML = SQL_SAMPLES.map(function (s, i) {
+      return '<button type="button" data-i="' + i + '">' + K.esc(s[0]) + "</button>";
+    }).join("");
+    $("#sqlSamples").addEventListener("click", function (e) {
+      var b = e.target.closest("button"); if (!b) return;
+      $("#sqlText").value = SQL_SAMPLES[Number(b.getAttribute("data-i"))][1];
+      runSql();
+    });
+    /* 保存的查询：存 localStorage，点击载入，× 删除 */
+    function savedList() {
+      try { return JSON.parse(localStorage.getItem("kpl_sql_saved") || "[]"); } catch (e) { return []; }
+    }
+    function renderSaved() {
+      var list = savedList();
+      $("#sqlSaved").innerHTML = list.length
+        ? list.map(function (s2, i) {
+          return '<button type="button" data-i="' + i + '" title="' + K.esc(s2.sql) + '">★ ' + K.esc(s2.name) +
+            '<span data-del="' + i + '" style="margin-left:6px;color:var(--muted)">×</span></button>';
+        }).join("")
+        : '<span class="block-note mono" style="color:var(--muted)">还没有保存的查询：写好 SQL 后点「★ 保存这条查询」</span>';
+    }
+    $("#sqlSaved").addEventListener("click", function (e) {
+      var del = e.target.getAttribute("data-del");
+      if (del != null) {
+        var list = savedList();
+        list.splice(Number(del), 1);
+        try { localStorage.setItem("kpl_sql_saved", JSON.stringify(list)); } catch (err) {}
+        renderSaved();
+        return;
+      }
+      var b = e.target.closest("button");
+      if (!b) return;
+      var s3 = savedList()[Number(b.getAttribute("data-i"))];
+      if (s3) { $("#sqlText").value = s3.sql; runSql(); }
+    });
+    $("#sqlSave").addEventListener("click", function () {
+      var sql = $("#sqlText").value.trim();
+      if (!sql) return;
+      var name = (sql.replace(/\s+/g, " ").slice(0, 26)) + "…";
+      var list = savedList();
+      list.unshift({ name: name, sql: sql });
+      try { localStorage.setItem("kpl_sql_saved", JSON.stringify(list.slice(0, 12))); } catch (err) {}
+      renderSaved();
+    });
+    $("#sqlText").value = SQL_SAMPLES[0][1];
+    $("#sqlRun").addEventListener("click", runSql);
+    document.addEventListener("keydown", function (e) {
+      if ((e.ctrlKey || e.metaKey) && e.key === "Enter" && mode === "sql") { e.preventDefault(); runSql(); }
+    });
+    $("#sqlCsv").addEventListener("click", function () {
+      if (!sqlLast) return;
+      var rows = [sqlLast.columns].concat(sqlLast.rows);
+      K.exportCSV("SQL查询结果.csv", rows);
+    });
+    renderSaved();
+  }
+  var sqlRanOnce = false;
+  function loadSql() {
+    fetch("/api/status").then(function (r) { if (!r.ok) throw 0; return r.json(); }).then(function (st) {
+      $("#sqlOff").hidden = true;
+      $("#sqlApp").hidden = false;
+      var c = st.counts || {};
+      var chips = [["数据范围", (st.dateRange || [])[0] + " ~ " + (st.dateRange || [])[1], false],
+        ["比赛（大场）", c.schedule, true], ["对局（小场）", c.battles, false],
+        ["选手对局行", c.battle_players, false], ["复盘帧", c.frames, false],
+        ["教练任期", c.coaches, false], ["数据库", st.dbMB + " MB", false]];
+      $("#sqlChips").innerHTML = chips.map(function (x) {
+        return '<div class="sql-chip"><span>' + K.esc(x[0]) + '</span><b class="' + (x[2] ? "gold" : "") + '">' +
+          K.esc(x[1] == null ? "—" : x[1]) + "</b></div>";
+      }).join("");
+      $("#sqlDbNote").textContent = "缓存建于 " + st.builtAt + " · 数据只读，assets 更新后重启自动重建";
+      if (!sqlRanOnce) { sqlRanOnce = true; runSql(); }
+      return fetch("/api/schema").then(function (r) { return r.json(); });
+    }).then(function (d) {
+      if (!d || !d.tables) return;
+      $("#sqlTables").innerHTML = d.tables.map(function (t) {
+        return '<div class="sql-tbl" data-t="' + K.esc(t.name) + '"><b>' + K.esc(t.name) + "</b><small>" +
+          (t.type === "view" ? "视图 · " : "") + t.rows.toLocaleString() + " rows · " + K.esc(t.columns.join(" · ")) + "</small></div>";
+      }).join("");
+      if (!$("#sqlTables").dataset.bound) {
+        $("#sqlTables").dataset.bound = "1";
+        $("#sqlTables").addEventListener("click", function (e) {
+          var card = e.target.closest(".sql-tbl");
+          if (!card) return;
+          $("#sqlText").value = "SELECT * FROM " + card.getAttribute("data-t") + " LIMIT 10;";
+          runSql();
+        });
+      }
+    }).catch(function () {
+      fetch("/api/health").then(function (r) { return r.json(); }).then(function (h) {
+        if (h && h.ok && !h.ready) {
+          $("#sqlOff").hidden = false;
+          $("#sqlApp").hidden = true;
+          $("#sqlOff").innerHTML = '<p style="font-weight:700;color:var(--ink)">本地数据库构建中…</p>' +
+            '<p style="color:var(--muted);font-size:13px">首次启动约 10-30 秒，8 秒后自动重试；期间站点页面可正常浏览。</p>';
+          setTimeout(function () { if (mode === "sql") loadSql(); }, 8000);
+          return;
+        }
+        showSqlOff();
+      }).catch(showSqlOff);
+    });
+  }
+  function showSqlOff() {
+    $("#sqlOff").hidden = false;
+    $("#sqlApp").hidden = true;
+    $("#sqlOff").innerHTML = '<p style="font-weight:700;color:var(--ink);margin-bottom:8px">SQL 控制台需要本地运行的服务</p>' +
+      '<p style="color:var(--muted);font-size:13px">把仓库下载到本地，在根目录执行下面一条命令（零第三方依赖，仅 Python 3.9+）：</p>' +
+      '<p style="margin-top:12px"><code class="mono" style="background:var(--card2);border:1px solid var(--line);border-radius:8px;padding:5px 14px;color:var(--gold)">python server.py</code></p>' +
+      '<p style="color:var(--muted);font-size:12px;margin-top:12px">Windows 可直接双击 <span class="mono">启动本地版.bat</span>。启动后回到本页即可查询。</p>';
+  }
+  var sqlLast = null;
+  function runSql() {
+    var sql = $("#sqlText").value;
+    $("#sqlErr").hidden = true;
+    $("#sqlMeta").innerHTML = "查询中…";
+    fetch("/api/query", { method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sql: sql }) }).then(function (r) { return r.json(); }).then(function (d) {
+      if (!d.ok) {
+        $("#sqlErr").textContent = d.error || "查询失败";
+        $("#sqlErr").hidden = false;
+        $("#sqlMeta").innerHTML = "";
+        return;
+      }
+      sqlLast = d;
+      $("#sqlMeta").innerHTML = "<span><b>" + d.rowCount.toLocaleString() + "</b> 行</span>" +
+        "<span><b>" + d.ms + "</b> ms</span>" +
+        (d.truncated ? '<span style="color:var(--gold)">已截断（上限 2000 行，请加 LIMIT）</span>' : "");
+      $("#sqlHead").innerHTML = "<tr>" + d.columns.map(function (c2) { return "<th>" + K.esc(c2) + "</th>"; }).join("") + "</tr>";
+      $("#sqlBody").innerHTML = d.rows.map(function (row) {
+        return "<tr>" + row.map(function (v) { return "<td>" + K.esc(v) + "</td>"; }).join("") + "</tr>";
+      }).join("") || '<tr><td colspan="12" style="color:var(--muted);text-align:center;padding:26px">0 行</td></tr>';
+    }).catch(function (e) {
+      $("#sqlErr").textContent = String(e);
+      $("#sqlErr").hidden = false;
+    });
+  }
+  if (new URLSearchParams(location.search).get("m") === "sql") {
+    var sqlBtn = document.querySelector('#typeTabs [data-m="sql"]');
+    if (sqlBtn) sqlBtn.click();
+  }
+
+  curScope = K.scopeBar("#scopeBar", function (id) { curScope = id; fillPos(); render(); });
   $("#qSearch").addEventListener("input", render);
   $("#qPos").addEventListener("change", render);
   $("#qMin").addEventListener("change", function () { sortKey = null; sortDir = -1; render(); });
@@ -277,8 +477,7 @@
   });
 
   curScope = K.scopeBar("#scopeBar", function (id) { curScope = id; fillPos(); render(); });
-  fillPos();
-  render();
+  if (mode !== "sql") { fillPos(); render(); }
 })();
 </script>
 </body>

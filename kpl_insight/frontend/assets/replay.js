@@ -16,8 +16,93 @@ window.KPL_REPLAY = (function () {
     : function (n) { return Number(n || 0).toLocaleString("en-US"); };
   var signed = function (v, d) { var n = Number(v || 0); return (n >= 0 ? "+" : "") + n.toFixed(d == null ? 0 : d); };
   var cache = {};
+  var activeJump = null;
   // 与 build_replay_frames.py 的 PLAYER_LANE_ORDER 一致：frames[].g / names 恒按此序排列
   var LANES = ["对抗路", "打野", "中路", "发育路", "游走"];
+  var NEUTRAL = { tyrant: 1, dark_tyrant: 1, lord: 1, storm: 1 };
+
+  function gdAt(points, m) {
+    if (!points || !points.length) return 0;
+    if (m <= points[0].m) return points[0].gd || 0;
+    if (m >= points[points.length - 1].m) return points[points.length - 1].gd || 0;
+    for (var i = 1; i < points.length; i++) {
+      if (m <= points[i].m) {
+        var a = points[i - 1], c = points[i];
+        var den = c.m - a.m;
+        var t = den ? (m - a.m) / den : 0;
+        return (a.gd || 0) + ((c.gd || 0) - (a.gd || 0)) * t;
+      }
+    }
+    return points[points.length - 1].gd || 0;
+  }
+
+  function keyEventsOf(b) {
+    var all = (b && b.events) || [];
+    var keys = all.filter(function (e) {
+      return e.t === "death" || NEUTRAL[e.t] || e.t === "first_blood" ||
+        (e.t === "tower" && Math.abs(e.dgd || 0) >= 1500);
+    });
+    return keys.length ? keys : all;
+  }
+
+  function evBadges(e) {
+    var out = "";
+    if (e.dgd != null) {
+      out += '<em class="rp-evdg ' + (e.dgd >= 0 ? "up" : "down") + '">' + goldText(e.dgd) + "</em>";
+    }
+    if (e.t === "death") {
+      out += '<em class="rp-evt">' + (e.respawn_sec ? "复活 " + e.respawn_sec + "s" : "终局") + "</em>";
+    }
+    return out;
+  }
+
+  function eventBtn(e, active) {
+    return '<button type="button" class="rp-ev' + (active ? " on" : "") + '" data-m="' + e.m + '">' +
+      '<span class="t mono">' + e.m.toFixed(0) + "′</span>" + esc(e.l) + evBadges(e) + "</button>";
+  }
+
+  function mmss(m) {
+    var total = Math.max(0, Math.round(Number(m || 0) * 60));
+    return Math.floor(total / 60) + ":" + String(total % 60).padStart(2, "0");
+  }
+
+  function eventShort(t) {
+    return ({ death: "死", first_blood: "血", kill: "击", tower: "塔", tyrant: "暴", dark_tyrant: "暗", lord: "主", storm: "龙" })[t] || "•";
+  }
+
+  function nearestFrame(b, m) {
+    var fr = (b && b.frames) || [], best = 0;
+    for (var i = 0; i < fr.length; i++) {
+      if (Math.abs(fr[i].m - m) < Math.abs(fr[best].m - m)) best = i;
+    }
+    return best;
+  }
+
+  function pAtM(b, side, m) {
+    var pts = ((b && b.frames) || []).filter(function (f) { return f.p != null; });
+    if (!pts.length) return null;
+    if (m <= pts[0].m) return side === 2 ? 1 - pts[0].p : pts[0].p;
+    if (m >= pts[pts.length - 1].m) return side === 2 ? 1 - pts[pts.length - 1].p : pts[pts.length - 1].p;
+    for (var i = 1; i < pts.length; i++) {
+      if (m <= pts[i].m) {
+        var a = pts[i - 1], c = pts[i], den = c.m - a.m;
+        var t = den ? (m - a.m) / den : 0;
+        var p = a.p + (c.p - a.p) * t;
+        return side === 2 ? 1 - p : p;
+      }
+    }
+    return null;
+  }
+
+  function gdAtM(b, side, m) {
+    var gd = (b.gold_curve && b.gold_curve.length) ? gdAt(b.gold_curve, m) : (b.frames[0] || {}).gd || 0;
+    return side === 2 ? -gd : gd;
+  }
+
+  function directionOf(dp, dg) {
+    if (dp == null || dg == null || (!dp && !dg)) return "";
+    return dp * dg < 0 ? "反向" : "同向";
+  }
 
   function loadPackage(matchId, cb) {
     if (cache[matchId]) { cb(cache[matchId]); return; }
@@ -32,45 +117,119 @@ window.KPL_REPLAY = (function () {
     return !!idx[matchId];
   }
 
-  /* ---------- 时间轴曲线 ---------- */
-  function curveSVG(frames, t1, t2, curIdx) {
-    var W = 1040, H = 240, P = { l: 46, r: 54, t: 16, b: 28 };
-    var maxM = Math.max(10, frames[frames.length - 1].m);
-    var gds = frames.map(function (f) { return f.gd || 0; });
-    var gMax = Math.max(1, Math.max.apply(null, gds.map(Math.abs)));
+  /* ---------- 时间轴曲线（V5 设计语言：天平优势面积 + 金差条带） ---------- */
+  function curveSVG(frames, t1, t2, curIdx, b) {
+    var W = 1040, H = 330;
+    var P = { l: 54, r: 58, t: 20 };
+    var mainT = P.t, mainB = 210;
+    var stripT = 232, stripB = 292, railY = 314;
+    var gc = (b && b.gold_curve && b.gold_curve.length)
+      ? b.gold_curve
+      : frames.map(function (f) { return { m: f.m, gd: f.gd || 0 }; });
+    var maxM = Math.max(10, frames[frames.length - 1].m, gc[gc.length - 1].m);
+    var light = !document.documentElement.classList.contains("dark-site");
+    var T1 = light ? "#C43A4B" : "#FF7184";
+    var T2 = light ? "#2E6FD0" : "#6FA5FF";
+    var LINE = light ? "#12203A" : "#E8EEF7";
+    var GRID = light ? "#E3E8F1" : "#22304A";
+    var LABEL = light ? "#64738B" : "#8FA0B8";
+    var CARD = light ? "#FFFFFF" : "#111A29";
     var X = function (m) { return P.l + m / maxM * (W - P.l - P.r); };
-    var Y = function (p) { return P.t + (1 - p) * (H - P.t - P.b); };
-    var YG = function (v) { return P.t + (0.5 - v / (gMax * 2)) * (H - P.t - P.b); };
-    var s = '<svg viewBox="0 0 ' + W + " " + H + '" preserveAspectRatio="none" role="img" aria-label="胜率时间轴">';
-    for (var gi = 0; gi <= 4; gi++) {
-      var gv = gi / 4, gy = Y(gv).toFixed(1);
-      s += '<line x1="' + P.l + '" y1="' + gy + '" x2="' + (W - P.r) + '" y2="' + gy + '" stroke=' + CP.grid + ' stroke-dasharray="4 6"/>' +
-        '<text x="' + (P.l - 8) + '" y="' + (parseFloat(gy) + 4) + '" text-anchor="end" font-size="10.5" fill=' + CP.label + ' font-family="Inter,monospace">' +
-        Math.round(gv * 100) + '%</text>';
-    }
-    for (var m = 0; m <= maxM; m += 5) {
-      s += '<text x="' + X(m).toFixed(1) + '" y="' + (H - 10) + '" text-anchor="middle" font-size="10.5" fill=' + CP.label + ' font-family="Inter,monospace">' + m + "′</text>";
-    }
-    /* 50% 中线 + 金差右轴 */
-    s += '<line x1="' + P.l + '" y1="' + Y(0.5).toFixed(1) + '" x2="' + (W - P.r) + '" y2="' + Y(0.5).toFixed(1) + '" stroke=' + CP.axis + ' />';
-    [gMax, 0, -gMax].forEach(function (gv) {
-      s += '<text x="' + (W - P.r + 8) + '" y="' + (YG(gv) + 4).toFixed(1) +
-        '" font-size="10.5" fill=' + CP.label + ' font-family="Inter,monospace">' +
-        (gv > 0 ? "+" : "") + (gv / 1000).toFixed(1) + "k</text>";
+    var Y = function (p) { return mainB - p * (mainB - mainT); };
+    var gds = gc.map(function (f) { return Number(f.gd) || 0; });
+    var gMax = Math.max(1000, Math.max.apply(null, gds.map(Math.abs))) * 1.15;
+    var YG = function (v) { return (stripT + stripB) / 2 - v / gMax * ((stripB - stripT) / 2 - 4); };
+    var s = '<svg viewBox="0 0 ' + W + " " + H + '" preserveAspectRatio="none" role="img" aria-label="胜率与金差时间轴">';
+    s += '<rect x="0" y="0" width="' + W + '" height="' + H + '" fill="' + CARD + '"/>';
+    /* 0–100% 胜率网格；50% 是唯一基线 */
+    [0, 25, 50, 75, 100].forEach(function (pct) {
+      var y = Y(pct / 100).toFixed(1);
+      var zero = pct === 50;
+      s += '<line x1="' + P.l + '" y1="' + y + '" x2="' + (W - P.r) + '" y2="' + y +
+        '" stroke="' + GRID + '"' + (zero ? "" : ' stroke-dasharray="4 7"') + ' opacity="' + (zero ? 1 : .9) + '"/>' +
+        '<text x="' + (P.l - 9) + '" y="' + (parseFloat(y) + 4) + '" text-anchor="end" font-size="10.5" fill="' + LABEL +
+        '" font-family="Inter,monospace">' + pct + "%</text>";
     });
-    var gPts = frames.map(function (f) { return X(f.m).toFixed(1) + "," + YG(f.gd || 0).toFixed(1); }).join(" ");
-    s += '<polyline points="' + gPts + '" fill="none" stroke=' + CP.label + ' stroke-width="1.6" stroke-dasharray="5 4" opacity=".85"/>';
-    var pts = frames.map(function (f) {
-      return X(f.m).toFixed(1) + "," + Y(f.p == null ? 0.5 : f.p).toFixed(1);
-    }).join(" ");
-    var area = "M" + X(frames[0].m).toFixed(1) + "," + Y(0.5).toFixed(1) + " L" + pts.split(" ").join(" L") +
-      " L" + X(frames[frames.length - 1].m).toFixed(1) + "," + Y(0.5).toFixed(1) + " Z";
-    s += '<path d="' + area + '" fill=' + CP.mark + ' fill-opacity=".10"/>';
-    s += '<polyline points="' + pts + '" fill="none" stroke=' + CP.mark + ' stroke-width="2.2" stroke-linejoin="round"/>';
+    s += '<text x="' + (P.l + 6) + '" y="' + (Y(0.5) - 6).toFixed(1) + '" font-size="10" fill="' + LABEL +
+      '" font-family="Inter,monospace">五五开</text>';
+    /* 领先带：只从 50% 基线长出来，低透明度，不再糊成整块 */
+    function areaPath(sign) {
+      var d = "";
+      frames.forEach(function (f, i) {
+        var p = f.p == null ? 0.5 : Math.max(0, Math.min(1, Number(f.p)));
+        var v = sign > 0 ? Math.max(0.5, p) : Math.min(0.5, p);
+        d += (i ? "L" : "M") + X(f.m).toFixed(1) + " " + Y(v).toFixed(1) + " ";
+      });
+      var first = frames[0].m, last = frames[frames.length - 1].m;
+      return d + "L" + X(last).toFixed(1) + " " + Y(0.5).toFixed(1) + " L" + X(first).toFixed(1) + " " +
+        Y(0.5).toFixed(1) + " Z";
+    }
+    s += '<path d="' + areaPath(1) + '" fill="' + T1 + '" fill-opacity=".12" stroke="none"/>';
+    s += '<path d="' + areaPath(-1) + '" fill="' + T2 + '" fill-opacity=".12" stroke="none"/>';
+    /* 胜率主线 */
+    var line = "";
+    frames.forEach(function (f, i) {
+      var p = f.p == null ? 0.5 : Math.max(0, Math.min(1, Number(f.p)));
+      line += (i ? "L" : "M") + X(f.m).toFixed(1) + " " + Y(p).toFixed(1) + " ";
+    });
+    s += '<path d="' + line + '" fill="none" stroke="' + LINE + '" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>';
+    /* 金差条带 */
+    s += '<rect x="' + P.l + '" y="' + stripT + '" width="' + (W - P.l - P.r) + '" height="' + (stripB - stripT) +
+      '" rx="7" fill="' + GRID + '" opacity=".5"/>';
+    var gLine = "", gPos = "", gNeg = "";
+    gc.forEach(function (f, i) {
+      var x = X(f.m).toFixed(1), y = YG(f.gd || 0).toFixed(1);
+      gLine += (i ? "L" : "M") + x + " " + y + " ";
+      gPos += (i ? "L" : "M") + x + " " + YG(Math.max(0, f.gd || 0)).toFixed(1) + " ";
+      gNeg += (i ? "L" : "M") + x + " " + YG(Math.min(0, f.gd || 0)).toFixed(1) + " ";
+    });
+    var gx0 = X(gc[0].m).toFixed(1), gx1 = X(gc[gc.length - 1].m).toFixed(1), gy0 = YG(0).toFixed(1);
+    s += '<path d="' + gPos + "L" + gx1 + " " + gy0 + " L" + gx0 + " " + gy0 + ' Z" fill="' + T1 + '" fill-opacity=".14" stroke="none"/>';
+    s += '<path d="' + gNeg + "L" + gx1 + " " + gy0 + " L" + gx0 + " " + gy0 + ' Z" fill="' + T2 + '" fill-opacity=".14" stroke="none"/>';
+    s += '<path d="' + gLine + '" fill="none" stroke="' + LINE + '" stroke-width="1.4" opacity=".55"/>';
+    s += '<line x1="' + P.l + '" y1="' + gy0 + '" x2="' + (W - P.r) + '" y2="' + gy0 + '" stroke="' + GRID + '" opacity=".9"/>';
+    [gMax, 0, -gMax].forEach(function (gv) {
+      s += '<text x="' + (W - P.r + 8) + '" y="' + (YG(gv) + 4).toFixed(1) + '" font-size="10" fill="' + LABEL +
+        '" font-family="Inter,monospace">' + (gv > 0 ? "+" : gv < 0 ? "−" : "") +
+        (Math.abs(gv) / 1000).toFixed(gv === 0 ? 0 : 1) + "k</text>";
+    });
+    s += '<text x="' + (P.l - 9) + '" y="' + ((stripT + stripB) / 2 + 4).toFixed(1) + '" text-anchor="end" font-size="10" fill="' +
+      LABEL + '" font-family="Inter,monospace">金差</text>';
+    var stepM = maxM > 40 ? 10 : 5;
+    for (var m = 0; m <= maxM; m += stepM) {
+      s += '<text x="' + X(m).toFixed(1) + '" y="' + (H - 8) + '" text-anchor="middle" font-size="10.5" fill="' + LABEL +
+        '" font-family="Inter,monospace">' + m + "′</text>";
+    }
+    /* 关键事件：少量竖线 + 底部圆点，避免糊屏 */
+    var evs = keyEventsOf(b).filter(function (e) { return e.key !== 0 && e.m != null; }).slice(-12);
+    evs.forEach(function (e) {
+      var ex = X(e.m);
+      if (ex < P.l || ex > W - P.r) return;
+      var color = e.team === t1 ? T1 : e.team === t2 ? T2 : LABEL;
+      s += '<g><line x1="' + ex.toFixed(1) + '" y1="' + mainT + '" x2="' + ex.toFixed(1) + '" y2="' + stripB +
+        '" stroke="' + color + '" stroke-width="1" stroke-dasharray="3 5" opacity=".15"/>' +
+        '<circle cx="' + ex.toFixed(1) + '" cy="' + railY + '" r="2.6" fill="' + color + '" opacity=".9"/>' +
+        '<title>' + esc(e.m.toFixed(1) + "′ " + e.l) + "</title></g>";
+    });
+    s += '<text x="' + (P.l - 9) + '" y="' + (railY + 4) + '" text-anchor="end" font-size="10" fill="' + LABEL +
+      '" font-family="Inter,monospace">事件</text>';
+    /* 当前帧游标 */
     var cf = frames[curIdx] || frames[frames.length - 1];
-    var cx = X(cf.m).toFixed(1), cy = Y(cf.p == null ? 0.5 : cf.p).toFixed(1);
-    s += '<line x1="' + cx + '" y1="' + P.t + '" x2="' + cx + '" y2="' + (H - P.b) + '" stroke=' + CP.label + ' stroke-width="1" stroke-dasharray="3 4"/>';
-    s += '<circle cx="' + cx + '" cy="' + cy + '" r="4.5" fill=' + CP.dot + ' stroke=' + CP.mark + ' stroke-width="2.4"/>';
+    var cx = X(cf.m).toFixed(1);
+    var pCur = cf.p == null ? 0.5 : Math.max(0, Math.min(1, Number(cf.p)));
+    var cy = Y(pCur).toFixed(1);
+    var gy = YG(gdAt(gc, cf.m)).toFixed(1);
+    s += '<line x1="' + cx + '" y1="' + mainT + '" x2="' + cx + '" y2="' + stripB + '" stroke="' + LABEL +
+      '" stroke-width="1" stroke-dasharray="3 4" opacity=".8"/>';
+    s += '<circle cx="' + cx + '" cy="' + cy + '" r="4.5" fill="' + CARD + '" stroke="' + LINE + '" stroke-width="2.2"/>';
+    s += '<circle cx="' + cx + '" cy="' + gy + '" r="3.2" fill="' + CARD + '" stroke="' + T1 + '" stroke-width="1.8"/>';
+    s += '<text x="' + (parseFloat(cx) + 8) + '" y="' + (parseFloat(cy) - 8).toFixed(1) + '" font-size="11" font-weight="700" fill="' +
+      LINE + '" font-family="Inter,monospace">' + Math.round(pCur * 100) + "%</text>";
+    s += '<text x="' + (parseFloat(cx) + 8) + '" y="' + (parseFloat(gy) - 6).toFixed(1) + '" font-size="10" fill="' +
+      LABEL + '" font-family="Inter,monospace">' + goldText(gdAt(gc, cf.m)) + "</text>";
+    s += '<text x="' + (W - P.r) + '" y="' + (P.t - 4) + '" text-anchor="end" font-size="10.5" font-family="Inter,monospace">' +
+      '<tspan fill="' + T1 + '">●</tspan><tspan fill="' + LABEL + '"> ' + esc(t1) +
+      '</tspan><tspan fill="' + LABEL + '"> vs </tspan><tspan fill="' + T2 + '">●</tspan><tspan fill="' + LABEL + '"> ' + esc(t2) + "</tspan></text>";
     s += "</svg>";
     return s;
   }
@@ -93,7 +252,8 @@ window.KPL_REPLAY = (function () {
     var sum = function (a) { return a.reduce(function (x, v) { return x + (v || 0); }, 0); };
     var t1 = sum(g1), t2 = sum(g2);
     var head = '<div class="rp-pt">经济状态 <em class="mono">金差 ' + signed(gd) +
-      (prev ? " · 较上一帧 " + signed(d) : "") + "</em></div>";
+      (prev ? " · 较上一帧 " + signed(d) : "") + "</em>" +
+      '<span class="rp-gold-src">' + (b.gold_src === "camp+local" ? "营地网格 + 本地校准" : "本地分钟") + "</span></div>";
     if (layer !== "lane") {
       return '<div class="rp-panel">' + head +
         '<div class="rp-gd"><b class="' + (gd >= 0 ? "up" : "down") + '">' + signed(gd) + "</b>" +
@@ -151,7 +311,7 @@ window.KPL_REPLAY = (function () {
     return segs.slice(0, 3);
   }
 
-  /* ---------- 赛后故事层：一句话结论 + 三个转折 ----------
+  /* ---------- 赛后故事层：一句话结论 + 关键节点 ----------
      原则：
        1. 只陈述数据里能直接读到的变化，不写因果；
        2. 官方 / 代理 / 估算分开标注；
@@ -174,12 +334,6 @@ window.KPL_REPLAY = (function () {
     var a = Math.abs(v);
     var body = a >= 1000 ? (a / 1000).toFixed(1) + "k" : Math.round(a).toString();
     return (v > 0 ? "+" : v < 0 ? "-" : "") + body;
-  }
-  function statDelta(fs, fe, key, side) {
-    if (!fs || !fe || !fs[key] || !fe[key]) return null;
-    var a = Number(fs[key][side - 1]), c = Number(fe[key][side - 1]);
-    if (!isFinite(a) || !isFinite(c)) return null;
-    return c - a;
   }
   function eventsNear(b, m0, m1, pad) {
     var p = pad == null ? 0.8 : pad;
@@ -297,69 +451,80 @@ window.KPL_REPLAY = (function () {
     }
     return parts.join(" · ");
   }
-  function storyCard(b, s, idx1, decisive) {
-    var evs = eventsNear(b, s.m0, s.m1, 0.8);
-    var evText = evs.length
-      ? evs.map(function (e) { return esc(e.l); }).join(" · ")
-      : "同段无结构性事件记录";
-    var dk = statDelta(b.frames[s.start], b.frames[s.end], "k", s.favored);
-    var dt = statDelta(b.frames[s.start], b.frames[s.end], "t", s.favored);
-    var bits = [];
-    if (dk != null) bits.push("击杀 " + (dk > 0 ? "+" : "") + dk);
-    if (dt != null) bits.push("推塔 " + (dt > 0 ? "+" : "") + dt);
-    return '<button type="button" class="rp-moment' + (decisive === s ? " key" : "") +
-      '" data-m="' + s.m0 + '" aria-label="跳到第 ' + minute(s.m0) + ' 分钟">' +
-      '<span class="rp-moment-top"><span class="rp-moment-i mono">0' + idx1 + '</span>' +
-      '<span class="rp-moment-t mono">' + minute(s.m0) + "′ → " + minute(s.m1) + "′</span>" +
-      (decisive === s ? '<span class="rp-moment-key">胜负窗口</span>' : "") + "</span>" +
-      '<span class="rp-moment-team">' + esc(teamName(b, s.favored)) + " 占优</span>" +
-      '<span class="rp-moment-main"><span>估算胜率</span><b class="mono">' + pct(s.p0) + " → " + pct(s.p1) +
-      '</b><em class="' + ((s.p1 - s.p0) >= 0 ? "up" : "down") + '">' +
-      signed((s.p1 - s.p0) * 100) + "pp</em></span>" +
-      '<span class="rp-moment-sub"><span>金差</span><b class="mono">' + goldText(s.g0) + " → " + goldText(s.g1) +
-      '</b><span class="rp-tag proxy">代理</span></span>' +
-      '<span class="rp-moment-ev"><span class="rp-tag official">官方</span>' + evText +
-      (bits.length ? " · " + bits.join(" · ") : "") + "</span></button>";
-  }
-  function storyFallbackCards(b) {
-    var fr = b.frames || [], win = b.win;
-    var candidates = [];
-    (b.events || []).forEach(function (e) {
-      var before = null, after = null;
-      for (var i = 0; i < fr.length; i++) {
-        if (fr[i].m <= e.m - 0.4) before = fr[i];
-        if (fr[i].m >= e.m + 0.4) { after = fr[i]; break; }
+  function clusterKeyEvents(b) {
+    var evs = keyEventsOf(b).filter(function (e) { return e.m != null; })
+      .sort(function (a, c) { return a.m - c.m; });
+    var groups = [];
+    evs.forEach(function (e) {
+      var g = groups[groups.length - 1];
+      if (g && e.m - g.m1 <= 1.2) { g.evs.push(e); g.m1 = e.m; }
+      else groups.push({ evs: [e], m0: e.m, m1: e.m });
+    });
+    return groups.map(function (g) {
+      var deaths = g.evs.filter(function (e) { return e.t === "death"; });
+      var teams = {};
+      g.evs.forEach(function (e) { if (e.team) teams[e.team] = (teams[e.team] || 0) + 1; });
+      var team = Object.keys(teams).sort(function (a, c) { return teams[c] - teams[a]; })[0] || "";
+      var side = team === b.t1 ? 1 : team === b.t2 ? 2 : null;
+      var neutral = g.evs.filter(function (e) { return NEUTRAL[e.t]; })[0];
+      var label, kind, iconType;
+      if (deaths.length >= 2) {
+        label = "团战 · " + team; kind = "fight"; iconType = "death";
+      } else if (deaths.length === 1) {
+        label = deaths[0].l; kind = "death"; iconType = "death";
+      } else if (neutral) {
+        label = neutral.l; kind = "objective"; iconType = neutral.t;
+      } else {
+        label = g.evs[0].l; kind = "event"; iconType = g.evs[0].t;
       }
-      if (!before || !after) return;
-      var g0 = gdOf(before, win), g1 = gdOf(after, win);
-      if (g0 == null || g1 == null) return;
-      candidates.push({ e: e, g0: g0, g1: g1, d: Math.abs(g1 - g0) });
+      var p0 = side ? pAtM(b, side, Math.max(0, g.m0 - 0.5)) : null;
+      var p1 = side ? pAtM(b, side, g.m1 + 0.5) : null;
+      var gd0 = side ? gdAtM(b, side, g.m0) : null;
+      var gd1 = side ? gdAtM(b, side, g.m1) : null;
+      var dp = (p0 != null && p1 != null) ? (p1 - p0) * 100 : null;
+      var dg = (gd0 != null && gd1 != null) ? (gd1 - gd0) : null;
+      return {
+        m0: g.m0, m1: g.m1, side: side, team: team, label: label, kind: kind,
+        icon: eventShort(iconType), iconType: iconType,
+        p0: p0, p1: p1, g0: gd0, g1: gd1, dp: dp, dg: dg,
+        conflict: dp != null && dg != null && dp * dg < 0,
+        evs: g.evs
+      };
     });
-    candidates.sort(function (a, c) { return c.d - a.d; });
-    var picked = [];
-    candidates.forEach(function (x) {
-      // 同一波团战里连续两条事件（推塔 / 拿龙）只留经济变化最大的一条
-      if (picked.some(function (p) { return Math.abs(p.e.m - x.e.m) < 2; })) return;
-      picked.push(x);
-    });
-    return picked.slice(0, 3).map(function (x, i) {
-      return '<button type="button" class="rp-moment" data-m="' + x.e.m + '" aria-label="跳到第 ' + minute(x.e.m) + ' 分钟">' +
-        '<span class="rp-moment-top"><span class="rp-moment-i mono">0' + (i + 1) + '</span>' +
-        '<span class="rp-moment-t mono">' + minute(x.e.m) + "′</span>" +
-        '<span class="rp-moment-key">官方事件</span></span>' +
-        '<span class="rp-moment-team">' + esc(teamName(b, win)) + " 视角</span>" +
-        '<span class="rp-moment-main"><span>金差</span><b class="mono">' + goldText(x.g0) + " → " + goldText(x.g1) +
-        '</b><span class="rp-tag proxy">代理</span></span>' +
-        '<span class="rp-moment-ev"><span class="rp-tag official">官方</span>' + esc(x.e.l) + "</span></button>";
-    }).join("");
   }
+
+  function storyNodes(b, decisive) {
+    var nodes = [];
+    if (decisive) {
+      var dp = (decisive.p1 - decisive.p0) * 100;
+      var dg = decisive.g1 - decisive.g0;
+      nodes.push({
+        m0: decisive.m0, m1: decisive.m1, side: decisive.favored,
+        team: teamName(b, decisive.favored), label: "模型跳变",
+        kind: "model", icon: "模", iconType: "model",
+        p0: decisive.p0, p1: decisive.p1, g0: decisive.g0, g1: decisive.g1,
+        dp: dp, dg: dg,
+        conflict: dp * dg < 0,
+        evs: eventsNear(b, decisive.m0, decisive.m1, 0.8)
+      });
+    }
+    var clusters = clusterKeyEvents(b).filter(function (c) {
+      return !decisive || c.m1 < decisive.m0 - 1.2 || c.m0 > decisive.m1 + 1.2;
+    });
+    clusters.sort(function (a, c) { return Math.abs(c.dg || 0) - Math.abs(a.dg || 0); });
+    clusters.slice(0, decisive ? 3 : 4).forEach(function (c) { nodes.push(c); });
+    nodes.sort(function (a, c) { return a.m0 - c.m0; });
+    return nodes.slice(0, 5);
+  }
+
   function buildStory(b) {
     var fr = b.frames || [], win = b.win;
     var story = {
       hasProb: b.src === "live" && fr.filter(function (f) { return f.p != null; }).length >= 3,
       winner: win === 1 || win === 2 ? teamName(b, win) : "—",
       duration: Number(b.dur || 0),
-      cards: "", sentence: "", note: "", decisive: null
+      sentence: "", note: "", decisive: null,
+      nodes: [], directionConflict: false
     };
     if (win !== 1 && win !== 2) {
       story.sentence = "本局结果未记录，无法生成胜负结论。可展开时间轴查看官方事件与经济快照。";
@@ -375,47 +540,51 @@ window.KPL_REPLAY = (function () {
     if (story.hasProb && fr.length >= 3 && story.modelAgrees === false) {
       // 终局方向和官方结果相反：这局不能用胜率曲线讲“谁赢在哪一段”，
       // 只保留官方事件与经济快照，并把模型未命中说清楚。
-      story.cards = storyFallbackCards(b);
       story.sentence = "<b>" + esc(story.winner) + "</b> 最终在 " + minute(story.duration) +
         "′ 结束比赛。但模型最后一帧只给 " + esc(story.winner) + " <b>" + pct(finalP) +
         "</b> 的胜率，方向和官方结果相反，所以本页不拿这条曲线解释胜负；" +
-        (story.cards ? "下面按官方事件前后的经济快照列三个可核对的时间点。" : "下面只展示官方事件与完整时间轴。");
+        "下面按官方事件与经济快照列出关键节点。";
       story.note = "模型终局判断与官方结果相反（" + pct(finalP) + "），不藏。此处只陈述官方事件与经济代理，不做胜负归因。";
     } else if (story.hasProb && fr.length >= 3) {
       var segs = segmentList(b);
       var decisive = decisiveSegment(b, segs);
       story.decisive = decisive;
-      var top = segs.slice().sort(function (a, c) { return c.mag - a.mag; }).slice(0, 3);
-      if (decisive && top.indexOf(decisive) < 0) {
-        if (top.length >= 3) top[2] = decisive; else top.push(decisive);
-      }
-      top.sort(function (a, c) { return a.m0 - c.m0; });
-      story.cards = top.map(function (s, i) { return storyCard(b, s, i + 1, decisive); }).join("");
       if (decisive) {
         var evs = eventsNear(b, decisive.m0, decisive.m1, 0.8);
         var evText = evs.length
           ? "同段官方事件为 " + evs.slice(0, 3).map(function (e) { return esc(e.l); }).join(" / ") + "。"
           : "同段没有结构性事件记录。";
+        var dp = (decisive.p1 - decisive.p0) * 100;
+        var dg = decisive.g1 - decisive.g0;
+        story.directionConflict = dp * dg < 0;
         story.sentence = "<b>" + esc(story.winner) + "</b> 在第 " + minute(decisive.m0) + "–" +
           minute(decisive.m1) + " 分钟把估算胜率从 <b>" + pct(decisive.p0) + "</b> 拉到 <b>" +
-          pct(decisive.p1) + "</b>（" + signed((decisive.p1 - decisive.p0) * 100) + "pp），" +
-          "同期金差从 " + goldText(decisive.g0) + " 到 " + goldText(decisive.g1) + "；" + evText +
+          pct(decisive.p1) + "</b>（" + signed(dp) + "pp），" +
+          "同期金差从 " + goldText(decisive.g0) + " 到 " + goldText(decisive.g1) +
+          (story.directionConflict ? "（方向相反）" : "") + "；" + evText +
           (decisive.held ? "此后模型胜率未再低于 50%。" : "") +
           "最终在 " + minute(story.duration) + "′ 结束比赛。";
-        story.note = decisive.held
-          ? "“胜负窗口”按模型胜率选择：该段结束后领先方再未被模型判为落后。只描述同段共现，不构成因果。"
-          : "“胜负窗口”按模型胜率变化幅度选择；该段结束后仍有反复，不写成“决定胜负”。";
+        story.note = story.directionConflict
+          ? "胜率跳变与金差方向不一致，可能由阵容、先验或其他特征驱动；这里只陈述同期发生，不写成因果。"
+          : (decisive.held
+            ? "“胜负窗口”按模型胜率选择：该段结束后领先方再未被模型判为落后。只描述同段共现，不构成因果。"
+            : "“胜负窗口”按模型胜率变化幅度选择；该段结束后仍有反复，不写成“决定胜负”。");
       } else {
         story.sentence = "<b>" + esc(story.winner) + "</b> 最终在 " + minute(story.duration) +
           "′ 结束比赛。整局没有出现方向明确、幅度足够大的模型胜率摆动，无法指出单一胜负窗口。";
         story.note = "本局胜率曲线没有可判定的转折段。";
       }
     } else {
-      story.cards = storyFallbackCards(b);
       story.sentence = "<b>" + esc(story.winner) + "</b> 最终在 " + minute(story.duration) +
         "′ 结束比赛。本局没有直播期模型胜率记录，不能用胜率判断转折；" +
-        (story.cards ? "下面按官方事件前后的经济快照给出三个可核对的时间点。" : "下面只展示完整时间轴与经济快照。");
+        "下面按官方事件与经济快照列出关键节点。";
       story.note = "没有直播胜率时，结论只依赖官方事件与经济代理，不写“胜率逆转”。";
+    }
+    story.nodes = storyNodes(b, story.decisive);
+    if (story.modelAgrees === false) {
+      story.nodes.forEach(function (n) {
+        n.p0 = null; n.p1 = null; n.dp = null; n.conflict = false;
+      });
     }
     return story;
   }
@@ -424,8 +593,53 @@ window.KPL_REPLAY = (function () {
     var hasBp = !!document.querySelector(".bp-grid");
     var hrefAnalog = "sandbox.html?battle=" + encodeURIComponent(b.battleId) +
       "&m=" + encodeURIComponent(minute(s.decisive ? s.decisive.m0 : (b.frames[0] || {}).m || 0));
+    var kpis = "";
+    if (s.decisive) {
+      var dp0 = (s.decisive.p1 - s.decisive.p0) * 100;
+      var dg0 = s.decisive.g1 - s.decisive.g0;
+      kpis = '<div class="rp-kpis">' +
+        '<span class="rp-kpi"><b class="mono up">' + signed(dp0) + "pp</b><em>估算胜率</em></span>" +
+        '<span class="rp-kpi' + (s.directionConflict ? " warn" : "") + '"><b class="mono ' +
+        (dg0 >= 0 ? "up" : "down") + '">' + goldText(dg0) + "</b><em>金差" +
+        (s.directionConflict ? " · 反向" : "") + "</em></span>" +
+        '<span class="rp-kpi"><b class="mono">' + (s.nodes || []).length + "</b><em>关键节点</em></span>" +
+        "</div>";
+    } else if ((s.nodes || []).length) {
+      kpis = '<div class="rp-kpis">' +
+        (s.hasProb && s.finalP != null
+          ? '<span class="rp-kpi' + (s.modelAgrees === false ? " warn" : "") +
+            '"><b class="mono">' + pct(s.finalP) + "</b><em>模型终局</em></span>"
+          : "") +
+        '<span class="rp-kpi"><b class="mono">' + s.nodes.length + "</b><em>关键节点</em></span>" +
+        "</div>";
+    }
+    var rows = (s.nodes || []).map(function (n) {
+      var dp = n.dp, dg = n.dg;
+      var conflict = n.conflict || (dp != null && dg != null && dp * dg < 0);
+      var pTxt = (n.p0 == null || n.p1 == null) ? "—" :
+        pct(n.p0) + " → " + pct(n.p1) + ' <em class="' + (dp >= 0 ? "up" : "down") + '">' +
+        signed(dp, 0) + "pp</em>";
+      var gTxt = (n.g0 == null || n.g1 == null) ? "—" :
+        goldText(n.g0) + " → " + goldText(n.g1) + ' <em class="' + (dg >= 0 ? "up" : "down") + '">' +
+        goldText(dg) + "</em>";
+      var dir = (dp == null || dg == null) ? "—" :
+        (conflict ? '<span class="rp-dir warn">反向</span>' : '<span class="rp-dir">同向</span>');
+      var time = mmss(n.m0) + (n.m1 - n.m0 > 0.15 ? "–" + mmss(n.m1) : "");
+      var icon = n.icon || eventShort(n.iconType || n.kind);
+      return '<tr class="rp-node" data-m="' + n.m0 + '" tabindex="0">' +
+        '<td class="mono">' + time + "</td>" +
+        '<td><span class="rp-node-i">' + esc(icon) + "</span>" + esc(n.label) + "</td>" +
+        '<td class="num">' + pTxt + "</td>" +
+        '<td class="num">' + gTxt + "</td>" +
+        "<td>" + dir + "</td></tr>";
+    }).join("");
+    var table = rows
+      ? '<div class="rp-node-wrap"><table class="rp-node-table"><thead><tr><th>时间</th><th>关键节点</th>' +
+        '<th class="num">估算胜率</th><th class="num">金差</th><th>方向</th></tr></thead><tbody>' +
+        rows + "</tbody></table></div>"
+      : "";
     return '<div class="rp-story">' +
-      '<div class="rp-story-kicker"><span class="mono">本局结论 · G' + (b.seq || 1) + '</span>' +
+      '<div class="rp-story-kicker"><span class="mono">本局结论 · G' + (b.seq || 1) + "</span>" +
       '<span class="rp-tag official">官方结果</span>' +
       (s.hasProb
         ? (s.modelAgrees === false
@@ -434,7 +648,7 @@ window.KPL_REPLAY = (function () {
         : '<span class="rp-tag proxy">无直播胜率</span>') +
       '<span class="rp-story-who">' + esc(b.t1) + " vs " + esc(b.t2) + " · " + minute(b.dur) + "′</span></div>" +
       '<div class="rp-story-lead">' + s.sentence + "</div>" +
-      (s.cards ? '<div class="rp-story-grid">' + s.cards + "</div>" : "") +
+      kpis + table +
       '<div class="rp-story-note">' + s.note + "</div>" +
       '<div class="rp-story-foot"><span class="rp-cov mono">' + coverageText(b) + "</span>" +
       '<span class="rp-legend"><span class="rp-tag official">官方</span>结果 / 击杀 / 推塔 / 资源　' +
@@ -449,19 +663,19 @@ window.KPL_REPLAY = (function () {
   }
 
   function tpPanel(b) {
-    var head = '<div class="rp-pt">比赛转折 <em class="mono">模型胜率变点 · ' + b.frames.length + " 个采样点</em></div>";
     var tps = turningPoints(b);
     if (!tps.length) {
-      return '<div class="rp-panel rp-tp">' + head + '<p class="rp-disc">' +
+      return '<details class="rp-tp-fold"><summary><span>完整变点列表</span><span class="mono">无显著转折</span></summary>' +
+        '<p class="rp-disc">' +
         (b.src === "replay"
           ? "本局没有直播期模型胜率记录，赛后重放曲线波动大，不做转折判定。"
-          : "本局胜率曲线平稳，未检出显著转折段。") + "</p></div>";
+          : "本局胜率曲线平稳，未检出显著转折段。") + "</p></details>";
     }
     var items = tps.map(function (t) {
       var m0 = b.frames[t.startIdx].m, m1 = b.frames[t.endIdx].m;
       var near = (b.events || []).filter(function (e) { return e.m >= m0 - 1 && e.m <= m1 + 1; });
       return '<div class="rp-tp-item"><div class="rp-tp-hd">' +
-        '<span class="t mono">' + m0.toFixed(0) + "′ → " + m1.toFixed(0) + "′</span>" +
+        '<span class="t mono">' + mmss(m0) + " → " + mmss(m1) + "</span>" +
         '<b>' + esc(t.dir > 0 ? b.t1 : b.t2) + " 占优</b>" +
         '<span class="pp ' + (t.dir > 0 ? "up" : "down") + '">' + pct(t.from) + " → " + pct(t.to) +
         "（" + signed((t.to - t.from) * 100) + "pp）</span></div>" +
@@ -469,9 +683,10 @@ window.KPL_REPLAY = (function () {
           ? "同段事件：" + near.map(function (e) { return esc(e.l); }).join(" · ")
           : "同段无结构性事件记录") + "</div></div>";
     }).join("");
-    return '<div class="rp-panel rp-tp">' + head + items +
+    return '<details class="rp-tp-fold"><summary><span>完整变点列表</span><span class="mono">' +
+      tps.length + " 段 · 点击展开</span></summary>" + items +
       '<p class="rp-disc">口径：模型胜率曲线上方向一致、幅度最大的 3 个摆动段（相邻采样点变化 ≥0.4pp 才计入），' +
-      "只说明这段时间胜率方向明确变化，不构成因果归因。</p></div>";
+      "只说明这段时间胜率方向明确变化，不构成因果归因。</p></details>";
   }
 
   function resourcePanel(b, f, prev) {
@@ -518,18 +733,48 @@ window.KPL_REPLAY = (function () {
       '<p class="rp-disc">说明：以上只表示这些现象出现在同一时间段，不能据此断言是某个事件改变了胜率。</p></div>';
   }
 
-  function eventList(b, curIdx) {
-    if (!(b.events || []).length) return '<div class="empty-tip">该局没有结构性事件记录</div>';
-    return '<div class="rp-events">' + b.events.map(function (e, i) {
-      var active = Math.abs(e.m - b.frames[curIdx].m) <= 1.5 ? " on" : "";
-      return '<button type="button" class="rp-ev' + active + '" data-m="' + e.m + '">' +
-        '<span class="t mono">' + e.m.toFixed(0) + "′</span>" + esc(e.l) + "</button>";
+  function ledgerHTML(b, filter) {
+    filter = filter || "all";
+    var all = (b.events || []).filter(function (e) { return e.dgd != null; });
+    var evs = all.filter(function (e) {
+      if (filter === "death") return e.t === "death";
+      if (filter === "objective") return !!NEUTRAL[e.t];
+      if (filter === "tower") return e.t === "tower";
+      return true;
+    });
+    evs.sort(function (a, c) { return Math.abs(c.dgd) - Math.abs(a.dgd); });
+    evs = evs.slice(0, 8);
+    var filters = [["all", "全部"], ["death", "死亡"], ["objective", "资源"], ["tower", "推塔"]];
+    var bar = '<div class="rp-ledger-filter">' + filters.map(function (f) {
+      return '<button type="button" data-f="' + f[0] + '"' + (filter === f[0] ? ' class="on"' : "") + ">" + f[1] + "</button>";
     }).join("") + "</div>";
+    var head = '<div class="rp-ledger-hd"><div class="rp-pt">事件经济账本 <em class="mono">按事件窗口金差变化排序</em></div>' + bar + "</div>";
+    if (!evs.length) {
+      return '<div class="rp-panel rp-ledger">' + head + '<div class="empty-tip">当前筛选没有可计算的事件</div></div>';
+    }
+    var rows = evs.map(function (e) {
+      var extra = [];
+      if (e.t === "death") extra.push(e.respawn_sec ? "复活 " + e.respawn_sec + "s" : "终局");
+      if (e.lost_farm_est != null) extra.push("损失≈" + fmtInt(e.lost_farm_est) + "g");
+      if (NEUTRAL[e.t]) {
+        extra.push("buff " + (e.buff_window_sec || e.window_sec || 0) + "s");
+        if (e.buff_respawn_min != null) extra.push(e.buff_respawn_min ? "刷新 " + e.buff_respawn_min + "min" : "不刷新");
+      }
+      return '<tr class="rp-ledger-row" data-m="' + e.m + '" tabindex="0">' +
+        '<td class="mono">' + mmss(e.m) + "</td><td>" + esc(e.l) + "</td>" +
+        '<td class="num ' + (e.dgd >= 0 ? "up" : "down") + '">' + goldText(e.dgd) + "</td>" +
+        '<td class="num">' + (e.window_sec || 0) + "s</td><td>" + esc(extra.join(" · ")) + "</td></tr>";
+    }).join("");
+    return '<div class="rp-panel rp-ledger">' + head +
+      '<div class="rp-tblwrap"><table class="rp-tbl"><thead><tr><th>时间</th><th>事件</th><th class="num">金差变化</th>' +
+      '<th class="num">窗口</th><th>补充</th></tr></thead><tbody>' + rows + "</tbody></table></div>" +
+      '<p class="rp-disc">金差变化 = 阵营1视角，事件时刻 → 窗口结束的观测值；死亡损失为「队伍金速×复活秒×20%」估算，不是官方结算。中立 buff 窗口默认 90s，刷新间隔按资源不同，可在 neutral_buffs 表覆盖。</p></div>';
   }
 
   /* ---------- 挂载 ---------- */
   function mount(el, opts) {
     if (!el) return;
+    activeJump = null;
     var matchId = String(opts.matchId || "");
     if (!matchId) { el.innerHTML = '<div class="empty-tip">缺少 matchId</div>'; return; }
     el.innerHTML = '<div class="rp-loading mono">加载复盘数据…</div>';
@@ -548,9 +793,11 @@ window.KPL_REPLAY = (function () {
         for (var i = 0; i < battles.length; i++) if (battles[i].battleId === opts.battleId) { bi = i; break; }
       }
       var frameIdx = 0;
-      // 分享深链直接指向某一分钟时展开技术面板；普通进入先看结论与三个转折。
+      // 分享深链直接指向某一分钟时展开技术面板；普通进入先看结论与关键节点。
       var detailOpen = opts.initialMinute != null && !isNaN(Number(opts.initialMinute));
       var layerMode = "team";   // team = 队伍总量（默认答案）；lane = 同位置对位
+      var ledgerFilter = "all";
+      var detailTab = "timeline";
       // 支持从链接直接回到某一分钟（?g=3&m=12）
       if (opts.initialMinute != null && !isNaN(Number(opts.initialMinute))) {
         var targetM = Number(opts.initialMinute);
@@ -572,7 +819,26 @@ window.KPL_REPLAY = (function () {
         if (detail) detail.hidden = !detailOpen;
         if (btn) {
           btn.setAttribute("aria-expanded", detailOpen ? "true" : "false");
-          btn.textContent = detailOpen ? "收起详细面板 ↑" : "展开完整时间轴与数据面板 ↓";
+          btn.textContent = detailOpen ? "收起详细分析 ↑" : "展开详细分析 ↓";
+        }
+      }
+
+      function applyDetailTab() {
+        var tabs = document.querySelectorAll("#rpTabs button");
+        Array.prototype.forEach.call(tabs, function (b) {
+          b.classList.toggle("on", b.getAttribute("data-tab") === detailTab);
+        });
+        ["timeline", "resource", "turn"].forEach(function (k) {
+          var el = document.getElementById("rpPane-" + k);
+          if (el) el.hidden = k !== detailTab;
+        });
+        var note = document.getElementById("rpTabNote");
+        if (note) {
+          note.textContent = detailTab === "timeline"
+            ? "时间轴：天平优势 + 金差条带"
+            : detailTab === "resource"
+              ? "资源与证据：中立资源、击杀推塔、同段事件"
+              : "转折与事件：模型变点和关键事件";
         }
       }
 
@@ -581,10 +847,16 @@ window.KPL_REPLAY = (function () {
         el.innerHTML =
           '<div class="rp">' +
           '<div class="rp-head">' +
-          '<div class="rp-tabs">' + battles.map(function (x, i) {
-            return '<button type="button" class="rp-tab' + (i === bi ? " on" : "") + '" data-i="' + i + '">G' + (x.seq || i + 1) +
-              '<i class="' + (x.win === 1 ? "w" : x.win === 2 ? "l" : "") + '">' + (x.win === 1 ? "胜" : x.win === 2 ? "负" : "—") + "</i></button>";
-          }).join("") + "</div>" +
+          (function () {
+            function tab(x, i) {
+              return '<button type="button" class="rp-tab' + (i === bi ? " on" : "") + '" data-i="' + i + '">G' +
+                (x.seq || i + 1) + '<i class="' + (x.win === 1 ? "w" : x.win === 2 ? "l" : "") + '">' +
+                (x.win === 1 ? "胜" : x.win === 2 ? "负" : "—") + "</i></button>";
+            }
+            var only = opts.showTabs === false;
+            return '<div class="rp-tabs' + (only ? " rp-tabs-single" : "") + '">' +
+              (only ? tab(battles[bi], bi) : battles.map(tab).join("")) + "</div>";
+          })() +
           '<div class="rp-meta mono">' + esc(b.t1) + " vs " + esc(b.t2) + " · 时长 " + b.dur.toFixed(0) + "′ · " +
           (b.win === 1 ? esc(b.t1) : b.win === 2 ? esc(b.t2) : "—") + " 胜出" +
           ' <span class="rp-src ' + (b.src === "live" ? "live" : "replay") + '">' +
@@ -596,30 +868,45 @@ window.KPL_REPLAY = (function () {
           (b.src === "replay"
             ? '<div class="rp-warn">本局没有直播期预测记录，曲线是赛后用当前模型重放的结果，只作参考；复盘结论请以经济 / 资源等客观指标为主。</div>'
             : "") +
-          '<div class="rp-chart" id="rpChart"></div>' +
-          '<div class="rp-tl"><input type="range" min="0" max="' + (b.frames.length - 1) + '" step="1" value="' + frameIdx + '" id="rpRange">' +
-          '<div class="rp-tl-meta mono"><span id="rpTime"></span>' +
-          "<span>拖动查看该时刻的经济、资源与选手表现</span></div></div>" +
-          '<div class="rp-layer seg" id="rpLayer">' +
-          '<button type="button" data-layer="team"' + (layerMode === "team" ? ' class="on"' : "") + ">队伍总量</button>" +
-          '<button type="button" data-layer="lane"' + (layerMode === "lane" ? ' class="on"' : "") + ">分路对位</button></div>" +
-          '<div class="rp-grid" id="rpGrid"></div>' +
-          '<div class="rp-turn" id="rpTurn"></div>' +
-          '<div class="rp-evs"><div class="rp-pt">关键事件 <em class="mono">点击跳到该分钟</em></div>' +
-          '<div class="rp-events" id="rpEvents"></div></div>' +
+          '<div class="rp-tabs2"><div class="seg" id="rpTabs">' +
+            '<button type="button" data-tab="timeline" class="on">时间轴</button>' +
+            '<button type="button" data-tab="resource">资源与证据</button>' +
+            '<button type="button" data-tab="turn">转折与事件</button>' +
+          '</div><span class="rp-tab-note mono" id="rpTabNote"></span></div>' +
+          '<div id="rpPane-timeline">' +
+            '<div class="rp-chart" id="rpChart"></div>' +
+            '<div class="rp-chart-legend">' +
+              '<span><i style="background:#F0C36A"></i>一血 / 击杀</span>' +
+              '<span><i style="background:#D5374B"></i>死亡</span>' +
+              '<span><i style="background:#B08A2E"></i>推塔</span>' +
+              '<span><i style="background:#2E6FD0"></i>中立资源</span>' +
+              '<span class="mono">事件轨 · 悬停看金差</span></div>' +
+            '<div class="rp-tl"><input type="range" min="0" max="' + (b.frames.length - 1) + '" step="1" value="' + frameIdx + '" id="rpRange">' +
+            '<div class="rp-tl-meta mono"><span id="rpTime"></span>' +
+            "<span>拖动查看该时刻的经济、资源与选手表现</span></div></div>" +
+            '<div class="rp-layer seg" id="rpLayer">' +
+              '<button type="button" data-layer="team"' + (layerMode === "team" ? ' class="on"' : "") + ">队伍总量</button>" +
+              '<button type="button" data-layer="lane"' + (layerMode === "lane" ? ' class="on"' : "") + ">分路对位</button></div>" +
+            '<div class="rp-grid" id="rpGridGold"></div>' +
+          '</div>' +
+          '<div id="rpPane-resource" hidden>' +
+            '<div class="rp-grid" id="rpGridData"></div>' +
+            '<div class="rp-evs"><div class="rp-pt">关键事件 <em class="mono">点击跳到该分钟</em></div>' +
+            '<div class="rp-events" id="rpEvents"></div></div>' +
+          '</div>' +
+          '<div id="rpPane-turn" hidden><div class="rp-turn" id="rpTurn"></div></div>' +
           "</div>" +
           "</div>";
 
         var evBox = document.getElementById("rpEvents");
         if (evBox) {
-          evBox.innerHTML = (b.events || []).length
-            ? b.events.map(function (e) {
-                return '<button type="button" class="rp-ev" data-m="' + e.m + '">' +
-                  '<span class="t mono">' + e.m.toFixed(0) + "′</span>" + esc(e.l) + "</button>";
-              }).join("")
+          var evs = keyEventsOf(b);
+          evBox.innerHTML = evs.length
+            ? evs.map(function (e) { return eventBtn(e, false); }).join("")
             : '<div class="empty-tip">该局没有结构性事件记录</div>';
         }
         applyDetail();
+        applyDetailTab();
         bind();
         paint();
       }
@@ -631,16 +918,16 @@ window.KPL_REPLAY = (function () {
         var prev = frameIdx > 0 ? b.frames[frameIdx - 1] : null;
 
         var chart = document.getElementById("rpChart");
-        if (chart) chart.innerHTML = curveSVG(b.frames, b.t1, b.t2, frameIdx);
+        if (chart) chart.innerHTML = curveSVG(b.frames, b.t1, b.t2, frameIdx, b);
 
-        var grid = document.getElementById("rpGrid");
-        if (grid) {
-          grid.innerHTML = goldPanel(b, f, prev, layerMode) + resourcePanel(b, f, prev) +
-            evidencePanel(b, f, prev, b.frames, frameIdx);
-        }
+        var gold = document.getElementById("rpGridGold");
+        if (gold) gold.innerHTML = goldPanel(b, f, prev, layerMode);
+
+        var data = document.getElementById("rpGridData");
+        if (data) data.innerHTML = resourcePanel(b, f, prev) + evidencePanel(b, f, prev, b.frames, frameIdx);
 
         var turn = document.getElementById("rpTurn");
-        if (turn) turn.innerHTML = tpPanel(b);
+        if (turn) turn.innerHTML = ledgerHTML(b, ledgerFilter) + tpPanel(b);
 
         var r = document.getElementById("rpRange");
         if (r) {
@@ -665,6 +952,15 @@ window.KPL_REPLAY = (function () {
         if (r) r.focus({ preventScroll: true });
       }
 
+      function jumpTo(m) {
+        detailOpen = true;
+        applyDetail();
+        if (window.KPL && KPL.track) KPL.track("key_moment_click");
+        setFrame(nearestFrame(battles[bi], m));
+        var chart = document.getElementById("rpChart");
+        if (chart) chart.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+
       function bind() {
         var expand = document.getElementById("rpExpand");
         if (expand) {
@@ -677,21 +973,30 @@ window.KPL_REPLAY = (function () {
             }
           });
         }
-        el.querySelectorAll(".rp-moment").forEach(function (btn) {
-          btn.addEventListener("click", function () {
-            detailOpen = true;
-            applyDetail();
-            if (window.KPL && KPL.track) KPL.track("key_moment_click");
-            var m = parseFloat(btn.getAttribute("data-m"));
-            var b = battles[bi], best = 0;
-            for (var i = 0; i < b.frames.length; i++) {
-              if (Math.abs(b.frames[i].m - m) < Math.abs(b.frames[best].m - m)) best = i;
-            }
-            setFrame(best);
-            var chart = document.getElementById("rpChart");
-            if (chart) chart.scrollIntoView({ behavior: "smooth", block: "center" });
+        el.querySelectorAll(".rp-node").forEach(function (row) {
+          function go() { jumpTo(parseFloat(row.getAttribute("data-m"))); }
+          row.addEventListener("click", go);
+          row.addEventListener("keydown", function (ev) {
+            if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); go(); }
           });
         });
+        var turnBox = document.getElementById("rpTurn");
+        if (turnBox) {
+          turnBox.addEventListener("click", function (ev) {
+            var target = ev.target;
+            var fbtn = target && target.closest ? target.closest("[data-f]") : null;
+            if (fbtn) { ledgerFilter = fbtn.getAttribute("data-f"); paint(); return; }
+            var row = target && target.closest ? target.closest("tr[data-m]") : null;
+            if (row) jumpTo(parseFloat(row.getAttribute("data-m")));
+          });
+          turnBox.addEventListener("keydown", function (ev) {
+            var row = ev.target && ev.target.closest ? ev.target.closest("tr[data-m]") : null;
+            if (row && (ev.key === "Enter" || ev.key === " ")) {
+              ev.preventDefault();
+              jumpTo(parseFloat(row.getAttribute("data-m")));
+            }
+          });
+        }
         var bpBtn = document.getElementById("rpBp");
         if (bpBtn) {
           bpBtn.addEventListener("click", function () {
@@ -721,8 +1026,9 @@ window.KPL_REPLAY = (function () {
           btn.addEventListener("click", function () {
             bi = parseInt(btn.getAttribute("data-i"), 10);
             frameIdx = 0;
+            var nextBattleId = battles[bi].battleId;
+            if (opts.onBattleChange) opts.onBattleChange(nextBattleId);
             renderShell();
-            if (opts.onBattleChange) opts.onBattleChange(battles[bi].battleId);
           });
         });
         el.querySelectorAll(".rp-ev").forEach(function (btn) {
@@ -735,6 +1041,14 @@ window.KPL_REPLAY = (function () {
             setFrame(best);
           });
         });
+        var tabBox = document.getElementById("rpTabs");
+        if (tabBox) {
+          tabBox.addEventListener("click", function (e) {
+            var btn = e.target.closest("button"); if (!btn) return;
+            detailTab = btn.getAttribute("data-tab") || "timeline";
+            applyDetailTab();
+          });
+        }
         var layerBox = document.getElementById("rpLayer");
         if (layerBox) {
           layerBox.addEventListener("click", function (e) {
@@ -779,9 +1093,17 @@ window.KPL_REPLAY = (function () {
         }
       }
 
+      activeJump = jumpTo;
       renderShell();
     });
   }
 
-  return { mount: mount, hasReplay: hasReplay, loadPackage: loadPackage };
+  return {
+    mount: mount,
+    hasReplay: hasReplay,
+    loadPackage: loadPackage,
+    jumpTo: function (m) {
+      if (activeJump && isFinite(Number(m))) activeJump(Number(m));
+    }
+  };
 })();

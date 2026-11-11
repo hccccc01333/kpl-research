@@ -1,0 +1,744 @@
+/* ==========================================================================
+   KPL 赛研 · 荣誉中心（honors）V2
+   —— 只换视觉层：DOM 结构、数据口径、筛选 / 导出 / 分享图交互保持原样。
+   —— 旧主题（pages.css / v55.css / light.css）优先级很高，本文件统一用
+      body.honors-page.v2-page 前缀 + !important 逐项覆盖，分组书写。
+   ========================================================================== */
+
+/* ---------- 0. 基础 ------------------------------------------------------ */
+body.honors-page { background: var(--v2-bg) !important; color: var(--v2-ink); }
+body.honors-page.v2-page main { padding-bottom: clamp(40px, 5vw, 72px); }
+
+/* 本地实时服务条（common.js 在 localhost 注入）：与下方筛选条留出呼吸 */
+body.honors-page.v2-page #kplLocalRuntime { margin-bottom: clamp(12px, 1.6vw, 16px) !important; }
+
+/* 头版数字带在手机上改单列：site-v2 的 .lg-kpis 单列规则会被后面的 .v2-stats
+   （≤900px → 两列）按加载顺序覆盖，页内补一条，避免「统计时间」被压成两行 */
+@media (max-width: 640px) {
+  body.honors-page.v2-page .lg-hero .lg-kpis { grid-template-columns: minmax(0, 1fr) !important; row-gap: 14px; }
+  body.honors-page.v2-page .lg-hero .lg-kpis .v2-stat { padding-left: 0 !important; border-left: 0 !important; }
+}
+
+/* 头版 lead 里的 <b> 是 JS 注入的口径强调，保持「深墨 + 加粗」而不是蓝色链接 */
+body.honors-page.v2-page .lg-hero .v2-lead b {
+  color: var(--v2-ink);
+  font-weight: 700;
+}
+
+/* ---------- 1. 头版：分享图按钮（share.js 会把它追加进 .v2-wrap） --------- */
+body.honors-page.v2-page #heroHead .share-fab {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 8px;
+  height: 36px !important;
+  margin: clamp(18px, 2vw, 22px) 0 0 !important;
+  padding: 0 15px !important;
+  border: 1px solid var(--v2-line-2) !important;
+  border-radius: 10px !important;
+  background: transparent !important;
+  color: var(--v2-ink-2) !important;
+  font-family: var(--v2-sans) !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color .18s, border-color .18s, background-color .18s;
+}
+body.honors-page.v2-page #heroHead .share-fab:hover {
+  color: var(--v2-ink) !important;
+  border-color: var(--v2-ink-3) !important;
+  background: var(--v2-card) !important;
+}
+
+/* ---------- 2. 筛选条 ---------------------------------------------------- */
+body.honors-page.v2-page .filterbar {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: flex-end !important;
+  justify-content: flex-start !important;
+  flex-wrap: wrap !important;
+  gap: 12px 16px;
+  margin: 0 0 clamp(14px, 1.8vw, 18px) !important;
+  padding: 12px 16px !important;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 16px !important;
+  background: var(--v2-card) !important;
+  box-shadow: var(--v2-shadow-sm) !important;
+}
+body.honors-page.v2-page .filterbar > * { margin-left: 0 !important; }
+
+/* 周榜 / 月榜：分段控件 */
+body.honors-page.v2-page .filterbar .hn-kind {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 2px;
+  flex: none;
+  padding: 3px;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 11px !important;
+  background: var(--v2-inset) !important;
+}
+body.honors-page.v2-page .filterbar .hn-kbtn {
+  appearance: none;
+  -webkit-appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 32px;
+  padding: 0 13px;
+  border: 0 !important;
+  border-radius: 8px !important;
+  background: transparent !important;
+  background-image: none !important;
+  color: var(--v2-ink-3) !important;
+  font-family: var(--v2-sans) !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color .16s, background-color .16s, box-shadow .16s;
+}
+body.honors-page.v2-page .filterbar .hn-kbtn:hover { color: var(--v2-ink-2) !important; }
+body.honors-page.v2-page .filterbar .hn-kbtn em {
+  font-style: normal;
+  font-family: var(--v2-mono);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--v2-ink-3);
+}
+body.honors-page.v2-page .filterbar .hn-kbtn.on {
+  color: var(--v2-ink) !important;
+  background: var(--v2-card) !important;
+  box-shadow: var(--v2-shadow-sm), 0 0 0 1px var(--v2-line) !important;
+}
+body.honors-page.v2-page .filterbar .hn-kbtn.on em { color: var(--v2-ink-2); }
+html.dark-site body.honors-page.v2-page .filterbar .hn-kbtn.on {
+  background: #17233a !important;
+  box-shadow: 0 0 0 1px var(--v2-line-2) !important;
+}
+
+/* 评选周期下拉 */
+body.honors-page.v2-page .filterbar .fld {
+  display: flex !important;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+body.honors-page.v2-page .filterbar .fld.grow { flex: 1 1 280px; max-width: 640px; }
+body.honors-page.v2-page .filterbar .fld > span {
+  padding-left: 2px;
+  font-family: var(--v2-mono) !important;
+  font-size: 9px !important;
+  font-weight: 500 !important;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--v2-ink-3) !important;
+}
+body.honors-page.v2-page .filterbar select {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  height: 38px;
+  padding: 0 34px 0 12px;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 10px !important;
+  background:
+    linear-gradient(45deg, transparent 50%, var(--v2-ink-3) 50%) calc(100% - 16px) 17px / 4px 4px no-repeat,
+    linear-gradient(135deg, var(--v2-ink-3) 50%, transparent 50%) calc(100% - 12px) 17px / 4px 4px no-repeat,
+    var(--v2-card) !important;
+  color: var(--v2-ink) !important;
+  font-family: var(--v2-sans) !important;
+  font-size: 12.5px !important;
+  color-scheme: light !important;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  outline: none;
+}
+html.dark-site body.honors-page.v2-page .filterbar select { color-scheme: dark !important; }
+body.honors-page.v2-page .filterbar select:focus {
+  border-color: var(--v2-line-2) !important;
+  box-shadow: 0 0 0 3px rgba(var(--v2-blue-rgb), .12);
+}
+
+body.honors-page.v2-page .filterbar .block-note {
+  padding-bottom: 10px;
+  font-family: var(--v2-mono) !important;
+  font-size: 10px !important;
+  letter-spacing: 0;
+  color: var(--v2-ink-3) !important;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 导出候选榜 CSV */
+body.honors-page.v2-page .filterbar .btn.ghost {
+  display: inline-flex !important;
+  align-items: center;
+  height: 36px !important;
+  margin-left: auto !important;
+  padding: 0 15px !important;
+  border: 1px solid var(--v2-line-2) !important;
+  border-radius: 10px !important;
+  background: transparent !important;
+  color: var(--v2-ink-2) !important;
+  font-family: var(--v2-sans) !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color .18s, border-color .18s, background-color .18s;
+}
+body.honors-page.v2-page .filterbar .btn.ghost:hover {
+  color: var(--v2-ink) !important;
+  border-color: var(--v2-ink-3) !important;
+  background: var(--v2-inset) !important;
+}
+
+/* ---------- 3. 数据简报 -------------------------------------------------- */
+body.honors-page.v2-page .brief {
+  display: flex !important;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 0 0 clamp(6px, 1vw, 10px) !important;
+  padding: 12px 16px !important;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 14px !important;
+  background: var(--v2-card-soft) !important;
+  box-shadow: none !important;
+  color: var(--v2-ink-3) !important;
+  font-size: 11.5px !important;
+  line-height: 1.75 !important;
+}
+body.honors-page.v2-page .brief p { margin: 0; }
+body.honors-page.v2-page .brief .ico {
+  flex: none;
+  margin-top: 3px;
+  color: var(--v2-blue) !important;
+  font-family: var(--v2-mono);
+  font-size: 9px;
+  font-weight: 800;
+}
+body.honors-page.v2-page .brief b { color: var(--v2-ink-2) !important; font-weight: 700; }
+
+/* ---------- 4. 区块标题 -------------------------------------------------- */
+body.honors-page.v2-page .block { margin-top: clamp(30px, 3.6vw, 44px) !important; }
+body.honors-page.v2-page .block:first-of-type { margin-top: clamp(20px, 2.4vw, 26px) !important; }
+body.honors-page.v2-page .block-head {
+  display: flex !important;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 10px 20px;
+  flex-wrap: wrap;
+  margin: 0 0 14px !important;
+}
+body.honors-page.v2-page .block-head h2 {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0;
+  font-family: var(--v2-sans) !important;
+  font-size: 17px !important;
+  font-weight: 800 !important;
+  letter-spacing: -.02em !important;
+  color: var(--v2-ink) !important;
+}
+body.honors-page.v2-page .block-head h2 i {
+  display: inline-block;
+  width: 3px !important;
+  height: 15px !important;
+  border-radius: 2px !important;
+  background: var(--v2-gold) !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+body.honors-page.v2-page .block-head .block-note {
+  margin: 0 0 1px;
+  font-family: var(--v2-mono) !important;
+  font-size: 10px !important;
+  letter-spacing: 0;
+  color: var(--v2-ink-3) !important;
+}
+body.honors-page.v2-page .block-head .more {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 2px auto !important;
+  padding-bottom: 3px;
+  border-bottom: 1px solid var(--v2-line-2);
+  color: var(--v2-ink-2) !important;
+  font-family: var(--v2-sans) !important;
+  font-size: 12.5px !important;
+  font-weight: 600 !important;
+  transition: color .16s, border-color .16s;
+}
+body.honors-page.v2-page .block-head .more:hover {
+  color: var(--v2-ink) !important;
+  border-color: var(--v2-ink-3);
+}
+
+/* ---------- 5. 五路最佳卡片 ---------------------------------------------- */
+body.honors-page.v2-page .hn-lanes {
+  display: grid !important;
+  grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  gap: clamp(12px, 1.4vw, 16px) !important;
+}
+body.honors-page.v2-page .hn-lanes .hn-lane {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  margin: 0 !important;
+  padding: 16px 15px 14px !important;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 18px !important;
+  background: var(--v2-card) !important;
+  box-shadow: var(--v2-shadow-sm) !important;
+  transform: none !important;
+  transition: border-color .18s, transform .18s, box-shadow .18s;
+}
+body.honors-page.v2-page .hn-lanes .hn-lane:hover {
+  border-color: var(--v2-line-2) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: var(--v2-shadow-lg) !important;
+}
+
+/* 分路名 / 候选人数 */
+body.honors-page.v2-page .hn-lh {
+  display: flex !important;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 12px !important;
+}
+body.honors-page.v2-page .hn-ln {
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  letter-spacing: -.01em;
+  color: var(--v2-ink) !important;
+}
+body.honors-page.v2-page .hn-ne {
+  margin-left: auto !important;
+  font-family: var(--v2-mono);
+  font-size: 9.5px !important;
+  font-weight: 500;
+  color: var(--v2-ink-3) !important;
+  white-space: nowrap;
+}
+
+/* 分路第一：头像 + 名字 + 综合分。旧 v55 给 .hn-lanes a 强制加了卡片底和描边，这里清掉 */
+body.honors-page.v2-page .hn-lanes .hn-win,
+body.honors-page.v2-page .hn-team .hn-win {
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+  margin: 0 -6px 10px !important;
+  padding: 6px !important;
+  border: 0 !important;
+  border-radius: 10px !important;
+  background: transparent !important;
+  background-image: none !important;
+  color: inherit;
+  text-decoration: none;
+  transition: background-color .15s;
+}
+body.honors-page.v2-page .hn-lanes .hn-win:hover,
+body.honors-page.v2-page .hn-team .hn-win:hover { background: var(--v2-inset) !important; }
+
+body.honors-page.v2-page .hn-ava {
+  width: 42px !important;
+  height: 42px !important;
+  flex: none;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 50% !important;
+  background: var(--v2-inset) !important;
+  object-fit: cover;
+}
+body.honors-page.v2-page .hn-ava-t {
+  display: grid !important;
+  place-items: center;
+  font-size: 16px !important;
+  font-weight: 800 !important;
+  color: var(--v2-ink-3) !important;
+  background: var(--v2-inset) !important;
+}
+body.honors-page.v2-page .hn-wt {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+body.honors-page.v2-page .hn-wt b {
+  overflow: hidden;
+  color: var(--v2-ink) !important;
+  font-size: 14.5px !important;
+  font-weight: 800 !important;
+  letter-spacing: -.01em;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+body.honors-page.v2-page .hn-wt span {
+  overflow: hidden;
+  color: var(--v2-ink-2) !important;
+  font-size: 10.5px !important;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+body.honors-page.v2-page .hn-ws {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  flex: none;
+}
+body.honors-page.v2-page .hn-ws b {
+  color: var(--v2-ink) !important;
+  font-family: var(--v2-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 24px !important;
+  font-weight: 800 !important;
+  line-height: 1;
+  letter-spacing: -.02em;
+}
+body.honors-page.v2-page .hn-ws em {
+  color: var(--v2-ink-3) !important;
+  font-style: normal;
+  font-size: 9px !important;
+}
+
+/* 数据条目 / 不确定性 / 风险提示 */
+body.honors-page.v2-page .hn-kv {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  padding: 10px 0 0 !important;
+  border-top: 1px solid var(--v2-line) !important;
+  color: var(--v2-ink-2) !important;
+  font-size: 10.5px !important;
+  line-height: 1.6;
+  font-variant-numeric: tabular-nums;
+}
+body.honors-page.v2-page .hn-unc {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0 0 !important;
+  color: var(--v2-ink-2) !important;
+  font-family: var(--v2-mono);
+  font-size: 10px !important;
+  line-height: 1.6;
+}
+body.honors-page.v2-page .hn-unc i {
+  color: var(--v2-line-2) !important;
+  font-style: normal;
+}
+body.honors-page.v2-page .hn-unc.warn span { color: var(--v2-ink-3) !important; }
+body.honors-page.v2-page .hn-warn {
+  margin-top: 10px !important;
+  padding: 7px 9px !important;
+  border: 1px solid rgba(var(--v2-gold-rgb), .28) !important;
+  border-radius: 8px !important;
+  background: rgba(var(--v2-gold-rgb), .07) !important;
+  color: var(--v2-gold) !important;
+  font-size: 10.5px !important;
+  line-height: 1.6;
+}
+
+/* 候选（2 名以后）*/
+body.honors-page.v2-page .hn-cand {
+  display: flex;
+  flex-direction: column;
+  margin-top: 10px;
+  border-top: 1px solid var(--v2-line);
+}
+body.honors-page.v2-page .hn-lanes .hn-cand a {
+  display: flex !important;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 2px !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--v2-line) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  background-image: none !important;
+  color: var(--v2-ink-2) !important;
+  font-size: 11.5px !important;
+}
+body.honors-page.v2-page .hn-cand a:last-child { border-bottom: 0 !important; }
+body.honors-page.v2-page .hn-lanes .hn-cand a:hover { background: var(--v2-inset) !important; }
+body.honors-page.v2-page .hn-cand i {
+  width: 14px;
+  flex: none;
+  color: var(--v2-ink-3) !important;
+  font-family: var(--v2-mono);
+  font-style: normal;
+  font-size: 10px !important;
+}
+body.honors-page.v2-page .hn-cn {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--v2-ink-2) !important;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+body.honors-page.v2-page .hn-cn em {
+  margin-left: 4px;
+  color: var(--v2-ink-3) !important;
+  font-style: normal;
+  font-size: 10px !important;
+}
+body.honors-page.v2-page .hn-cand b {
+  color: var(--v2-ink) !important;
+  font-family: var(--v2-mono);
+  font-size: 11.5px !important;
+  font-weight: 700;
+}
+body.honors-page.v2-page .hn-muted {
+  color: var(--v2-ink-3) !important;
+  font-size: 11.5px !important;
+}
+
+/* ---------- 6. 本期最佳战队 ---------------------------------------------- */
+body.honors-page.v2-page .hn-team {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 380px) !important;
+  overflow: hidden;
+  margin-top: 4px;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 18px !important;
+  background: var(--v2-card) !important;
+  box-shadow: var(--v2-shadow-sm) !important;
+}
+body.honors-page.v2-page .hn-team-main {
+  min-width: 0;
+  padding: 18px 18px 16px !important;
+}
+body.honors-page.v2-page .hn-team-rest {
+  min-width: 0;
+  padding: 10px 18px !important;
+  border-left: 1px solid var(--v2-line) !important;
+  background: var(--v2-card-soft);
+}
+body.honors-page.v2-page .hn-trow {
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 2px !important;
+  border-bottom: 1px solid var(--v2-line) !important;
+  color: var(--v2-ink-2) !important;
+  font-size: 12px !important;
+  text-decoration: none;
+}
+body.honors-page.v2-page .hn-trow:last-child { border-bottom: 0 !important; }
+body.honors-page.v2-page .hn-trow:hover { background: var(--v2-inset) !important; }
+body.honors-page.v2-page .hn-trow i {
+  width: 14px;
+  flex: none;
+  color: var(--v2-ink-3) !important;
+  font-family: var(--v2-mono);
+  font-style: normal;
+  font-size: 10px !important;
+}
+body.honors-page.v2-page .hn-trow .hn-cn { color: var(--v2-ink) !important; font-weight: 600; }
+body.honors-page.v2-page .hn-trow em {
+  color: var(--v2-ink-3) !important;
+  font-style: normal;
+  font-size: 10.5px !important;
+  white-space: nowrap;
+}
+body.honors-page.v2-page .hn-trow b {
+  margin-left: auto;
+  color: var(--v2-ink) !important;
+  font-family: var(--v2-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 12px !important;
+  font-weight: 700;
+}
+
+/* ---------- 7. 候选榜表格 ------------------------------------------------ */
+/* 窄屏横向滚动的提示（桌面隐藏） */
+body.honors-page.v2-page .hn-scroll-hint {
+  display: none;
+  margin: -2px 2px 8px;
+  font-family: var(--v2-mono);
+  font-size: 9.5px;
+  letter-spacing: .04em;
+  color: var(--v2-ink-3);
+}
+body.honors-page.v2-page #boardBlock .table-panel {
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch;
+  padding: 4px 16px 8px !important;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 18px !important;
+  background: var(--v2-card) !important;
+  box-shadow: var(--v2-shadow-sm) !important;
+}
+body.honors-page.v2-page #boardBlock .tbl {
+  width: 100%;
+  min-width: 920px;
+  border-collapse: collapse;
+}
+body.honors-page.v2-page #boardBlock .tbl thead th {
+  padding: 11px 9px !important;
+  border-bottom: 1px solid var(--v2-line-2) !important;
+  background: none !important;
+  color: var(--v2-ink-3) !important;
+  font-family: var(--v2-mono) !important;
+  font-size: 9.5px !important;
+  font-weight: 500 !important;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  text-align: left;
+  white-space: nowrap;
+}
+body.honors-page.v2-page #boardBlock .tbl th.num,
+body.honors-page.v2-page #boardBlock .tbl td.num { text-align: right; }
+body.honors-page.v2-page #boardBlock .tbl td {
+  padding: 9px !important;
+  border-bottom: 1px solid var(--v2-line) !important;
+  color: var(--v2-ink-2) !important;
+  font-size: 11.5px !important;
+  white-space: nowrap;
+}
+body.honors-page.v2-page #boardBlock .tbl td.num {
+  font-family: var(--v2-mono) !important;
+  font-variant-numeric: tabular-nums;
+}
+body.honors-page.v2-page #boardBlock .tbl td b { color: var(--v2-ink) !important; font-size: 12px; }
+body.honors-page.v2-page #boardBlock .tbl td a { color: var(--v2-ink-2); }
+body.honors-page.v2-page #boardBlock .tbl td a:hover { color: var(--v2-ink); text-decoration: underline; }
+body.honors-page.v2-page #boardBlock .tbl tbody tr:hover { background: var(--v2-inset) !important; }
+body.honors-page.v2-page #boardBlock .tbl tbody tr:last-child td { border-bottom: 0 !important; }
+body.honors-page.v2-page .hn-hit {
+  margin-left: 4px;
+  color: var(--v2-ink-3) !important;
+  font-family: var(--v2-mono);
+  font-size: 9px !important;
+  font-style: normal;
+}
+
+/* ---------- 8. 评分口径（可复算） ---------------------------------------- */
+body.honors-page.v2-page #formulaBlock .panel,
+body.honors-page.v2-page #formula {
+  padding: 20px 22px !important;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 18px !important;
+  background: var(--v2-card) !important;
+  box-shadow: var(--v2-shadow-sm) !important;
+}
+body.honors-page.v2-page .hn-fx {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, .95fr) !important;
+  gap: 28px;
+}
+body.honors-page.v2-page .hn-fx-col { min-width: 0; }
+body.honors-page.v2-page .hn-fx-col h3 {
+  margin: 0 0 10px !important;
+  color: var(--v2-ink) !important;
+  font-family: var(--v2-sans) !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  letter-spacing: -.01em;
+}
+body.honors-page.v2-page .hn-fx-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+body.honors-page.v2-page .hn-fx .tbl { width: 100%; border-collapse: collapse; }
+body.honors-page.v2-page .hn-fx .tbl th {
+  padding: 8px 6px !important;
+  border-bottom: 1px solid var(--v2-line-2) !important;
+  background: none !important;
+  color: var(--v2-ink-3) !important;
+  font-family: var(--v2-mono) !important;
+  font-size: 9px !important;
+  font-weight: 500 !important;
+  letter-spacing: .04em;
+  text-align: left;
+  white-space: nowrap;
+}
+body.honors-page.v2-page .hn-fx .tbl th.num,
+body.honors-page.v2-page .hn-fx .tbl td.num {
+  text-align: right;
+  font-family: var(--v2-mono) !important;
+  font-variant-numeric: tabular-nums;
+}
+body.honors-page.v2-page .hn-fx .tbl td {
+  padding: 8px 6px !important;
+  border-bottom: 1px solid var(--v2-line) !important;
+  color: var(--v2-ink-2) !important;
+  font-size: 11.5px !important;
+}
+body.honors-page.v2-page .hn-fx .tbl td b { color: var(--v2-ink) !important; }
+body.honors-page.v2-page .hn-fx .tbl tbody tr:last-child td { border-bottom: 0 !important; }
+body.honors-page.v2-page .hn-fnote {
+  margin: 12px 0 0 !important;
+  color: var(--v2-ink-3) !important;
+  font-size: 11px !important;
+  line-height: 1.8;
+}
+body.honors-page.v2-page .hn-flist {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--v2-ink-2) !important;
+  font-size: 11.5px !important;
+  line-height: 1.85;
+}
+body.honors-page.v2-page .hn-flist li { margin-bottom: 4px; }
+body.honors-page.v2-page .hn-flist b { color: var(--v2-ink) !important; }
+
+/* ---------- 9. 动效残留清理（card-motion 已移除） ------------------------ */
+body.honors-page.v2-page .reveal { opacity: 1 !important; transform: none !important; }
+body.honors-page.v2-page .motion-card,
+body.honors-page.v2-page .motion-surface { transform: none !important; }
+body.honors-page.v2-page .motion-tabs::before,
+body.honors-page.v2-page .motion-tabs::after { display: none !important; }
+
+/* ---------- 10. 响应式 --------------------------------------------------- */
+@media (max-width: 1180px) {
+  body.honors-page.v2-page .hn-lanes { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+}
+@media (max-width: 900px) {
+  body.honors-page.v2-page .hn-lanes { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  body.honors-page.v2-page .hn-team { grid-template-columns: minmax(0, 1fr) !important; }
+  body.honors-page.v2-page .hn-team-rest {
+    border-left: 0 !important;
+    border-top: 1px solid var(--v2-line) !important;
+    padding: 10px 18px 14px !important;
+  }
+  body.honors-page.v2-page .hn-fx { grid-template-columns: minmax(0, 1fr) !important; gap: 20px; }
+}
+@media (max-width: 760px) {
+  body.honors-page.v2-page .filterbar { padding: 12px !important; gap: 10px 12px; }
+  body.honors-page.v2-page .filterbar .fld.grow { flex: 1 1 100%; max-width: none; }
+  /* arena.css 在 ≤600px 给所有 .block-note 加了 order:3，会让周期说明掉到导出按钮下面 */
+  body.honors-page.v2-page .filterbar .block-note {
+    order: 0 !important;
+    flex: 0 0 auto !important;
+    padding-bottom: 2px;
+  }
+  body.honors-page.v2-page .filterbar .btn.ghost { margin-left: 0 !important; }
+  body.honors-page.v2-page .block-head { margin-bottom: 12px !important; }
+  body.honors-page.v2-page .block-head .block-note { flex-basis: 100%; margin: 0; }
+  body.honors-page.v2-page .block-head .more { margin-left: 0 !important; }
+  body.honors-page.v2-page #formulaBlock .panel,
+  body.honors-page.v2-page #formula { padding: 16px !important; }
+  body.honors-page.v2-page .hn-team-main { padding: 16px !important; }
+  body.honors-page.v2-page .hn-team-rest { padding: 8px 16px 12px !important; }
+}
+@media (max-width: 620px) {
+  body.honors-page.v2-page .hn-lanes { grid-template-columns: minmax(0, 1fr) !important; }
+  body.honors-page.v2-page .hn-lanes .hn-lane { padding: 15px 14px 13px !important; }
+  body.honors-page.v2-page .filterbar .hn-kind { flex: 1 1 auto; }
+  body.honors-page.v2-page .filterbar .hn-kbtn { flex: 1; justify-content: center; }
+  body.honors-page.v2-page .filterbar .btn.ghost { width: 100%; justify-content: center; }
+  body.honors-page.v2-page #boardBlock .table-panel { padding: 2px 10px 6px !important; }
+  body.honors-page.v2-page .hn-scroll-hint { display: block; }
+  body.honors-page.v2-page #boardBlock .tbl { min-width: 780px; }
+  /* 权重表 7 列：收紧内边距并禁止分路名折行，整表在 320–390 内正好放下 */
+  body.honors-page.v2-page .hn-fx .tbl th,
+  body.honors-page.v2-page .hn-fx .tbl td { padding: 7px 4px !important; }
+  body.honors-page.v2-page .hn-fx .tbl th { font-size: 8.5px !important; }
+  body.honors-page.v2-page .hn-fx .tbl td { font-size: 11px !important; }
+  body.honors-page.v2-page .hn-fx .tbl th:first-child,
+  body.honors-page.v2-page .hn-fx .tbl td:first-child { white-space: nowrap; }
+}

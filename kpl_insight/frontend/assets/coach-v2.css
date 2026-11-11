@@ -1,0 +1,1147 @@
+/* ==========================================================================
+   KPL 赛研 · 教练档案（coach）V2
+   与 players / teams 页共用同一套 token（site-v2.css）与榜单基础（board-v2.css）。
+   旧 pages.css / v55.css / arena.css 里有很多高优先级规则（含 !important），
+   因此本文件统一用 `body.coach-page ...` 前缀 + `!important` 逐项覆盖，按区块分组。
+   ========================================================================== */
+
+/* ==========================================================================
+   0. 页面基底
+   ========================================================================== */
+body.coach-page {
+  background: var(--v2-bg);
+  color: var(--v2-ink);
+  font-family: var(--v2-sans);
+}
+body.coach-page .coach-main { min-width: 0; }
+body.coach-page main > section { min-width: 0; }
+body.coach-page .coach-tab[hidden] { display: none !important; }
+body.coach-page img { max-width: 100%; }
+
+/* 头版补充说明（任期来源） */
+body.coach-page .lg-hero .v2-note {
+  max-width: 72ch;
+  font-size: 11px !important;
+  line-height: 1.75;
+  color: var(--v2-ink-3) !important;
+  font-family: var(--v2-mono);
+  letter-spacing: .01em;
+}
+body.coach-page .lg-hero .v2-lead b,
+body.coach-page .lg-hero .v2-lead strong {
+  color: var(--v2-ink);
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   1. 头版 KPI 数字带（#coachCareer 由 coach_app.js 填充 4 个生涯指标）
+   ========================================================================== */
+body.coach-page #coachCareer {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 1px !important;
+  margin-top: 26px !important;
+  padding-top: clamp(16px, 1.8vw, 22px) !important;
+  border-top: 1px solid var(--v2-line) !important;
+}
+body.coach-page #coachCareer .coach-career-item {
+  display: block !important;
+  min-width: 0;
+  padding: 0 20px !important;
+  border: 0 !important;
+  border-left: 1px solid var(--v2-line) !important;
+  border-radius: 0 !important;
+  background: none !important;
+}
+body.coach-page #coachCareer .coach-career-item:first-child {
+  padding-left: 0 !important;
+  border-left: 0 !important;
+}
+body.coach-page #coachCareer .coach-career-item b {
+  display: block;
+  font-family: var(--v2-mono);
+  font-size: clamp(20px, 2.1vw, 29px);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -.02em;
+  color: var(--v2-ink);
+  font-variant-numeric: tabular-nums;
+}
+body.coach-page #coachCareer .coach-career-item span {
+  display: block;
+  margin-top: 6px;
+  font-size: 11px;
+  letter-spacing: .04em;
+  color: var(--v2-ink-3);
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   2. 教练 / 任期筛选卡
+   ========================================================================== */
+body.coach-page .panel.coach-controls {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: flex-end !important;
+  gap: 12px 16px !important;
+  margin-top: 0 !important;
+  padding: 14px 16px !important;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 14px !important;
+  background: var(--v2-card) !important;
+  box-shadow: var(--v2-shadow-sm) !important;
+  overflow: visible !important;
+  min-width: 0;
+}
+body.coach-page .coach-controls .fld {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0 !important;
+  margin: 0;
+}
+body.coach-page .coach-controls .fld:first-of-type { flex: 1 1 300px; max-width: 460px; }
+body.coach-page .coach-controls .fld:nth-of-type(2) { flex: 0 1 280px; }
+body.coach-page .coach-controls .fld > span {
+  padding-left: 2px;
+  font-family: var(--v2-mono);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--v2-ink-3) !important;
+}
+
+/* 下拉框：统一 V2 描边 / 箭头 / 高度 */
+body.coach-page select,
+body.coach-page .coach-controls .fld select {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  width: 100%;
+  height: 38px;
+  min-width: 0;
+  padding: 0 32px 0 12px;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 10px !important;
+  background:
+    linear-gradient(45deg, transparent 50%, var(--v2-ink-3) 50%) calc(100% - 15px) 16px / 4px 4px no-repeat,
+    linear-gradient(135deg, var(--v2-ink-3) 50%, transparent 50%) calc(100% - 11px) 16px / 4px 4px no-repeat,
+    var(--v2-card) !important;
+  color: var(--v2-ink) !important;
+  font-family: var(--v2-sans);
+  font-size: 12.5px;
+  cursor: pointer;
+  outline: none;
+  box-shadow: none !important;
+}
+html.light-site body.coach-page select { color-scheme: light !important; }
+html.dark-site body.coach-page select { color-scheme: dark !important; }
+body.coach-page select:focus {
+  border-color: var(--v2-line-2) !important;
+  box-shadow: 0 0 0 3px rgba(var(--v2-blue-rgb), .12) !important;
+}
+body.coach-page select option {
+  background-color: var(--v2-card) !important;
+  color: var(--v2-ink) !important;
+}
+body.coach-page .coach-meta {
+  margin-left: auto !important;
+  padding-bottom: 10px !important;
+  font-family: var(--v2-mono);
+  font-size: 10px;
+  line-height: 1.6;
+  letter-spacing: .01em;
+  color: var(--v2-ink-3) !important;
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   3. 教练概览卡（#coachSummary 身份 + 本任期 KPI，#coachBlurb 常用英雄）
+   ========================================================================== */
+body.coach-page .coach-profile {
+  margin-top: 12px;
+  padding: 18px 20px;
+  border: 1px solid var(--v2-line);
+  border-radius: 18px;
+  background: var(--v2-card);
+  box-shadow: var(--v2-shadow-sm);
+  min-width: 0;
+}
+body.coach-page .coach-summary {
+  display: flex !important;
+  align-items: center;
+  gap: 16px 22px;
+  flex-wrap: wrap;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: none !important;
+  min-width: 0;
+}
+body.coach-page .coach-id { display: flex; align-items: center; gap: 13px; min-width: 0; flex: 0 1 auto; }
+body.coach-page .coach-teamicon {
+  width: 46px;
+  height: 46px;
+  flex: none;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 13px !important;
+  background: var(--v2-card-soft) !important;
+  object-fit: contain;
+}
+body.coach-page .coach-teamicon.ph {
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: 18px;
+  color: var(--v2-ink-3);
+}
+body.coach-page .coach-name {
+  font-family: var(--v2-sans);
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -.02em;
+  color: var(--v2-ink) !important;
+}
+body.coach-page .coach-sub {
+  margin-top: 4px;
+  font-size: 11.5px;
+  line-height: 1.55;
+  color: var(--v2-ink-3) !important;
+  overflow-wrap: anywhere;
+}
+body.coach-page .coach-kpis {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, auto));
+  gap: clamp(16px, 2.6vw, 38px);
+  margin-left: auto !important;
+  min-width: 0;
+  flex: none;
+}
+body.coach-page .coach-kpis > div {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  min-width: 0;
+  white-space: nowrap;
+}
+body.coach-page .coach-kpis b {
+  font-family: var(--v2-mono);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -.02em;
+  color: var(--v2-ink) !important;
+  font-variant-numeric: tabular-nums;
+}
+body.coach-page .coach-kpis span {
+  font-size: 10px;
+  letter-spacing: .03em;
+  color: var(--v2-ink-3) !important;
+}
+
+/* 常用英雄 / 最常被 Ban 摘要条 */
+body.coach-page .coach-blurb {
+  margin-top: 16px !important;
+  padding: 14px 0 0 !important;
+  border: 0 !important;
+  border-top: 1px solid var(--v2-line) !important;
+  border-radius: 0 !important;
+  background: none !important;
+  font-size: 12px;
+  color: var(--v2-ink-2) !important;
+  line-height: 1.7;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+}
+body.coach-page .coach-blurb > span { font-size: 11px; color: var(--v2-ink-3); }
+body.coach-page .coach-blurb .coach-blurb-sep { font-style: normal; opacity: .4; margin: 0 2px; }
+body.coach-page .coach-blurb .tbp-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 9px 2px 3px;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 999px;
+  background: var(--v2-card-soft) !important;
+  color: var(--v2-ink-2);
+  font-size: 10.5px;
+  line-height: 1.7;
+}
+body.coach-page .coach-blurb .tbp-chip .tbp-hicon {
+  width: 16px;
+  height: 16px;
+  border: 0 !important;
+  border-radius: 50% !important;
+  object-fit: cover;
+}
+
+/* ==========================================================================
+   4. 标签页切换条（概览 / BP 风格 / 相似教练 / 证据）
+   ========================================================================== */
+body.coach-page .mode-bar {
+  display: flex !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: 10px 18px !important;
+  margin-top: 18px !important;
+  padding: 0 !important;
+  min-width: 0;
+}
+body.coach-page .mode-bar .seg {
+  display: inline-flex !important;
+  flex-wrap: wrap !important;
+  gap: 2px;
+  margin-left: 0 !important;
+  padding: 3px !important;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 11px !important;
+  background: var(--v2-inset) !important;
+  overflow: visible !important;
+}
+body.coach-page .mode-bar .seg button {
+  appearance: none;
+  border: 0 !important;
+  height: 30px;
+  padding: 0 14px;
+  border-radius: 8px;
+  background: transparent !important;
+  color: var(--v2-ink-3) !important;
+  font-family: var(--v2-sans);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color .16s, background-color .16s, box-shadow .16s;
+}
+body.coach-page .mode-bar .seg button + button { border-left: 0 !important; }
+body.coach-page .mode-bar .seg button:hover { color: var(--v2-ink-2) !important; }
+body.coach-page .mode-bar .seg button.on {
+  color: var(--v2-ink) !important;
+  background: var(--v2-card) !important;
+  background-image: none !important;
+  font-weight: 600 !important;
+  box-shadow: var(--v2-shadow-sm), 0 0 0 1px var(--v2-line) !important;
+}
+html.dark-site body.coach-page .mode-bar .seg button.on {
+  background: #17233a !important;
+  color: var(--v2-ink) !important;
+  box-shadow: 0 0 0 1px var(--v2-line-2) !important;
+}
+body.coach-page .mode-bar .block-note {
+  margin-left: auto;
+  padding: 0;
+  font-family: var(--v2-mono);
+  font-size: 10px !important;
+  line-height: 1.6;
+  color: var(--v2-ink-3) !important;
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   5. 面板 / 区块标题 / 注释
+   ========================================================================== */
+body.coach-page .panel {
+  margin-top: 16px;
+  padding: 20px !important;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 18px !important;
+  background: var(--v2-card) !important;
+  box-shadow: var(--v2-shadow-sm) !important;
+  min-width: 0;
+  overflow: visible !important;
+}
+body.coach-page .coach-two {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+body.coach-page .coach-two > .panel { margin-top: 0 !important; min-width: 0; }
+body.coach-page .coach-tab > .panel:first-child { margin-top: 16px; }
+
+body.coach-page .panel-title {
+  display: flex !important;
+  align-items: baseline !important;
+  justify-content: space-between !important;
+  flex-wrap: wrap !important;
+  gap: 6px 12px !important;
+  margin: 0 0 12px !important;
+  padding: 0 0 10px !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--v2-line) !important;
+  border-left: 0 !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  letter-spacing: -.01em;
+  color: var(--v2-ink) !important;
+  text-align: left !important;
+}
+body.coach-page .panel-title::before,
+body.coach-page .panel-title::after { display: none !important; content: none !important; }
+body.coach-page .panel-title em {
+  font-style: normal !important;
+  font-weight: 400;
+  font-family: var(--v2-mono);
+  font-size: 9.5px;
+  letter-spacing: .02em;
+  color: var(--v2-ink-3) !important;
+}
+body.coach-page .panel-title .hp-scroll-hint {
+  margin-left: auto;
+  font-family: var(--v2-mono);
+  font-size: 9px;
+  font-weight: 400;
+  color: var(--v2-ink-3) !important;
+  white-space: nowrap;
+}
+body.coach-page .block-note {
+  font-size: 11px !important;
+  line-height: 1.8 !important;
+  letter-spacing: 0;
+  color: var(--v2-ink-3) !important;
+}
+body.coach-page .empty-tip {
+  padding: 26px 12px !important;
+  text-align: center;
+  font-size: 12px !important;
+  color: var(--v2-ink-3) !important;
+}
+body.coach-page .tbp-table-wrap {
+  overflow: auto !important;
+  -webkit-overflow-scrolling: touch;
+  margin-top: 6px;
+  max-height: 620px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--v2-line-2) transparent;
+}
+body.coach-page .coach-evidence-wrap {
+  overflow: auto !important;
+  -webkit-overflow-scrolling: touch;
+  margin-top: 6px;
+  max-height: 460px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--v2-line-2) transparent;
+}
+
+/* ==========================================================================
+   6. 来源与置信（#coachSource）
+   ========================================================================== */
+body.coach-page .coach-source-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+body.coach-page .coach-source-head .mono {
+  font-family: var(--v2-mono);
+  font-size: 10px;
+  color: var(--v2-ink-3);
+}
+body.coach-page .coach-source-tag {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 9px;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 6px;
+  background: var(--v2-inset);
+  font-family: var(--v2-mono);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  color: var(--v2-ink-2) !important;
+}
+body.coach-page .coach-source-tag.medium {
+  color: var(--v2-gold) !important;
+  border-color: rgba(var(--v2-gold-rgb), .45) !important;
+  background: rgba(var(--v2-gold-rgb), .07);
+}
+body.coach-page .coach-source-tag.high {
+  color: var(--v2-blue) !important;
+  border-color: rgba(var(--v2-blue-rgb), .38) !important;
+  background: rgba(var(--v2-blue-rgb), .06);
+}
+body.coach-page .coach-source-tag.low {
+  color: var(--v2-red) !important;
+  border-color: rgba(var(--v2-red-rgb), .38) !important;
+  background: rgba(var(--v2-red-rgb), .06);
+}
+body.coach-page .coach-source-body {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px 18px;
+  margin-top: 0;
+}
+body.coach-page .coach-source-body > div { min-width: 0; }
+body.coach-page .coach-source-body span {
+  display: block;
+  font-family: var(--v2-mono);
+  font-size: 9px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--v2-ink-3) !important;
+}
+body.coach-page .coach-source-body b {
+  display: block;
+  margin-top: 5px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--v2-ink-2) !important;
+  word-break: break-word;
+}
+body.coach-page .coach-source-body a { color: var(--v2-blue); border-bottom: 1px solid transparent; }
+body.coach-page .coach-source-body a:hover { border-bottom-color: currentColor; }
+body.coach-page #coachSource .block-note {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--v2-line);
+}
+
+/* ==========================================================================
+   7. 任期时间轴 + 任期档案表（#coachTenures）
+   ========================================================================== */
+body.coach-page .ct-timeline {
+  margin-bottom: 16px;
+  padding: 14px 16px;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 14px;
+  background: var(--v2-card-soft) !important;
+}
+body.coach-page .ct-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+body.coach-page .ct-head b { font-size: 12.5px; font-weight: 700; color: var(--v2-ink); }
+body.coach-page .ct-head span { font-family: var(--v2-mono); font-size: 10px; color: var(--v2-ink-3); }
+body.coach-page .ct-row {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr) 82px;
+  gap: 10px;
+  align-items: center;
+  padding: 5px 0;
+  font-size: 11px;
+}
+body.coach-page .ct-team { color: var(--v2-ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+body.coach-page .ct-track {
+  position: relative;
+  height: 12px;
+  border: 1px solid var(--v2-line);
+  border-radius: 6px;
+  background: var(--v2-inset) !important;
+}
+body.coach-page .ct-track i {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  min-width: 6px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--v2-gold), rgba(var(--v2-gold-rgb), .42)) !important;
+}
+body.coach-page .ct-track i.nobp {
+  background: transparent !important;
+  border: 1px dashed var(--v2-line-2);
+}
+body.coach-page .ct-meta {
+  font-family: var(--v2-mono);
+  font-size: 10px;
+  text-align: right;
+  color: var(--v2-ink-3) !important;
+}
+body.coach-page .ct-note {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--v2-line);
+  font-size: 10.5px;
+  line-height: 1.75;
+  color: var(--v2-ink-3) !important;
+}
+
+/* 紧凑表格（任期档案 / 常用双人组合共用） */
+body.coach-page .tbp-compact {
+  width: 100%;
+  min-width: 640px;
+  border-collapse: collapse;
+  color: var(--v2-ink-2);
+}
+body.coach-page .tbp-compact th,
+body.coach-page .tbp-compact td {
+  padding: 10px !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--v2-line) !important;
+  text-align: right;
+  font-size: 12px;
+  white-space: nowrap;
+  color: var(--v2-ink-2);
+}
+body.coach-page .tbp-compact th:first-child,
+body.coach-page .tbp-compact td:first-child { text-align: left; }
+body.coach-page .tbp-compact thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--v2-card) !important;
+  font-family: var(--v2-mono);
+  font-size: 9.5px;
+  font-weight: 500;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--v2-ink-3) !important;
+}
+body.coach-page .tbp-compact tbody tr { cursor: pointer; transition: background-color .15s; }
+body.coach-page .tbp-compact tbody tr:hover { background: var(--v2-inset) !important; }
+body.coach-page .tbp-compact tbody tr.on {
+  background: rgba(var(--v2-gold-rgb), .09) !important;
+  box-shadow: inset 2px 0 0 var(--v2-gold);
+}
+body.coach-page .tbp-compact tbody tr:focus-visible {
+  outline: 2px solid rgba(var(--v2-blue-rgb), .5);
+  outline-offset: -2px;
+}
+body.coach-page .tbp-compact td b {
+  font-family: var(--v2-mono);
+  font-weight: 700;
+  color: var(--v2-ink);
+}
+body.coach-page .tbp-compact td a { color: var(--v2-blue); border-bottom: 1px solid transparent; }
+body.coach-page .tbp-compact td a:hover { border-bottom-color: currentColor; }
+body.coach-page #coachTenures .block-note {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--v2-line);
+}
+
+/* ==========================================================================
+   8. BP 指纹（#coachFingerprint）
+   ========================================================================== */
+body.coach-page .cfp-bars {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 20px;
+  margin-bottom: 16px;
+}
+body.coach-page .cfp-bars > div > span {
+  display: block;
+  margin-bottom: 6px;
+  font-family: var(--v2-mono);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--v2-ink-3);
+}
+body.coach-page .cfp-bar {
+  display: flex;
+  height: 14px;
+  border: 1px solid var(--v2-line);
+  border-radius: 7px;
+  overflow: hidden;
+  background: var(--v2-inset) !important;
+}
+body.coach-page .cfp-bar i { display: block; height: 100%; min-width: 2px; }
+body.coach-page .cfp-empty { padding: 4px 0; font-size: 10.5px; color: var(--v2-ink-3); }
+
+body.coach-page .coach-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 16px;
+}
+body.coach-page .coach-stat-grid > div {
+  min-width: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--v2-line);
+  border-radius: 12px;
+  background: var(--v2-card-soft);
+}
+body.coach-page .coach-stat-grid b {
+  display: block;
+  font-family: var(--v2-mono);
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -.02em;
+  color: var(--v2-ink);
+  font-variant-numeric: tabular-nums;
+}
+body.coach-page .coach-stat-grid span { display: block; margin-top: 4px; font-size: 10.5px; color: var(--v2-ink-3); }
+body.coach-page .coach-stat-grid em {
+  display: block;
+  margin-top: 3px;
+  font-style: normal;
+  font-size: 9.5px;
+  line-height: 1.5;
+  color: var(--v2-ink-3);
+}
+
+/* 英雄选用表（#coachPicksTable） */
+body.coach-page #coachPicksTable { width: 100%; min-width: 700px; border-collapse: collapse; }
+body.coach-page #coachPicksTable th,
+body.coach-page #coachPicksTable td {
+  padding: 9px !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--v2-line) !important;
+  text-align: right;
+  font-size: 12px;
+  white-space: nowrap;
+  color: var(--v2-ink-2);
+}
+body.coach-page #coachPicksTable th:first-child,
+body.coach-page #coachPicksTable td:first-child { text-align: left; }
+body.coach-page #coachPicksTable thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--v2-card) !important;
+  font-family: var(--v2-mono);
+  font-size: 9.5px;
+  font-weight: 500;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--v2-ink-3) !important;
+}
+body.coach-page #coachPicksTable tbody tr { transition: background-color .15s; }
+body.coach-page #coachPicksTable tbody tr:hover { background: var(--v2-inset); }
+body.coach-page #coachPicksTable td b {
+  font-family: var(--v2-mono);
+  font-weight: 700;
+  color: var(--v2-ink);
+}
+body.coach-page .tbp-hero-cell { display: inline-flex; align-items: center; gap: 7px; min-width: 96px; }
+body.coach-page .tbp-hicon {
+  width: 24px;
+  height: 24px;
+  flex: none;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 6px !important;
+  background: var(--v2-card-soft);
+  object-fit: cover;
+}
+body.coach-page #coachFingerprint .block-note {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--v2-line);
+}
+
+/* ==========================================================================
+   9. 最爱 Ban / 最被针对 / 常用双人组合
+   ========================================================================== */
+body.coach-page .tbp-ban-list { margin-top: 2px; }
+body.coach-page .tbp-ban-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 9px 2px !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--v2-line) !important;
+  background: none;
+}
+body.coach-page .tbp-ban-row:last-child { border-bottom: 0 !important; }
+body.coach-page .tbp-ban-row:hover { background: var(--v2-inset) !important; }
+body.coach-page .tbp-ban-row .tbp-hicon { width: 24px; height: 24px; }
+body.coach-page .tbp-ban-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12.5px;
+  color: var(--v2-ink-2);
+}
+body.coach-page .tbp-ban-num {
+  font-family: var(--v2-mono);
+  font-size: 11px;
+  color: var(--v2-ink-3);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+body.coach-page .tbp-ban-rate {
+  width: 52px;
+  text-align: right;
+  font-family: var(--v2-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--v2-ink);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+body.coach-page #coachBans .block-note,
+body.coach-page #coachBansAgainst .block-note {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--v2-line);
+}
+body.coach-page .tbp-pair { display: inline-flex; align-items: center; gap: 6px; min-width: 0; }
+body.coach-page .tbp-pair .tbp-hicon { width: 22px; height: 22px; }
+body.coach-page .tbp-pair i { font-style: normal; font-size: 10px; color: var(--v2-ink-3); }
+
+/* ==========================================================================
+   10. 相似教练（#coachSimilar）
+   ========================================================================== */
+body.coach-page .coach-similar-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+body.coach-page .coach-similar {
+  min-width: 0;
+  padding: 14px 16px;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 14px;
+  background: var(--v2-card-soft) !important;
+  transition: border-color .18s, transform .18s, box-shadow .18s;
+}
+body.coach-page .coach-similar:hover {
+  border-color: var(--v2-line-2) !important;
+  box-shadow: var(--v2-shadow-sm);
+  transform: translateY(-1px);
+}
+body.coach-page .coach-similar-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+body.coach-page .coach-similar-head b {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -.01em;
+  color: var(--v2-ink);
+}
+body.coach-page .coach-similar-head span {
+  font-size: 10px;
+  color: var(--v2-ink-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+body.coach-page .coach-similar-body {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 14px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--v2-line);
+}
+body.coach-page .coach-similar-body > div { min-width: 0; }
+body.coach-page .coach-similar-body span {
+  display: block;
+  font-family: var(--v2-mono);
+  font-size: 9px;
+  letter-spacing: .06em;
+  color: var(--v2-ink-3);
+}
+body.coach-page .coach-similar-body b {
+  display: block;
+  margin-top: 3px;
+  font-family: var(--v2-mono);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -.01em;
+  color: var(--v2-ink);
+  font-variant-numeric: tabular-nums;
+}
+body.coach-page .coach-similar-foot {
+  margin-top: 12px;
+  font-family: var(--v2-mono);
+  font-size: 9.5px;
+  color: var(--v2-ink-3);
+}
+body.coach-page #coachSimilar .block-note {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--v2-line);
+}
+
+/* ==========================================================================
+   11. 证据表（#coachEvidenceTable）
+   ========================================================================== */
+body.coach-page #coachEvidenceTable { width: 100%; min-width: 980px; border-collapse: collapse; }
+body.coach-page #coachEvidenceTable th,
+body.coach-page #coachEvidenceTable td {
+  padding: 8px !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--v2-line) !important;
+  text-align: right;
+  vertical-align: top;
+  white-space: nowrap;
+  font-size: 11.5px;
+  color: var(--v2-ink-2);
+}
+body.coach-page #coachEvidenceTable thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--v2-card) !important;
+  font-family: var(--v2-mono);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--v2-ink-3) !important;
+}
+body.coach-page #coachEvidenceTable th:nth-child(1),
+body.coach-page #coachEvidenceTable th:nth-child(2),
+body.coach-page #coachEvidenceTable th:nth-child(5),
+body.coach-page #coachEvidenceTable th:nth-child(6),
+body.coach-page #coachEvidenceTable th:nth-child(7),
+body.coach-page #coachEvidenceTable td:nth-child(1),
+body.coach-page #coachEvidenceTable td:nth-child(2),
+body.coach-page #coachEvidenceTable td:nth-child(5),
+body.coach-page #coachEvidenceTable td:nth-child(6),
+body.coach-page #coachEvidenceTable td:nth-child(7) { text-align: left; }
+body.coach-page #coachEvidenceTable tbody tr { transition: background-color .15s; }
+body.coach-page #coachEvidenceTable tbody tr:hover { background: var(--v2-inset); }
+body.coach-page #coachEvidenceTable td a { color: var(--v2-blue); border-bottom: 1px solid transparent; }
+body.coach-page #coachEvidenceTable td a:hover { border-bottom-color: currentColor; }
+body.coach-page .tbp-stage {
+  display: block;
+  margin-top: 2px;
+  font-family: var(--v2-mono);
+  font-size: 9px;
+  color: var(--v2-ink-3);
+}
+body.coach-page .tbp-hname {
+  display: inline-block;
+  margin: 1px 3px 1px 0;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--v2-inset);
+  color: var(--v2-ink-2);
+  font-size: 10px;
+  line-height: 1.6;
+}
+body.coach-page .tbp-result {
+  display: inline-block;
+  min-width: 24px;
+  padding: 1px 6px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  text-align: center;
+  font-size: 10px;
+  font-weight: 700;
+}
+body.coach-page .tbp-result.w {
+  color: var(--v2-blue) !important;
+  border-color: rgba(var(--v2-blue-rgb), .3);
+  background: rgba(var(--v2-blue-rgb), .08) !important;
+}
+body.coach-page .tbp-result.l {
+  color: var(--v2-red) !important;
+  border-color: rgba(var(--v2-red-rgb), .28);
+  background: rgba(var(--v2-red-rgb), .07) !important;
+}
+
+/* ==========================================================================
+   12. 覆盖与边界（#coachCoverage）
+   ========================================================================== */
+body.coach-page .coach-coverage-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+body.coach-page .coach-coverage-grid > div {
+  min-width: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--v2-line);
+  border-radius: 12px;
+  background: var(--v2-card-soft);
+}
+body.coach-page .coach-coverage-grid b {
+  display: block;
+  font-family: var(--v2-mono);
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -.02em;
+  color: var(--v2-ink);
+  font-variant-numeric: tabular-nums;
+}
+body.coach-page .coach-coverage-grid span { display: block; margin-top: 4px; font-size: 10px; color: var(--v2-ink-3); }
+body.coach-page #coachCoverage > .block-note { margin-top: 14px; }
+body.coach-page .coach-exclusions {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--v2-line);
+}
+body.coach-page .coach-exclusions-head { margin-bottom: 6px; font-size: 12px; font-weight: 700; color: var(--v2-ink-2); }
+body.coach-page .coach-exclusions-head em {
+  margin-left: 6px;
+  font-style: normal;
+  font-family: var(--v2-mono);
+  font-weight: 400;
+  color: var(--v2-ink-3);
+}
+body.coach-page .coach-exclusion {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--v2-line);
+  font-size: 11px;
+}
+body.coach-page .coach-exclusion:last-child { border-bottom: 0; }
+body.coach-page .coach-exclusion span { flex: none; color: var(--v2-ink-3) !important; }
+body.coach-page .coach-exclusion b { font-weight: 500; color: var(--v2-ink-2) !important; }
+body.coach-page .coach-coverage-note {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--v2-line);
+}
+
+/* ==========================================================================
+   13. 语义色（旧 pages.css 的 #7BE0A3 / #F2A3AE 在纸白底上对比不足）
+   ========================================================================== */
+body.coach-page .pos { color: var(--v2-blue) !important; }
+body.coach-page .neg { color: var(--v2-red) !important; }
+body.coach-page .hp-p {
+  display: inline-block;
+  margin-left: 3px;
+  padding: 1px 5px;
+  border: 1px solid var(--v2-line);
+  border-radius: 999px;
+  font-family: var(--v2-mono);
+  font-size: 9.5px;
+  font-weight: 700;
+  vertical-align: 1px;
+  white-space: nowrap;
+  color: var(--v2-ink-2);
+}
+body.coach-page .hp-p.high { color: var(--v2-blue); border-color: rgba(var(--v2-blue-rgb), .35); background: rgba(var(--v2-blue-rgb), .06); }
+body.coach-page .hp-p.low { color: var(--v2-red); border-color: rgba(var(--v2-red-rgb), .32); background: rgba(var(--v2-red-rgb), .06); }
+
+/* ==========================================================================
+   14. 响应式
+   ========================================================================== */
+@media (max-width: 1120px) {
+  body.coach-page .coach-similar-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  body.coach-page .coach-stat-grid,
+  body.coach-page .coach-coverage-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  body.coach-page .cfp-bars { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 1000px) {
+  body.coach-page .coach-two { grid-template-columns: 1fr; }
+  body.coach-page .coach-source-body { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 900px) {
+  /* KPI 数字带：两列，左边两格不重复画竖线 */
+  body.coach-page #coachCareer {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    row-gap: 18px;
+  }
+  body.coach-page #coachCareer .coach-career-item:nth-child(odd) {
+    padding-left: 0 !important;
+    border-left: 0 !important;
+  }
+  body.coach-page .coach-summary { flex-direction: column; align-items: flex-start; gap: 16px; }
+  body.coach-page .coach-kpis {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    width: 100%;
+    margin-left: 0 !important;
+    padding-top: 14px;
+    border-top: 1px solid var(--v2-line);
+    gap: 10px 16px;
+  }
+  body.coach-page .coach-kpis > div { align-items: flex-start; }
+  body.coach-page .coach-kpis b { font-size: 19px; }
+  body.coach-page .mode-bar .block-note { margin-left: 0; white-space: normal; }
+}
+
+@media (max-width: 820px) {
+  body.coach-page .coach-controls .fld:first-of-type,
+  body.coach-page .coach-controls .fld:nth-of-type(2) { flex: 1 1 100%; max-width: none; }
+  body.coach-page .coach-meta {
+    margin-left: 0 !important;
+    width: 100%;
+    padding-bottom: 0 !important;
+    white-space: normal;
+  }
+}
+
+@media (max-width: 760px) {
+  body.coach-page .coach-main { margin-top: 20px !important; }
+  body.coach-page .coach-profile { padding: 16px; border-radius: 16px; }
+  body.coach-page .panel { padding: 16px !important; border-radius: 16px !important; }
+  body.coach-page .tbp-compact { min-width: 600px; }
+  body.coach-page .coach-similar-grid { grid-template-columns: 1fr; }
+  body.coach-page .coach-source-body { grid-template-columns: 1fr; }
+  body.coach-page .mode-bar { gap: 10px !important; }
+  body.coach-page .mode-bar .seg { width: 100%; flex-wrap: nowrap; overflow-x: auto; }
+  body.coach-page .mode-bar .seg button { padding: 0 12px; }
+}
+
+/* 窄屏横向滚动提示（表格容器的可滚动性提示） */
+body.coach-page .coach-scroll-hint { display: none !important; }
+@media (max-width: 760px) {
+  body.coach-page .coach-scroll-hint {
+    display: inline !important;
+    margin-left: auto;
+    font-family: var(--v2-mono);
+    font-size: 9px !important;
+    font-weight: 400;
+    color: var(--v2-ink-3) !important;
+    white-space: nowrap;
+  }
+}
+
+/* ==========================================================================
+   15. 覆盖 light.css 的 html.v55.light-site :is(.panel,...) !important
+       旧浅色主题把所有 .panel 归一化为 14px 圆角 / 旧描边 token；这里用更高
+       优先级的选择器把纸白主题拉回 V2 的 18px 圆角 + var(--v2-line) 描边，
+       保证与暗色主题、与站内 .v2-card 完全一致。
+   ========================================================================== */
+html.light-site body.v2-page.coach-page .panel {
+  padding: 20px !important;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 18px !important;
+  background: var(--v2-card) !important;
+  box-shadow: var(--v2-shadow-sm) !important;
+}
+html.light-site body.v2-page.coach-page .panel.coach-controls {
+  padding: 14px 16px !important;
+  border-radius: 14px !important;
+}
+html.light-site body.v2-page.coach-page select { border-radius: 10px !important; }
+
+@media (max-width: 760px) {
+  html.light-site body.v2-page.coach-page .panel {
+    padding: 16px !important;
+    border-radius: 16px !important;
+  }
+  html.light-site body.v2-page.coach-page .panel.coach-controls {
+    padding: 14px 16px !important;
+    border-radius: 14px !important;
+  }
+}
+
+@media (max-width: 640px) {
+  /* 移动端：头版 KPI 数字带单列 */
+  body.coach-page #coachCareer {
+    grid-template-columns: 1fr !important;
+    row-gap: 0;
+  }
+  body.coach-page #coachCareer .coach-career-item {
+    padding: 13px 0 !important;
+    border-left: 0 !important;
+    border-top: 1px solid var(--v2-line) !important;
+  }
+  body.coach-page #coachCareer .coach-career-item:first-child {
+    padding-top: 0 !important;
+    border-top: 0 !important;
+  }
+  body.coach-page .coach-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 16px; }
+  body.coach-page .coach-kpis b { font-size: 18px; }
+  body.coach-page .coach-name { font-size: 19px; }
+  body.coach-page .ct-row { grid-template-columns: 84px minmax(0, 1fr) 64px; gap: 8px; }
+  body.coach-page .cfp-bar { height: 12px; }
+  body.coach-page .coach-exclusion { flex-direction: column; gap: 2px; }
+  body.coach-page .coach-two { gap: 12px; }
+  body.coach-page .panel { margin-top: 12px; }
+}

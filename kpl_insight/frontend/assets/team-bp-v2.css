@@ -1,0 +1,845 @@
+/* ==========================================================================
+   KPL 赛研 · 战队 BP 风格（team-bp.html）V2
+   与 coach / teams / picks 同一套 token（site-v2.css）。
+   旧 pages.css / v55.css / arena.css / light.css 里针对 .panel / select /
+   .panel-title / .block-note 的高优先级规则用 `html.v55 body.team-bp-page`
+   前缀 + 必要时 !important 覆盖。JS（team_bp_app.js）注入的 tbp-* / hp-*
+   标记类只换皮，不改逻辑。
+   ========================================================================== */
+
+html.v55 body.team-bp-page {
+  background: var(--v2-bg) !important;
+  color: var(--v2-ink) !important;
+  font-family: var(--v2-sans) !important;
+}
+body.team-bp-page .team-bp-main { margin-top: clamp(22px, 2.4vw, 30px); min-width: 0; }
+body.team-bp-page .mono,
+body.team-bp-page .v2-mono { font-family: var(--v2-mono); font-variant-numeric: tabular-nums; }
+body.team-bp-page img { max-width: 100%; }
+body.team-bp-page :is(a, button, select, input):focus-visible {
+  outline: 2px solid rgba(var(--v2-blue-rgb), .55);
+  outline-offset: 2px;
+}
+
+/* 头版 ------------------------------------------------------------------ */
+html.v55 body.team-bp-page .lg-hero {
+  padding: clamp(30px, 3.8vw, 54px) 0 clamp(24px, 3vw, 40px) !important;
+  background: var(--v2-hero-bg) !important;
+  border-bottom: 1px solid var(--v2-hero-line) !important;
+}
+html.v55 body.team-bp-page .lg-hero .v2-h1 { color: var(--v2-ink) !important; }
+html.v55 body.team-bp-page .lg-hero .v2-lead { max-width: 76ch; color: var(--v2-ink-2) !important; }
+html.v55 body.team-bp-page .lg-hero .v2-lead b { color: var(--v2-ink) !important; font-weight: 600; }
+html.v55 body.team-bp-page .lg-hero .v2-note {
+  max-width: 92ch;
+  font-size: 11px !important;
+  line-height: 1.75;
+  letter-spacing: .01em;
+  color: var(--v2-ink-3) !important;
+}
+
+/* ==========================================================================
+   1. 战队 / 数据范围选择卡
+   ========================================================================== */
+html.v55 body.team-bp-page .panel.tbp-controls {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: flex-end !important;
+  gap: 12px 16px !important;
+  margin-top: 0 !important;
+  padding: 14px 16px !important;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 14px !important;
+  background: var(--v2-card) !important;
+  box-shadow: var(--v2-shadow-sm) !important;
+  overflow: visible !important;
+  min-width: 0;
+}
+html.v55 body.team-bp-page .tbp-controls .fld {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0 !important;
+  margin: 0 !important;
+  flex: 0 1 280px;
+}
+html.v55 body.team-bp-page .tbp-controls .fld:first-of-type { flex: 1 1 320px; max-width: 460px; }
+html.v55 body.team-bp-page .tbp-controls .fld:nth-of-type(2) { flex: 0 1 280px; }
+html.v55 body.team-bp-page .tbp-controls .fld > span {
+  padding-left: 2px;
+  font-family: var(--v2-mono);
+  font-size: 9px !important;
+  font-weight: 500;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--v2-ink-3) !important;
+  white-space: nowrap;
+}
+
+html.v55 body.team-bp-page select,
+html.v55 body.team-bp-page .fld select {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  width: 100%;
+  height: 38px;
+  min-width: 0;
+  padding: 0 32px 0 12px !important;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 10px !important;
+  background:
+    linear-gradient(45deg, transparent 50%, var(--v2-ink-3) 50%) calc(100% - 15px) 16px / 4px 4px no-repeat,
+    linear-gradient(135deg, var(--v2-ink-3) 50%, transparent 50%) calc(100% - 11px) 16px / 4px 4px no-repeat,
+    var(--v2-card) !important;
+  color: var(--v2-ink) !important;
+  font-family: var(--v2-sans);
+  font-size: 12.5px;
+  cursor: pointer;
+  outline: none;
+  box-shadow: none !important;
+}
+html.light-site body.team-bp-page select { color-scheme: light !important; }
+html.dark-site body.team-bp-page select { color-scheme: dark !important; }
+html.v55 body.team-bp-page select:focus {
+  border-color: var(--v2-line-2) !important;
+  box-shadow: 0 0 0 3px rgba(var(--v2-blue-rgb), .12) !important;
+}
+html.v55 body.team-bp-page select option {
+  background-color: var(--v2-card) !important;
+  color: var(--v2-ink) !important;
+}
+html.v55 body.team-bp-page .tbp-meta {
+  margin-left: auto !important;
+  padding-bottom: 10px !important;
+  font-family: var(--v2-mono);
+  font-size: 10px;
+  line-height: 1.6;
+  letter-spacing: .01em;
+  color: var(--v2-ink-3) !important;
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   2. 战队概览卡（#tbpSummary）
+   ========================================================================== */
+html.v55 body.team-bp-page .tbp-summary {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  gap: 16px 22px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+  padding: 18px 20px;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 18px !important;
+  background: var(--v2-card) !important;
+  box-shadow: var(--v2-shadow-sm) !important;
+  min-width: 0;
+}
+html.v55 body.team-bp-page .tbp-id {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  min-width: 0;
+  flex: 0 1 auto;
+}
+html.v55 body.team-bp-page .tbp-ava {
+  width: 46px;
+  height: 46px;
+  flex: none;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 13px !important;
+  background: var(--v2-card-soft) !important;
+  object-fit: contain;
+}
+html.v55 body.team-bp-page .tbp-ava.ph {
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: 18px;
+  color: var(--v2-ink-3) !important;
+}
+html.v55 body.team-bp-page .tbp-name {
+  font-family: var(--v2-sans);
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -.02em;
+  color: var(--v2-ink) !important;
+}
+html.v55 body.team-bp-page .tbp-sub {
+  margin-top: 4px;
+  font-size: 11.5px;
+  line-height: 1.55;
+  color: var(--v2-ink-3) !important;
+  overflow-wrap: anywhere;
+}
+html.v55 body.team-bp-page .tbp-kpis {
+  display: flex !important;
+  gap: clamp(18px, 2.6vw, 38px);
+  margin-left: auto !important;
+  min-width: 0;
+  flex: none;
+}
+html.v55 body.team-bp-page .tbp-kpis > div {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  min-width: 0;
+  white-space: nowrap;
+}
+html.v55 body.team-bp-page .tbp-kpis b {
+  font-family: var(--v2-mono);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -.02em;
+  color: var(--v2-ink) !important;
+  font-variant-numeric: tabular-nums;
+}
+html.v55 body.team-bp-page .tbp-kpis span {
+  font-size: 10px;
+  letter-spacing: .03em;
+  color: var(--v2-ink-3) !important;
+}
+
+/* ==========================================================================
+   3. 面板 / 标题 / 注释
+   ========================================================================== */
+html.v55 body.team-bp-page .panel {
+  margin-top: 16px;
+  padding: 20px !important;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 18px !important;
+  background: var(--v2-card) !important;
+  box-shadow: var(--v2-shadow-sm) !important;
+  color: var(--v2-ink) !important;
+  min-width: 0;
+  overflow: visible !important;
+}
+html.v55 body.team-bp-page .panel-title {
+  display: flex !important;
+  align-items: baseline !important;
+  justify-content: flex-start !important;
+  flex-wrap: wrap !important;
+  gap: 6px 12px !important;
+  margin: 0 0 12px !important;
+  padding: 0 0 10px !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--v2-line) !important;
+  border-left: 0 !important;
+  text-align: left !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  letter-spacing: -.01em;
+  color: var(--v2-ink) !important;
+}
+html.v55 body.team-bp-page .panel-title em { margin-left: auto; }
+html.v55 body.team-bp-page .panel-title::before,
+html.v55 body.team-bp-page .panel-title::after { display: none !important; content: none !important; }
+html.v55 body.team-bp-page .panel-title em {
+  font-style: normal !important;
+  font-weight: 400;
+  font-family: var(--v2-mono);
+  font-size: 9.5px;
+  letter-spacing: .02em;
+  color: var(--v2-ink-3) !important;
+}
+html.v55 body.team-bp-page .block-note {
+  font-size: 11px !important;
+  line-height: 1.8 !important;
+  color: var(--v2-ink-3) !important;
+}
+html.v55 body.team-bp-page .empty-tip {
+  padding: 22px 12px !important;
+  text-align: center;
+  font-size: 11.5px !important;
+  color: var(--v2-ink-3) !important;
+}
+html.v55 body.team-bp-page .tbp-two {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 16px;
+  margin-top: 16px;
+}
+html.v55 body.team-bp-page .tbp-two > .panel { margin-top: 0 !important; }
+html.v55 body.team-bp-page .tbp-grid {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr) !important;
+  gap: 16px;
+  margin-top: 16px;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: none !important;
+  align-items: start;
+  min-width: 0;
+}
+html.v55 body.team-bp-page .tbp-grid > .panel { margin-top: 0 !important; min-width: 0; }
+
+/* 风格 / 效果统计卡 ------------------------------------------------------ */
+html.v55 body.team-bp-page .tbp-stat-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+html.v55 body.team-bp-page .tbp-stat {
+  min-width: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 12px;
+  background: var(--v2-card-soft) !important;
+}
+html.v55 body.team-bp-page .tbp-stat b {
+  display: block;
+  font-family: var(--v2-mono);
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -.02em;
+  color: var(--v2-ink) !important;
+  font-variant-numeric: tabular-nums;
+}
+html.v55 body.team-bp-page .tbp-stat span {
+  display: block;
+  margin-top: 4px;
+  font-size: 10.5px;
+  letter-spacing: .02em;
+  color: var(--v2-ink-3) !important;
+}
+html.v55 body.team-bp-page .tbp-stat em {
+  display: block;
+  margin-top: 3px;
+  font-style: normal;
+  font-size: 9.5px;
+  line-height: 1.5;
+  color: var(--v2-ink-3) !important;
+}
+
+/* 常用英雄 chips --------------------------------------------------------- */
+html.v55 body.team-bp-page .tbp-chip-head {
+  margin-top: 14px;
+  font-family: var(--v2-mono);
+  font-size: 10px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--v2-ink-3);
+}
+html.v55 body.team-bp-page .tbp-chip-head em { font-style: normal; margin-left: 4px; }
+html.v55 body.team-bp-page .tbp-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+html.v55 body.team-bp-page .tbp-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 10px 0 4px;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 8px;
+  background: var(--v2-card-soft) !important;
+  color: var(--v2-ink-2);
+  font-family: var(--v2-sans);
+  font-size: 11px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color .16s, color .16s, background-color .16s;
+}
+html.v55 body.team-bp-page .tbp-chip:hover { border-color: var(--v2-line-2) !important; color: var(--v2-ink); }
+html.v55 body.team-bp-page .tbp-chip .tbp-hicon { width: 22px; height: 22px; border-radius: 6px; }
+html.v55 body.team-bp-page .tbp-chip em {
+  font-style: normal;
+  font-family: var(--v2-mono);
+  font-size: 10px;
+  color: var(--v2-gold);
+}
+html.v55 body.team-bp-page .tbp-effect-note {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--v2-line);
+  font-size: 10.5px;
+  line-height: 1.8;
+  color: var(--v2-ink-3) !important;
+}
+html.v55 body.team-bp-page .hp-tag {
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  margin-top: 8px;
+  padding: 0 8px;
+  border-radius: 5px;
+  border: 1px solid var(--v2-line);
+  font-family: var(--v2-mono);
+  font-size: 9px;
+  letter-spacing: .04em;
+  color: var(--v2-ink-3);
+}
+html.v55 body.team-bp-page .hp-tag.warn {
+  color: var(--v2-gold) !important;
+  border-color: rgba(var(--v2-gold-rgb), .45);
+  background: rgba(var(--v2-gold-rgb), .07);
+}
+
+/* ==========================================================================
+   4. 英雄使用表（#tbpPicksTable）
+   ========================================================================== */
+html.v55 body.team-bp-page .tbp-table-wrap {
+  overflow: auto !important;
+  -webkit-overflow-scrolling: touch;
+  margin-top: 4px;
+  max-height: 620px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--v2-line-2) transparent;
+}
+html.v55 body.team-bp-page #tbpPicksTable {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+}
+html.v55 body.team-bp-page #tbpPicksTable th,
+html.v55 body.team-bp-page #tbpPicksTable td {
+  padding: 9px !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--v2-line) !important;
+  text-align: right;
+  font-size: 12px;
+  white-space: nowrap;
+  color: var(--v2-ink-2);
+}
+html.v55 body.team-bp-page #tbpPicksTable th:first-child,
+html.v55 body.team-bp-page #tbpPicksTable td:first-child { text-align: left; }
+html.v55 body.team-bp-page #tbpPicksTable thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--v2-card) !important;
+  font-family: var(--v2-mono);
+  font-size: 9px !important;
+  font-weight: 500 !important;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--v2-ink-3) !important;
+}
+html.v55 body.team-bp-page #tbpPicksTable tbody tr {
+  cursor: pointer;
+  transition: background-color .15s;
+}
+html.v55 body.team-bp-page #tbpPicksTable tbody tr:hover { background: var(--v2-inset) !important; }
+html.v55 body.team-bp-page #tbpPicksTable tbody tr.on {
+  background: rgba(var(--v2-gold-rgb), .09) !important;
+  box-shadow: inset 2px 0 0 var(--v2-gold);
+}
+html.v55 body.team-bp-page #tbpPicksTable tbody tr:focus-visible {
+  outline: 2px solid rgba(var(--v2-blue-rgb), .5);
+  outline-offset: -2px;
+}
+html.v55 body.team-bp-page #tbpPicksTable td b {
+  font-family: var(--v2-mono);
+  font-weight: 700;
+  color: var(--v2-ink);
+}
+html.v55 body.team-bp-page .tbp-hero-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 96px;
+}
+html.v55 body.team-bp-page .tbp-hicon {
+  width: 24px;
+  height: 24px;
+  flex: none;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 6px !important;
+  background: var(--v2-card-soft);
+  object-fit: cover;
+}
+html.v55 body.team-bp-page .tbp-lift {
+  font-family: var(--v2-mono);
+  font-size: 11px;
+  color: var(--v2-ink-3);
+}
+html.v55 body.team-bp-page .tbp-lift.high { color: var(--v2-gold) !important; }
+html.v55 body.team-bp-page .tbp-lift.low { color: var(--v2-red) !important; }
+html.v55 body.team-bp-page .pos { color: var(--v2-blue) !important; }
+html.v55 body.team-bp-page .neg { color: var(--v2-red) !important; }
+
+/* ==========================================================================
+   5. 英雄竞争状态（#tbpHeroDetail）
+   ========================================================================== */
+html.v55 body.team-bp-page .tbp-hero-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+html.v55 body.team-bp-page .tbp-hero-head .tbp-hicon { width: 36px; height: 36px; border-radius: 9px; }
+html.v55 body.team-bp-page .tbp-hero-name {
+  display: block;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--v2-ink);
+}
+html.v55 body.team-bp-page .tbp-hero-sub {
+  display: block;
+  margin-top: 2px;
+  font-family: var(--v2-mono);
+  font-size: 10px;
+  color: var(--v2-ink-3);
+}
+html.v55 body.team-bp-page .tbp-statebar {
+  display: flex;
+  height: 10px;
+  margin-top: 14px;
+  border-radius: 5px;
+  overflow: hidden;
+  background: var(--v2-inset);
+  border: 1px solid var(--v2-line);
+}
+html.v55 body.team-bp-page .tbp-statebar i { display: block; height: 100%; min-width: 2px; }
+/* 状态条颜色在 JS 里写死，这里按 title 前缀重绘为 V2 语义色 */
+html.v55 body.team-bp-page .tbp-statebar i[title^="己方选用"] { background: var(--v2-gold) !important; }
+html.v55 body.team-bp-page .tbp-statebar i[title^="己方禁用"] { background: var(--v2-red) !important; }
+html.v55 body.team-bp-page .tbp-statebar i[title^="对手选用"] { background: var(--v2-blue) !important; }
+html.v55 body.team-bp-page .tbp-statebar i[title^="对手禁用"] { background: #8b6fd1 !important; }
+html.v55 body.team-bp-page .tbp-statebar i[title^="未出现"] { background: var(--v2-ink-3) !important; }
+html.dark-site body.team-bp-page .tbp-statebar i[title^="对手禁用"] { background: #b8a1f2 !important; }
+
+html.v55 body.team-bp-page .tbp-state-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+html.v55 body.team-bp-page .tbp-state {
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 12px;
+  background: var(--v2-card-soft) !important;
+}
+html.v55 body.team-bp-page .tbp-state span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  letter-spacing: .02em;
+  color: var(--v2-ink-3) !important;
+}
+html.v55 body.team-bp-page .tbp-state span i { width: 7px; height: 7px; border-radius: 50%; flex: none; }
+html.v55 body.team-bp-page .tbp-state:nth-child(1) span i { background: var(--v2-gold) !important; }
+html.v55 body.team-bp-page .tbp-state:nth-child(2) span i { background: var(--v2-red) !important; }
+html.v55 body.team-bp-page .tbp-state:nth-child(3) span i { background: var(--v2-blue) !important; }
+html.v55 body.team-bp-page .tbp-state:nth-child(4) span i { background: #8b6fd1 !important; }
+html.v55 body.team-bp-page .tbp-state:nth-child(5) span i { background: var(--v2-ink-3) !important; }
+html.dark-site body.team-bp-page .tbp-state:nth-child(4) span i { background: #b8a1f2 !important; }
+html.v55 body.team-bp-page .tbp-state b {
+  display: inline-block;
+  margin-top: 5px;
+  font-family: var(--v2-mono);
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--v2-ink);
+  font-variant-numeric: tabular-nums;
+}
+html.v55 body.team-bp-page .tbp-state em {
+  margin-left: 6px;
+  font-style: normal;
+  font-family: var(--v2-mono);
+  font-size: 9.5px;
+  color: var(--v2-ink-3);
+}
+html.v55 body.team-bp-page .tbp-detail-note {
+  margin-top: 12px;
+  font-size: 11px;
+  line-height: 1.75;
+  color: var(--v2-ink-2) !important;
+}
+html.v55 body.team-bp-page .tbp-detail-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 14px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--v2-line);
+}
+html.v55 body.team-bp-page .tbp-detail-metrics > div { min-width: 0; }
+html.v55 body.team-bp-page .tbp-detail-metrics span {
+  display: block;
+  font-size: 9.5px;
+  letter-spacing: .02em;
+  color: var(--v2-ink-3) !important;
+}
+html.v55 body.team-bp-page .tbp-detail-metrics b {
+  display: block;
+  margin-top: 3px;
+  font-family: var(--v2-mono);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -.01em;
+  color: var(--v2-ink);
+  font-variant-numeric: tabular-nums;
+}
+html.v55 body.team-bp-page .tbp-detail-metrics em {
+  display: block;
+  margin-top: 2px;
+  font-style: normal;
+  font-size: 9.5px;
+  color: var(--v2-ink-3);
+}
+html.v55 body.team-bp-page #tbpHeroDetail .block-note {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--v2-line);
+}
+
+/* ==========================================================================
+   6. 禁用 Top 列表
+   ========================================================================== */
+html.v55 body.team-bp-page .tbp-ban-list { margin-top: 2px; }
+html.v55 body.team-bp-page .tbp-ban-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 9px 2px !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--v2-line) !important;
+  background: none;
+  color: var(--v2-ink-2);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color .15s;
+}
+html.v55 body.team-bp-page .tbp-ban-row:last-child { border-bottom: 0 !important; }
+html.v55 body.team-bp-page .tbp-ban-row:hover { background: var(--v2-inset) !important; }
+html.v55 body.team-bp-page .tbp-ban-row .tbp-hicon { width: 24px; height: 24px; }
+html.v55 body.team-bp-page .tbp-ban-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12.5px;
+  color: var(--v2-ink-2);
+}
+html.v55 body.team-bp-page .tbp-ban-num {
+  font-family: var(--v2-mono);
+  font-size: 11px;
+  color: var(--v2-ink-3);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+html.v55 body.team-bp-page .tbp-ban-rate {
+  width: 52px;
+  text-align: right;
+  font-family: var(--v2-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--v2-ink);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ==========================================================================
+   7. 双人组合 / 证据表
+   ========================================================================== */
+html.v55 body.team-bp-page .tbp-compact,
+html.v55 body.team-bp-page #tbpEvidenceTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+html.v55 body.team-bp-page .tbp-compact { min-width: 640px; }
+html.v55 body.team-bp-page #tbpEvidenceTable { min-width: 1080px; }
+html.v55 body.team-bp-page .tbp-compact th,
+html.v55 body.team-bp-page .tbp-compact td,
+html.v55 body.team-bp-page #tbpEvidenceTable th,
+html.v55 body.team-bp-page #tbpEvidenceTable td {
+  padding: 9px 10px !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--v2-line) !important;
+  text-align: right;
+  vertical-align: top;
+  white-space: nowrap;
+  font-size: 11.5px;
+  color: var(--v2-ink-2);
+}
+html.v55 body.team-bp-page .tbp-compact th:first-child,
+html.v55 body.team-bp-page .tbp-compact td:first-child { text-align: left; }
+html.v55 body.team-bp-page #tbpEvidenceTable th:nth-child(1),
+html.v55 body.team-bp-page #tbpEvidenceTable th:nth-child(2),
+html.v55 body.team-bp-page #tbpEvidenceTable th:nth-child(3),
+html.v55 body.team-bp-page #tbpEvidenceTable th:nth-child(6),
+html.v55 body.team-bp-page #tbpEvidenceTable th:nth-child(7),
+html.v55 body.team-bp-page #tbpEvidenceTable th:nth-child(8),
+html.v55 body.team-bp-page #tbpEvidenceTable td:nth-child(1),
+html.v55 body.team-bp-page #tbpEvidenceTable td:nth-child(2),
+html.v55 body.team-bp-page #tbpEvidenceTable td:nth-child(3),
+html.v55 body.team-bp-page #tbpEvidenceTable td:nth-child(6),
+html.v55 body.team-bp-page #tbpEvidenceTable td:nth-child(7),
+html.v55 body.team-bp-page #tbpEvidenceTable td:nth-child(8) { text-align: left; }
+html.v55 body.team-bp-page .tbp-compact thead th,
+html.v55 body.team-bp-page #tbpEvidenceTable thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--v2-card) !important;
+  font-family: var(--v2-mono);
+  font-size: 9px !important;
+  font-weight: 500 !important;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--v2-ink-3) !important;
+}
+html.v55 body.team-bp-page .tbp-compact tbody tr,
+html.v55 body.team-bp-page #tbpEvidenceTable tbody tr { transition: background-color .15s; }
+html.v55 body.team-bp-page .tbp-compact tbody tr:hover,
+html.v55 body.team-bp-page #tbpEvidenceTable tbody tr:hover { background: var(--v2-inset) !important; }
+html.v55 body.team-bp-page #tbpCombos .block-note,
+html.v55 body.team-bp-page .tbp-coverage-note { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--v2-line); }
+html.v55 body.team-bp-page .tbp-evidence-wrap {
+  overflow: auto !important;
+  -webkit-overflow-scrolling: touch;
+  margin-top: 4px;
+  max-height: 460px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--v2-line-2) transparent;
+}
+html.v55 body.team-bp-page .tbp-pair { display: inline-flex; align-items: center; gap: 6px; min-width: 0; }
+html.v55 body.team-bp-page .tbp-pair .tbp-hicon { width: 22px; height: 22px; }
+html.v55 body.team-bp-page .tbp-pair i { font-style: normal; font-size: 10px; color: var(--v2-ink-3); }
+html.v55 body.team-bp-page .tbp-stage {
+  display: block;
+  margin-top: 2px;
+  font-family: var(--v2-mono);
+  font-size: 9px;
+  color: var(--v2-ink-3);
+}
+html.v55 body.team-bp-page .tbp-state-tag { display: block; margin-top: 2px; font-size: 9px; color: var(--v2-ink-3); }
+html.v55 body.team-bp-page .tbp-state-tag.oppban { color: #8b6fd1; }
+html.dark-site body.team-bp-page .tbp-state-tag.oppban { color: #b8a1f2; }
+html.v55 body.team-bp-page .tbp-result {
+  display: inline-block;
+  min-width: 24px;
+  padding: 1px 6px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  text-align: center;
+  font-size: 10px;
+  font-weight: 700;
+}
+html.v55 body.team-bp-page .tbp-result.w {
+  color: var(--v2-blue) !important;
+  border-color: rgba(var(--v2-blue-rgb), .3);
+  background: rgba(var(--v2-blue-rgb), .08) !important;
+}
+html.v55 body.team-bp-page .tbp-result.l {
+  color: var(--v2-red) !important;
+  border-color: rgba(var(--v2-red-rgb), .28);
+  background: rgba(var(--v2-red-rgb), .07) !important;
+}
+html.v55 body.team-bp-page .tbp-hname {
+  display: inline-block;
+  margin: 1px 3px 1px 0;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--v2-inset);
+  color: var(--v2-ink-2);
+  font-size: 10px;
+  line-height: 1.6;
+}
+html.v55 body.team-bp-page #tbpEvidenceTable td a {
+  color: var(--v2-blue);
+  border-bottom: 1px solid transparent;
+}
+html.v55 body.team-bp-page #tbpEvidenceTable td a:hover { border-bottom-color: currentColor; }
+
+/* 证据表里的「证据」列在深色下保持可读 */
+html.v55 body.team-bp-page .tbp-scroll-hint { display: none !important; }
+
+/* ==========================================================================
+   8. 响应式
+   ========================================================================== */
+@media (max-width: 1120px) {
+  html.v55 body.team-bp-page .tbp-grid { grid-template-columns: minmax(0, 1fr) !important; }
+  html.v55 body.team-bp-page .tbp-two { grid-template-columns: minmax(0, 1fr) !important; }
+}
+@media (max-width: 900px) {
+  html.v55 body.team-bp-page .tbp-summary { flex-direction: column !important; align-items: flex-start; gap: 16px; }
+  html.v55 body.team-bp-page .tbp-kpis {
+    width: 100%;
+    margin-left: 0 !important;
+    padding-top: 14px;
+    border-top: 1px solid var(--v2-line);
+    gap: 12px 16px;
+  }
+  html.v55 body.team-bp-page .tbp-kpis > div { align-items: flex-start; }
+  html.v55 body.team-bp-page .tbp-kpis b { font-size: 19px; }
+}
+@media (max-width: 760px) {
+  html.v55 body.team-bp-page .team-bp-main { margin-top: 20px !important; }
+  html.v55 body.team-bp-page .panel { padding: 16px !important; border-radius: 16px !important; }
+  html.v55 body.team-bp-page .panel.tbp-controls { padding: 14px !important; border-radius: 14px !important; }
+  html.v55 body.team-bp-page .tbp-controls .fld:first-of-type,
+  html.v55 body.team-bp-page .tbp-controls .fld:nth-of-type(2) { flex: 1 1 100%; max-width: none; }
+  html.v55 body.team-bp-page .tbp-meta {
+    margin-left: 0 !important;
+    width: 100%;
+    padding-bottom: 0 !important;
+    white-space: normal;
+  }
+  html.v55 body.team-bp-page .tbp-summary { padding: 16px; border-radius: 16px !important; }
+  html.v55 body.team-bp-page .tbp-stat-grid { grid-template-columns: minmax(0, 1fr); }
+  html.v55 body.team-bp-page .tbp-state-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  html.v55 body.team-bp-page .tbp-detail-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  html.v55 body.team-bp-page .tbp-scroll-hint {
+    display: inline !important;
+    margin-left: auto;
+    font-family: var(--v2-mono);
+    font-size: 9px !important;
+    font-weight: 400;
+    color: var(--v2-ink-3) !important;
+    white-space: nowrap;
+  }
+}
+@media (max-width: 560px) {
+  html.v55 body.team-bp-page .tbp-state-grid { grid-template-columns: minmax(0, 1fr); }
+  html.v55 body.team-bp-page .tbp-kpis { flex-wrap: wrap; }
+  html.v55 body.team-bp-page .tbp-kpis > div { flex: 1 1 40%; }
+}
+
+/* ==========================================================================
+   9. 覆盖 light.css 对旧 .panel 的 !important 归一化
+   ========================================================================== */
+html.v55.light-site body.v2-page.team-bp-page .panel {
+  padding: 20px !important;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 18px !important;
+  background: var(--v2-card) !important;
+  box-shadow: var(--v2-shadow-sm) !important;
+}
+html.v55.light-site body.v2-page.team-bp-page .panel.tbp-controls {
+  padding: 14px 16px !important;
+  border-radius: 14px !important;
+}
+@media (max-width: 760px) {
+  html.v55.light-site body.v2-page.team-bp-page .panel {
+    padding: 16px !important;
+    border-radius: 16px !important;
+  }
+  html.v55.light-site body.v2-page.team-bp-page .panel.tbp-controls {
+    padding: 14px !important;
+    border-radius: 14px !important;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  body.team-bp-page *, body.team-bp-page *::before, body.team-bp-page *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

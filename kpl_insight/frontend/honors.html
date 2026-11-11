@@ -8,39 +8,37 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='5' fill='%230A111C'/%3E%3Crect x='3' y='3' width='26' height='26' rx='4' fill='none' stroke='%23F6C021' stroke-width='2'/%3E%3Ctext x='16' y='22' font-family='Arial,sans-serif' font-size='16' font-weight='bold' fill='%23F6C021' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="assets/style.css?v=20261102-brand">
 <link rel="stylesheet" href="assets/pages.css?v=20261102-brand">
-<link rel="stylesheet" href="assets/v55.css?v=87">
+<link rel="stylesheet" href="assets/v55.css?v=92">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="KPL赛研">
 <meta property="og:title" content="荣誉中心 · KPL赛研">
-<meta property="og:description" content="KPL 荣誉中心：周榜 / 月榜五路最佳选手与本周最佳战队。分路内六项稳健标准分加权评分，按大场成组 bootstrap 给出不确定性。">
+<meta property="og:description" content="KPL 荣誉中心：周榜 / 月榜五路最佳选手与本期最佳战队。分路内六项稳健标准分加权评分，按大场成组 bootstrap 给出不确定性。">
 <meta property="og:image" content="https://hccccc01333.github.io/KPLdata-site/assets/brand/kpl-research-social.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="assets/arena.css?v=1">
-<link rel="stylesheet" href="assets/arena-world.css?v=20261026">
-<script src="assets/arena-world.js?v=20261030a" type="module"></script>
-<link rel="stylesheet" href="assets/card-motion.css?v=1">
-<script src="assets/card-motion.js?v=1" type="module"></script>
 <link rel="stylesheet" href="assets/light.css?v=20261030a">
 <link rel="stylesheet" href="assets/theme.css?v=20261030b">
+<link rel="stylesheet" href="assets/site-v2.css?v=20261112a">
+<link rel="stylesheet" href="assets/honors-v2.css?v=20261112a">
 </head>
-<body data-page="honors.html">
+<body data-page="honors.html" class="v2-page honors-page">
 <header id="siteHeader" class="topbar"></header>
 
-<header class="page-hero" id="heroHead">
-  <div class="wrap">
-    <div class="ph-kicker mono">HONORS · 荣誉中心</div>
-    <h1>荣誉中心</h1>
-    <p>按周 / 月评出五个分路的最佳选手与本周最佳战队。所有名次由<b>固定评分卡</b>在该分路当期样本内可复算得出，
-      <b>不是「真实实力」排名</b>；不确定性按大场成组 bootstrap 给出。</p>
-    <div class="ph-meta mono">
-      <span>算法版本 <b id="mVer">—</b></span><i>/</i>
-      <span>评分卡 <b>固定权重 · 分路内标准分</b></span><i>/</i>
-      <span>统计时间 <b id="mBuilt">—</b></span>
+<header class="lg-hero" id="heroHead">
+  <div class="lg-hero-gridlines" aria-hidden="true"></div>
+  <div class="v2-wrap wrap">
+    <div class="v2-kicker"><i></i>HONORS<b>·</b>荣誉中心</div>
+    <h1 class="v2-h1">荣誉中心</h1>
+    <p class="v2-lead">按周 / 月评出五个分路的最佳选手与本期最佳战队。所有名次由<b>固定评分卡</b>在该分路当期样本内可复算得出，<b>不是「真实实力」排名</b>；不确定性按大场成组 bootstrap 给出。</p>
+    <div class="v2-stats lg-kpis" style="margin-top:26px">
+      <div class="v2-stat"><b class="v2-mono" id="mVer">—</b><span>算法版本</span></div>
+      <div class="v2-stat"><b class="v2-mono">固定权重</b><span>评分卡 · 分路内标准分</span></div>
+      <div class="v2-stat"><b class="v2-mono" id="mBuilt">—</b><span>统计时间</span></div>
     </div>
   </div>
 </header>
 
-<main class="wrap" style="margin-top:22px">
+<main class="wrap" style="margin-top:26px">
   <div class="filterbar">
     <div class="hn-kind" id="kindSwitch"></div>
     <label class="fld grow"><span>评选周期</span><select id="fPeriod"></select></label>
@@ -50,7 +48,7 @@
 
   <div class="brief" id="brief"></div>
 
-  <section class="block" id="lanesBlock" style="margin-top:26px">
+  <section class="block" id="lanesBlock">
     <div class="block-head">
       <h2><i></i>五路最佳</h2>
       <span class="block-note mono" id="lanesNote">—</span>
@@ -71,6 +69,7 @@
       <h2><i></i>候选榜</h2>
       <span class="block-note mono">仅列出达到门槛的选手 / 战队；未达门槛的分路只显示「候选」</span>
     </div>
+    <div class="hn-scroll-hint">左右滑动查看完整候选榜 →</div>
     <div class="panel table-panel">
       <table class="tbl">
         <thead><tr>
@@ -99,7 +98,7 @@
 <script src="assets/seasons.js?v=85"></script>
 <script src="assets/schedule_all.js?v=85"></script>
 <script src="assets/coverage.js?v=85"></script>
-<script src="assets/common.js?v=20261102-brand"></script>
+<script src="assets/common.js?v=20261110-curve"></script>
 <script src="assets/share.js?v=20261102-brand"></script>
 <script src="assets/honors.js?v=85"></script>
 <script>
@@ -299,7 +298,7 @@
     $("#formula").innerHTML =
       '<div class="hn-fx"><div class="hn-fx-col">' +
       "<h3>选手评分</h3>" +
-      '<table class="tbl"><thead>' + head + "</thead><tbody>" + body + "</tbody></table>" +
+      '<div class="hn-fx-scroll"><table class="tbl"><thead>' + head + "</thead><tbody>" + body + "</tbody></table></div>" +
       '<p class="hn-fnote">每列权重之和为 100%。' + esc(META.formula.robustZ) + "。" + esc(META.formula.score) + "</p>" +
       "</div><div class=\"hn-fx-col\">" +
       "<h3>门槛与不确定性</h3><ul class=\"hn-flist\">" +
@@ -325,7 +324,7 @@
     }
     $("#periodNote").textContent = period.start.replace(/-/g, "/") + " – " + period.end.replace(/-/g, "/") +
       " · " + period.matches + " 大场 / " + period.games + " 局";
-    document.querySelector(".page-hero p").innerHTML =
+    document.querySelector("#heroHead .v2-lead").innerHTML =
       "本期为 <b>" + esc(period.label) + "</b>（" + esc(period.season || "—") +
       "）：由<b>固定评分卡</b>在该分路当期样本内可复算评出，<b>不是「真实实力」排名</b>；不确定性按大场成组 bootstrap 给出。";
 

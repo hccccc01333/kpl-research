@@ -1,0 +1,848 @@
+/* ==========================================================================
+   KPL 赛研 · 战队详情（team）V2
+   与 teams / players 榜单页共用 site-v2.css 令牌；旧 pages.css / v55.css /
+   arena.css 里有大量高优先级规则（含 !important），本文件统一用
+   `body.team-page ...`（必要时加 #main / html.light-site）前缀逐项覆盖。
+   ========================================================================== */
+
+/* ==========================================================================
+   0. 页面基底
+   ========================================================================== */
+html.v55 body.team-page {
+  background: var(--v2-bg) !important;
+  color: var(--v2-ink);
+  font-family: var(--v2-sans);
+}
+body.team-page #main { margin-top: 26px !important; min-width: 0; }
+body.team-page #teamBody { min-width: 0; }
+body.team-page img { max-width: 100%; }
+body.team-page .reveal { opacity: 1 !important; transform: none !important; }
+body.team-page .mono { font-family: var(--v2-mono) !important; font-variant-numeric: tabular-nums; }
+
+/* ==========================================================================
+   1. 头版：lg-hero + 队徽 + 六个 KPI
+   ========================================================================== */
+body.team-page .detail-hero { padding-bottom: clamp(30px, 3.4vw, 46px); }
+body.team-page .detail-hero .v2-crumb { margin-bottom: clamp(16px, 2vw, 24px); }
+body.team-page .detail-id {
+  display: flex;
+  align-items: center;
+  gap: clamp(14px, 2vw, 22px);
+  margin-top: clamp(12px, 1.6vw, 18px);
+  min-width: 0;
+}
+body.team-page .detail-ava {
+  width: clamp(68px, 7.2vw, 96px);
+  height: clamp(68px, 7.2vw, 96px);
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 24px;
+  overflow: hidden;
+  background: var(--v2-card);
+  border: 1px solid var(--v2-line);
+  box-shadow: var(--v2-shadow-sm);
+  padding: 4px;
+}
+body.team-page .detail-ava img { width: 100%; height: 100%; object-fit: contain; }
+body.team-page .detail-id-main { min-width: 0; }
+body.team-page .detail-hero .v2-h1 {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 12px;
+  margin-bottom: 8px;
+}
+body.team-page .detail-hero .v2-lead {
+  max-width: 96ch;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 6px;
+}
+body.team-page .detail-hero .v2-lead .form-chip { vertical-align: middle; }
+body.team-page .detail-hero .hero-note {
+  margin-top: 10px;
+  font-size: 10px !important;
+  color: var(--v2-gold) !important;
+}
+body.team-page .detail-stats { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+body.team-page .detail-stats .v2-stat { padding: 0 14px; }
+body.team-page .detail-stats .v2-stat span { white-space: normal; }
+body.team-page .detail-stats.detail-stats-6 .v2-stat b { font-size: clamp(18px, 1.8vw, 26px); }
+body.team-page .detail-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+}
+body.team-page .detail-actions:empty { display: none; }
+body.team-page .detail-actions .share-fab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 !important;
+  height: 34px;
+  padding: 0 15px !important;
+  border: 1px solid var(--v2-line-2) !important;
+  border-radius: 9px !important;
+  background: transparent !important;
+  color: var(--v2-ink-2) !important;
+  font-family: var(--v2-sans);
+  font-size: 12.5px !important;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color .18s, border-color .18s, background-color .18s;
+}
+body.team-page .detail-actions .share-fab:hover {
+  color: var(--v2-ink) !important;
+  border-color: var(--v2-ink-3) !important;
+  background: var(--v2-card) !important;
+}
+
+/* 收藏按钮 */
+body.team-page .fav-btn {
+  margin-left: 2px !important;
+  height: 26px;
+  padding: 0 11px !important;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 999px !important;
+  background: var(--v2-card) !important;
+  color: var(--v2-ink-3) !important;
+  font-family: var(--v2-sans);
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  line-height: 1;
+  cursor: pointer;
+  transition: color .16s, border-color .16s, background-color .16s;
+}
+body.team-page .fav-btn:hover { color: var(--v2-ink) !important; border-color: var(--v2-line-2) !important; }
+body.team-page .fav-btn.on {
+  color: var(--v2-gold) !important;
+  border-color: rgba(var(--v2-gold-rgb), .45) !important;
+  background: rgba(var(--v2-gold-rgb), .08) !important;
+  font-weight: 600 !important;
+}
+
+/* 近 5 场走势小方块（头版副标题内） */
+body.team-page .form-chip {
+  display: inline-grid;
+  place-items: center;
+  width: 19px;
+  height: 19px;
+  border-radius: 5px;
+  font-family: var(--v2-mono);
+  font-size: 9.5px;
+  font-weight: 700;
+  line-height: 1;
+}
+body.team-page .form-chip.w {
+  color: var(--v2-blue) !important;
+  background: rgba(var(--v2-blue-rgb), .10) !important;
+  border: 1px solid rgba(var(--v2-blue-rgb), .30) !important;
+}
+body.team-page .form-chip.l {
+  color: var(--v2-red) !important;
+  background: rgba(var(--v2-red-rgb), .08) !important;
+  border: 1px solid rgba(var(--v2-red-rgb), .28) !important;
+}
+
+/* ==========================================================================
+   2. 数据范围条（main 顶部 scopebar）
+   ========================================================================== */
+body.team-page #main > .scopebar {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: flex-end !important;
+  flex-wrap: wrap !important;
+  justify-content: flex-start !important;
+  gap: 12px 16px !important;
+  margin: 0 0 18px !important;
+  padding: 14px 16px !important;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 16px !important;
+  background: var(--v2-card) !important;
+  box-shadow: var(--v2-shadow-sm) !important;
+  min-width: 0;
+}
+body.team-page #main > .scopebar > * { margin-left: 0 !important; }
+body.team-page #main > .scopebar .scope-lab {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 7px;
+  flex: none !important;
+  padding-bottom: 11px;
+  font-family: var(--v2-mono);
+  font-size: 9.5px !important;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--v2-ink-3) !important;
+  white-space: nowrap;
+}
+body.team-page #main > .scopebar .scope-lab svg { width: 13px; height: 13px; }
+body.team-page #main > .scopebar .fld {
+  display: flex !important;
+  flex: 0 0 auto !important;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0 !important;
+  margin: 0 !important;
+}
+body.team-page #main > .scopebar .fld > span {
+  padding-left: 2px;
+  font-family: var(--v2-mono);
+  font-size: 9px !important;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--v2-ink-3) !important;
+}
+body.team-page #main > .scopebar select {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  height: 36px;
+  min-width: 156px;
+  padding: 0 30px 0 11px !important;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 9px !important;
+  background:
+    linear-gradient(45deg, transparent 50%, var(--v2-ink-3) 50%) calc(100% - 14px) 15px / 4px 4px no-repeat,
+    linear-gradient(135deg, var(--v2-ink-3) 50%, transparent 50%) calc(100% - 10px) 15px / 4px 4px no-repeat,
+    var(--v2-card) !important;
+  color: var(--v2-ink) !important;
+  font-family: var(--v2-sans);
+  font-size: 12.5px;
+  cursor: pointer;
+}
+html.dark-site body.team-page #main > .scopebar select { color-scheme: dark; }
+body.team-page #main > .scopebar select:disabled { opacity: .55; cursor: not-allowed; }
+body.team-page #main > .scopebar .scope-meta {
+  margin-left: auto !important;
+  padding-bottom: 10px;
+  font-family: var(--v2-mono);
+  font-size: 10px;
+  color: var(--v2-ink-3) !important;
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   3. 面板 / 区块标题 / 注释
+   ========================================================================== */
+body.team-page #teamBody .panel {
+  margin: 0;
+  padding: clamp(16px, 1.7vw, 22px) !important;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 18px !important;
+  background: var(--v2-card) !important;
+  box-shadow: var(--v2-shadow-sm) !important;
+  min-width: 0;
+  overflow: visible;
+}
+body.team-page #teamBody > .panel { margin-top: 16px; }
+body.team-page #teamBody .hd-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 16px;
+  align-items: start;
+}
+body.team-page #teamBody .hd-grid > .panel { margin-top: 0 !important; }
+body.team-page #teamBody .hd-grid > .panel:has(.hero-grid.mini) { grid-column: 1 / -1; }
+body.team-page #teamBody .panel-title {
+  display: flex !important;
+  align-items: baseline !important;
+  justify-content: space-between !important;
+  flex-wrap: wrap !important;
+  gap: 6px 12px !important;
+  margin: 0 0 14px !important;
+  padding: 0 0 10px !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--v2-line) !important;
+  color: var(--v2-ink) !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  letter-spacing: -.01em;
+  text-align: left !important;
+}
+body.team-page #teamBody .panel-title::before,
+body.team-page #teamBody .panel-title::after { display: none !important; content: none !important; }
+body.team-page #teamBody .panel-title em {
+  font-style: normal !important;
+  font-family: var(--v2-mono);
+  font-size: 9.5px !important;
+  font-weight: 400;
+  letter-spacing: .02em;
+  color: var(--v2-ink-3) !important;
+}
+body.team-page #teamBody .panel-title .hp-entry {
+  margin-left: auto;
+  font-family: var(--v2-mono);
+  font-size: 9.5px !important;
+  font-weight: 500;
+  color: var(--v2-ink-3) !important;
+  white-space: nowrap;
+  border-bottom: 1px solid transparent;
+}
+body.team-page #teamBody .panel-title .hp-entry:hover {
+  color: var(--v2-ink) !important;
+  border-bottom-color: var(--v2-line-2);
+}
+body.team-page #teamBody .block-note {
+  font-family: var(--v2-mono);
+  font-size: 10px !important;
+  line-height: 1.8 !important;
+  letter-spacing: .01em;
+  color: var(--v2-ink-3) !important;
+}
+body.team-page #teamBody .empty-tip {
+  padding: 26px 12px !important;
+  text-align: center;
+  font-size: 12px !important;
+  color: var(--v2-ink-3) !important;
+}
+
+/* 面板标题里的“基准”分段 */
+body.team-page #teamBody .panel-title .seg {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 2px;
+  margin-left: auto !important;
+  padding: 3px !important;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 11px !important;
+  background: var(--v2-inset) !important;
+  overflow: visible !important;
+}
+body.team-page #teamBody .panel-title .seg button {
+  appearance: none;
+  border: 0 !important;
+  height: 26px;
+  padding: 0 12px;
+  border-radius: 8px;
+  background: transparent !important;
+  background-image: none !important;
+  color: var(--v2-ink-3) !important;
+  font-family: var(--v2-sans);
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color .16s, background-color .16s, box-shadow .16s;
+}
+body.team-page #teamBody .panel-title .seg button + button { border-left: 0 !important; }
+body.team-page #teamBody .panel-title .seg button:hover { color: var(--v2-ink-2) !important; }
+body.team-page #teamBody .panel-title .seg button.on {
+  color: var(--v2-ink) !important;
+  background: var(--v2-card) !important;
+  background-image: none !important;
+  box-shadow: var(--v2-shadow-sm), 0 0 0 1px var(--v2-line) !important;
+}
+html.dark-site body.team-page #teamBody .panel-title .seg button.on {
+  background: #17233a !important;
+  box-shadow: 0 0 0 1px var(--v2-line-2) !important;
+}
+
+/* ==========================================================================
+   4. 表格
+   ========================================================================== */
+body.team-page #teamBody .tbl {
+  width: 100%;
+  border-collapse: collapse;
+  background: transparent;
+  color: var(--v2-ink-2);
+  font-size: 12.5px;
+}
+body.team-page #teamBody .tbl thead th {
+  padding: 8px 10px !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--v2-line-2) !important;
+  background: transparent !important;
+  color: var(--v2-ink-3) !important;
+  font-family: var(--v2-mono);
+  font-size: 9.5px !important;
+  font-weight: 500 !important;
+  letter-spacing: .08em !important;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+body.team-page #teamBody .tbl td {
+  padding: 8px 10px !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--v2-line) !important;
+  color: var(--v2-ink-2);
+  white-space: nowrap;
+}
+body.team-page #teamBody .tbl tbody tr:last-child td { border-bottom: 0 !important; }
+body.team-page #teamBody .tbl tbody tr:hover { background: var(--v2-inset) !important; }
+body.team-page #teamBody .tbl th.num,
+body.team-page #teamBody .tbl td.num {
+  text-align: right;
+  font-family: var(--v2-mono);
+  font-variant-numeric: tabular-nums;
+}
+body.team-page #teamBody .tbl td a { color: var(--v2-ink); }
+body.team-page #teamBody .tbl td a:hover { color: var(--v2-blue); }
+body.team-page #teamBody .team-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: var(--v2-ink);
+}
+body.team-page #teamBody .team-cell img {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  object-fit: contain;
+  background: var(--v2-inset);
+  border: 1px solid var(--v2-line);
+}
+body.team-page #teamBody .gold-t { color: var(--v2-win) !important; font-weight: 700; }
+body.team-page #teamBody .silver-t { color: var(--v2-ink-2) !important; font-weight: 600; }
+body.team-page #teamBody .lead-t { color: var(--v2-ink-3) !important; font-weight: 600; }
+
+/* ==========================================================================
+   5. 能力雷达
+   ========================================================================== */
+body.team-page #teamBody .radar-wrap {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+body.team-page #teamBody .radar-wrap .cmp-radar {
+  min-width: 0;
+  padding: 14px !important;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 16px !important;
+  background: var(--v2-card-soft) !important;
+  box-shadow: none !important;
+}
+body.team-page #teamBody .cmp-radar svg { display: block; width: 100%; height: auto; }
+/* 雷达数据色从旧红换成 V2 蓝（网格线仍用中性灰；暗色主题的旧红是 #F07483） */
+body.team-page #teamBody .cmp-radar svg polygon[stroke="#F02F55"],
+body.team-page #teamBody .cmp-radar svg polygon[stroke="#F07483"] {
+  stroke: var(--v2-blue) !important;
+  fill: var(--v2-blue) !important;
+}
+body.team-page #teamBody .cmp-radar svg circle[fill="#F02F55"],
+body.team-page #teamBody .cmp-radar svg circle[fill="#F07483"] { fill: var(--v2-blue) !important; }
+body.team-page #teamBody .radar-side { min-width: 0; }
+body.team-page #teamBody .radar-side .block-note {
+  margin-bottom: 10px;
+  font-size: 9.5px !important;
+}
+body.team-page #teamBody .radar-side .tbl td,
+body.team-page #teamBody .radar-side .tbl th { padding: 7px 8px !important; }
+body.team-page #teamBody .radar-side .block-note#radarFallbackNote {
+  margin-bottom: 10px;
+  color: var(--v2-gold) !important;
+}
+
+/* ==========================================================================
+   6. 系列赛画像（sr-grid）
+   ========================================================================== */
+body.team-page #teamBody .sr-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+  margin-top: 2px !important;
+  border: 0 !important;
+}
+body.team-page #teamBody .sr-cell {
+  min-width: 0;
+  padding: 12px 14px !important;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 13px !important;
+  background: var(--v2-card-soft) !important;
+}
+body.team-page #teamBody .sr-cell .k {
+  font-size: 10px !important;
+  color: var(--v2-ink-3) !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+body.team-page #teamBody .sr-cell .v {
+  margin-top: 2px !important;
+  font-family: var(--v2-mono);
+  font-size: clamp(17px, 1.7vw, 21px) !important;
+  font-weight: 700 !important;
+  line-height: 1.2;
+  letter-spacing: -.02em;
+  color: var(--v2-ink) !important;
+}
+body.team-page #teamBody .sr-cell.hl .v { color: var(--v2-gold) !important; }
+body.team-page #teamBody .sr-cell .s {
+  margin-top: 3px !important;
+  font-family: var(--v2-mono);
+  font-size: 9.5px !important;
+  line-height: 1.5;
+  color: var(--v2-ink-3) !important;
+}
+body.team-page #teamBody .sr-form { display: flex; align-items: center; gap: 10px; margin-top: 12px; }
+body.team-page #teamBody .form-str { display: inline-flex; gap: 3px; }
+body.team-page #teamBody .form-str i {
+  display: inline-grid;
+  place-items: center;
+  width: 17px;
+  height: 17px;
+  border-radius: 4px;
+  font-family: var(--v2-mono);
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 700;
+}
+body.team-page #teamBody .form-str i.w {
+  color: var(--v2-blue) !important;
+  background: rgba(var(--v2-blue-rgb), .10) !important;
+}
+body.team-page #teamBody .form-str i.l {
+  color: var(--v2-red) !important;
+  background: rgba(var(--v2-red-rgb), .08) !important;
+}
+
+/* ==========================================================================
+   7. 冠军墙
+   ========================================================================== */
+body.team-page #teamBody .champ-strip {
+  display: flex !important;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 2px 2px 10px;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+}
+body.team-page #teamBody .champ {
+  flex: 0 0 auto;
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+  width: 264px;
+  padding: 11px 14px !important;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 14px !important;
+  background: var(--v2-card) !important;
+  box-shadow: var(--v2-shadow-sm) !important;
+  scroll-snap-align: start;
+  color: var(--v2-ink);
+  transform: none !important;
+  transition: border-color .18s, box-shadow .18s;
+}
+body.team-page #teamBody .champ:hover {
+  border-color: var(--v2-line-2) !important;
+  box-shadow: var(--v2-shadow-lg) !important;
+  transform: none !important;
+}
+body.team-page #teamBody .champ > div { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+body.team-page #teamBody .champ b {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--v2-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+body.team-page #teamBody .champ b em {
+  flex: none;
+  font-style: normal;
+  font-family: var(--v2-mono);
+  font-size: 8px;
+  letter-spacing: .06em;
+  color: var(--v2-win);
+  border: 1px solid rgba(var(--v2-gold-rgb), .4);
+  border-radius: 3px;
+  padding: 0 3px;
+}
+body.team-page #teamBody .champ span {
+  font-size: 9.5px;
+  color: var(--v2-ink-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+body.team-page #teamBody .champ span b {
+  display: inline;
+  font-family: var(--v2-mono);
+  font-size: 10px;
+  color: var(--v2-ink-2);
+}
+body.team-page #teamBody .champ.pending {
+  border-style: dashed !important;
+  border-color: rgba(var(--v2-gold-rgb), .45) !important;
+}
+body.team-page #teamBody .champ.pending b { color: var(--v2-gold); }
+
+/* ==========================================================================
+   8. 近期比赛 / 阵容 / 常用英雄
+   ========================================================================== */
+body.team-page #teamBody .mrow-t {
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr) 54px 38px;
+  gap: 10px;
+  align-items: center;
+  padding: 8px 6px !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--v2-line) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: var(--v2-ink-2) !important;
+}
+body.team-page #teamBody .mrow-t:last-child { border-bottom: 0 !important; }
+body.team-page #teamBody .mrow-t:hover { background: var(--v2-inset) !important; }
+body.team-page #teamBody .mrow-t .d { font-family: var(--v2-mono); font-size: 10px; color: var(--v2-ink-3); }
+body.team-page #teamBody .mrow-t .opp {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  font-size: 12px;
+  color: var(--v2-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+body.team-page #teamBody .mrow-t .opp img {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  border-radius: 50%;
+  object-fit: contain;
+  background: var(--v2-inset);
+  border: 1px solid var(--v2-line);
+}
+body.team-page #teamBody .mrow-t .sc {
+  font-family: var(--v2-mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--v2-ink);
+  text-align: right;
+}
+body.team-page #teamBody .mrow-t .res {
+  font-family: var(--v2-mono);
+  font-size: 10px;
+  font-weight: 700;
+  text-align: right;
+  color: var(--v2-ink-3);
+}
+body.team-page #teamBody .mrow-t .res.w { color: var(--v2-blue) !important; }
+body.team-page #teamBody .mrow-t .res.l { color: var(--v2-red) !important; }
+
+body.team-page #teamBody .usage { display: flex; flex-direction: column; margin-top: 2px; }
+body.team-page #teamBody .usage a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 6px !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--v2-line) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: var(--v2-ink-2) !important;
+}
+body.team-page #teamBody .usage a:last-child { border-bottom: 0 !important; }
+body.team-page #teamBody .usage a:hover { background: var(--v2-inset) !important; }
+body.team-page #teamBody .usage img {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: contain;
+  border: 1px solid var(--v2-line);
+  background: var(--v2-inset);
+}
+body.team-page #teamBody .usage .nm {
+  flex: 1;
+  min-width: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--v2-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+body.team-page #teamBody .usage .em { font-size: 9.5px; font-weight: 400; color: var(--v2-ink-3); }
+body.team-page #teamBody .usage .n {
+  width: 52px;
+  font-family: var(--v2-mono);
+  font-size: 10px;
+  color: var(--v2-ink-3);
+  text-align: right;
+}
+body.team-page #teamBody .usage .wr {
+  width: 54px;
+  font-family: var(--v2-mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--v2-ink) !important;
+  text-align: right;
+}
+
+body.team-page #teamBody .hero-grid.mini {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 9px !important;
+  margin-bottom: 8px;
+}
+body.team-page #teamBody .tmini {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 10px 12px !important;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 12px !important;
+  background: var(--v2-card-soft) !important;
+  color: var(--v2-ink) !important;
+  transition: border-color .18s;
+  min-width: 0;
+}
+body.team-page #teamBody .tmini:hover { border-color: var(--v2-line-2) !important; }
+body.team-page #teamBody .tmini b {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--v2-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+body.team-page #teamBody .tmini span {
+  font-family: var(--v2-mono);
+  font-size: 9.5px;
+  color: var(--v2-ink-3);
+}
+body.team-page #teamBody .tmini i {
+  font-style: normal;
+  font-family: var(--v2-mono);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--v2-ink-2);
+}
+
+/* ==========================================================================
+   9. 页脚导航
+   ========================================================================== */
+body.team-page .mnav {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 22px;
+  padding-top: 16px;
+  border-top: 1px solid var(--v2-line);
+  font-size: 12px;
+}
+body.team-page .mnav a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 15px;
+  border: 1px solid var(--v2-line-2);
+  border-radius: 9px;
+  color: var(--v2-ink-2);
+  font-weight: 600;
+  transition: color .18s, border-color .18s, background-color .18s;
+}
+body.team-page .mnav a:hover {
+  color: var(--v2-ink);
+  border-color: var(--v2-ink-3);
+  background: var(--v2-card);
+}
+
+/* ==========================================================================
+   10. 响应式
+   ========================================================================== */
+@media (max-width: 1180px) {
+  body.team-page .detail-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: 18px; }
+  body.team-page .detail-stats.detail-stats-6 .v2-stat:nth-child(4) { padding-left: 0; border-left: 0; }
+  body.team-page #teamBody .sr-grid { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+}
+
+@media (max-width: 1000px) {
+  body.team-page #teamBody .hd-grid { grid-template-columns: minmax(0, 1fr) !important; }
+  body.team-page #teamBody .radar-wrap { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+}
+
+@media (max-width: 900px) {
+  body.team-page .detail-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  body.team-page .detail-stats.detail-stats-6 .v2-stat:nth-child(odd) { padding-left: 0; border-left: 0; }
+  body.team-page .detail-stats.detail-stats-6 .v2-stat:nth-child(4) { padding-left: 14px; border-left: 1px solid var(--v2-line); }
+  body.team-page #teamBody .sr-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  body.team-page #teamBody .hero-grid.mini { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+}
+
+@media (max-width: 760px) {
+  body.team-page #main { margin-top: 20px !important; }
+  body.team-page #main > .scopebar { border-radius: 14px !important; padding: 12px 14px !important; }
+  body.team-page #main > .scopebar .scope-meta { margin-left: 0 !important; padding-bottom: 0; }
+  body.team-page #teamBody .panel { padding: 16px !important; border-radius: 16px !important; }
+  body.team-page #teamBody .champ { width: 232px; }
+  body.team-page #teamBody .hero-grid.mini { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  body.team-page #teamBody .panel:has(> .tbl) { overflow-x: auto !important; -webkit-overflow-scrolling: touch; }
+  body.team-page #teamBody .panel:has(> .tbl) .tbl { min-width: 520px; }
+  body.team-page #teamBody .radar-side { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  body.team-page #teamBody .radar-side .tbl { width: 100%; min-width: 0; table-layout: fixed; }
+  body.team-page #teamBody .radar-side .tbl th,
+  body.team-page #teamBody .radar-side .tbl td {
+    padding: 6px 4px !important;
+    font-size: 10px !important;
+    white-space: normal !important;
+    word-break: break-word;
+  }
+  body.team-page #teamBody .radar-side .tbl thead th { font-size: 8.5px !important; letter-spacing: 0 !important; }
+  body.team-page #teamBody .panel:has(> .tbl)::after {
+    content: "← 左右滑动查看完整表格 →";
+    display: block;
+    margin-top: 8px;
+    font-family: var(--v2-mono);
+    font-size: 9px;
+    letter-spacing: .02em;
+    color: var(--v2-ink-3);
+    text-align: center;
+  }
+  body.team-page #teamBody .mnav { flex-direction: column; align-items: stretch; }
+  body.team-page #teamBody .mnav a { justify-content: center; }
+}
+
+@media (max-width: 640px) {
+  body.team-page #main > .scopebar .scope-lab { width: 100%; padding-bottom: 0; }
+  body.team-page #main > .scopebar .fld { flex: 1 1 100% !important; }
+  body.team-page #main > .scopebar select { width: 100%; min-width: 0; }
+  body.team-page #main > .scopebar .scope-meta { margin-left: 0 !important; padding-bottom: 0; white-space: normal; }
+  body.team-page .detail-stats { grid-template-columns: minmax(0, 1fr) !important; row-gap: 0 !important; }
+  body.team-page .detail-stats .v2-stat {
+    padding: 12px 0 !important;
+    border-left: 0 !important;
+    border-top: 1px solid var(--v2-line);
+  }
+  body.team-page .detail-stats .v2-stat:first-child { padding-top: 0 !important; border-top: 0 !important; }
+  body.team-page .detail-id { align-items: flex-start; }
+  body.team-page .detail-ava { width: 62px; height: 62px; border-radius: 18px; }
+  body.team-page .detail-hero .v2-h1 { font-size: clamp(24px, 8vw, 34px); }
+  body.team-page #teamBody .sr-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  body.team-page #teamBody .panel-title .seg { margin-left: 0 !important; }
+}
+
+/* ==========================================================================
+   11. 覆盖 light.css 的 html.v55.light-site :is(.panel,...) !important
+   ========================================================================== */
+html.light-site body.team-page.v2-page #teamBody .panel {
+  padding: clamp(16px, 1.7vw, 22px) !important;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 18px !important;
+  background: var(--v2-card) !important;
+  box-shadow: var(--v2-shadow-sm) !important;
+}
+html.light-site body.team-page.v2-page #main > .scopebar {
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 16px !important;
+  background: var(--v2-card) !important;
+  box-shadow: var(--v2-shadow-sm) !important;
+}
+@media (max-width: 760px) {
+  html.light-site body.team-page.v2-page #teamBody .panel {
+    padding: 16px !important;
+    border-radius: 16px !important;
+  }
+  html.light-site body.team-page.v2-page #main > .scopebar { border-radius: 14px !important; }
+}

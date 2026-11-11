@@ -17,7 +17,6 @@
 
 from __future__ import annotations
 
-import argparse
 import sys
 from pathlib import Path
 
@@ -72,7 +71,6 @@ def build():
     team_rows = []
     event_rows = []
     player_rows = []
-    training_rows = []
 
     # 选手/战队图标：payload 不含 icon 字段，按名称从既有 players 表继承（缺失留空）
     player_icon_map: dict[str, str] = {}
@@ -122,27 +120,6 @@ def build():
             c2 = final.get("camp2_team", "")
             win_camp = int(final.get("win_camp", 0) or 0)
             winner = c1 if win_camp == 1 else c2 if win_camp == 2 else ""
-            if win_camp in (1, 2):
-                training_row = {
-                    "battle_id": battle_id,
-                    "match_id": match.get("match_id"),
-                    "league_id": match.get("league_id"),
-                    "game_duration": int(final.get("time_sec", 0)) * 1000,
-                    "win_camp": win_camp,
-                    "status": final.get("status", 0),
-                }
-                for camp in (1, 2):
-                    prefix = f"camp{camp}"
-                    training_row[f"{prefix}_team_name"] = final.get(f"{prefix}_team", "")
-                    for target, source in {
-                        "gold": "gold", "kill_num": "kill", "assist_num": "assist",
-                        "death_num": "death", "push_tower_num": "tower",
-                        "kill_tyrant_num": "tyrant", "kill_dark_tyrant_num": "dark_tyrant",
-                        "kill_big_dragon_num": "lord", "kill_prophet_dragon_num": "prophet",
-                        "kill_shadow_dragon_num": "shadow", "kill_storm_dragon_king_num": "storm",
-                    }.items():
-                        training_row[f"{prefix}_{target}"] = final.get(f"{prefix}_{source}", 0)
-                training_rows.append(training_row)
             duration_min = final.get("minute", 0)
             camp1_gold = final.get("camp1_gold", 0)
             camp2_gold = final.get("camp2_gold", 0)
@@ -259,21 +236,12 @@ def build():
     save_table(pd.DataFrame(battle_rows), "battles")
     save_table(pd.DataFrame(team_rows), "teams")
     save_table(pd.DataFrame(event_rows), "events")
-    if training_rows:
-        training_path = PROCESSED_DIR / "battles.csv"
-        pd.DataFrame(training_rows).to_csv(training_path, index=False, encoding="utf-8-sig")
-        print(f"training battles: {len(training_rows)} rows -> {training_path}")
     if player_rows:
         pl_path = PROCESSED_DIR / "players.csv"
         pd.DataFrame(player_rows).to_csv(pl_path, index=False, encoding="utf-8-sig")
         print(f"players: {len(player_rows)} rows -> {pl_path}")
 
 
-def main():
-    parser = argparse.ArgumentParser(description="Build analysis and training tables from local schedule and snapshots")
-    parser.parse_args()
+if __name__ == "__main__":
     build()
 
-
-if __name__ == "__main__":
-    main()

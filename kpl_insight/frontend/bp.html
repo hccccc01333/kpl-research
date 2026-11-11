@@ -8,106 +8,39 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='5' fill='%230A111C'/%3E%3Crect x='3' y='3' width='26' height='26' rx='4' fill='none' stroke='%23F6C021' stroke-width='2'/%3E%3Ctext x='16' y='22' font-family='Arial,sans-serif' font-size='16' font-weight='bold' fill='%23F6C021' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="assets/style.css?v=20261102-brand">
 <link rel="stylesheet" href="assets/pages.css?v=20261102-brand">
-<link rel="stylesheet" href="assets/v55.css?v=87">
-<style>
-.bp2-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:14px;align-items:start}
-@media(max-width:1050px){.bp2-grid{grid-template-columns:1fr}}
-.bp2-panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
-.bp2-panel .pt{font-size:14px;font-weight:800;margin-bottom:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.bp2-panel .pt img{width:22px;height:22px;object-fit:contain}
-.bp2-cap{font-size:11.5px;color:var(--muted);font-family:var(--mono);margin:10px 0 4px}
-.bp2-chips{display:flex;flex-wrap:wrap;gap:6px}
-.bp2-chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:8px;
-          padding:4px 8px;font-size:12.5px;background:var(--inset)}
-.bp2-chip img{width:20px;height:20px;border-radius:50%;object-fit:cover;border:1px solid var(--line2)}
-.bp2-chip b{color:var(--gold);font-family:var(--mono);font-size:11.5px}
-.bp2-chip.fall{border-color:rgba(192,138,141,.4)}
-.bp2-chip.fall b{color:var(--red)}
-.bp-board{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:8px}
-.bp-slot{border:1px dashed var(--line2);border-left-width:3px;border-radius:9px;padding:7px 8px;min-height:58px;font-size:11.5px;color:var(--muted)}
-.bp-slot.ban-slot{border-left-color:rgba(192,138,141,.8)}
-.bp-slot.pick-slot{border-left-color:rgba(255,255,255,.8)}
-.act-badge{display:inline-flex;align-items:center;justify-content:center;min-width:32px;
-  font-size:10px;font-weight:800;border-radius:4px;padding:1px 5px;margin-right:5px;letter-spacing:.5px}
-.act-badge.ban{background:rgba(192,138,141,.16);color:#FF7A7E;border:1px solid rgba(192,138,141,.5)}
-.act-badge.pick{background:rgba(255,255,255,.16);color:var(--gold);border:1px solid rgba(255,255,255,.5)}
-.dot{width:9px;height:9px;border-radius:2px;display:inline-block;margin-right:7px;vertical-align:middle}
-.dot.red{background:var(--red)} .dot.gold{background:var(--gold)}
-.bp-legend{display:flex;gap:18px;align-items:center;font-size:12.5px;color:var(--ink2);font-family:var(--mono)}
-.bp-slot.filled{border-style:solid;background:var(--inset)}
-.bp-slot.blue{border-color:rgba(157,178,204,.45)}
-.bp-slot.red{border-color:rgba(192,138,141,.45)}
-.bp-slot.now{outline:2px solid rgba(255,255,255,.6)}
-.bp-slot .k{font-family:var(--mono);font-size:10px;color:var(--muted)}
-.bp-slot .h{display:flex;align-items:center;gap:6px;margin-top:3px;color:var(--ink);font-weight:700;font-size:12.5px}
-.bp-slot .h img{width:22px;height:22px;border-radius:50%;object-fit:cover;border:1px solid var(--line2)}
-.bp-now{margin-top:12px;border:1px solid var(--line);border-radius:11px;padding:12px 14px;background:var(--inset)}
-.bp-now .ask{font-size:13.5px;font-weight:700}
-.bp-now .ask b{color:var(--gold)}
-.pred-row{display:grid;grid-template-columns:150px 1fr 58px;gap:9px;align-items:center;padding:4px 2px;cursor:pointer;border-radius:7px}
-.pred-row:hover{background:var(--card2)}
-.pred-row .n{display:flex;align-items:center;gap:7px;font-size:12.5px;min-width:0}
-.pred-row .n img{width:20px;height:20px;border-radius:50%;object-fit:cover}
-.pred-row .n span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.pred-row .bar{height:9px;background:var(--inset);border-radius:5px;overflow:hidden}
-.pred-row .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-d));border-radius:5px}
-.pred-row .p{font-family:var(--mono);font-size:12px;color:var(--ink2);text-align:right}
-.bp-actions{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap}
-.sample-tag{font-size:11.5px;color:var(--muted);font-family:var(--mono)}
-.sample-tag.warn{color:var(--orange)}
-.bp-dims{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;align-items:end}
-@media(max-width:1100px){.bp-dims{grid-template-columns:repeat(3,minmax(0,1fr))}}
-.bp-dims .fld{min-width:0}
-.hv-row{display:grid;grid-template-columns:1fr 64px;gap:8px;align-items:center;padding:3px 4px;border-radius:6px}
-.hv-row:hover{background:var(--inset)}
-.hv-row .n{display:flex;align-items:center;gap:7px;font-size:12.5px;min-width:0}
-.hv-row .n img{width:20px;height:20px;object-fit:contain}
-.hv-row .n span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.hv-row .c{font-family:var(--mono);font-size:12px;color:var(--gold);text-align:right}
-@media(max-width:700px){
-  .bp-dims{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .bp-board{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .hv-row,.pred-row{grid-template-columns:minmax(0,1fr) auto}
-}
-/* V5 双模式：官方赛事板 / 分析模式 */
-.mode-bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 16px}
-.bp2-grid.board-mode{grid-template-columns:minmax(0,1fr)}
-.bp2-grid.board-mode .bp-board{grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
-.bp2-grid.board-mode .bp-slot{min-height:76px}
-@media(max-width:820px){.bp2-grid.board-mode .bp-board{grid-template-columns:repeat(2,minmax(0,1fr))}}
-.why-item{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-top:8px;background:var(--inset);font-size:12.5px;line-height:1.7}
-.why-item .hh{display:flex;align-items:center;gap:7px;font-weight:800;font-size:13.5px}
-.why-item .hh img{width:22px;height:22px;border-radius:50%;object-fit:cover}
-.why-item .ev{margin-top:5px;color:var(--ink2)}
-.why-item .ev b{font-family:var(--mono);color:var(--gold)}
-</style>
+<link rel="stylesheet" href="assets/v55.css?v=92">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="KPL赛研">
 <meta property="og:title" content="BP 分析 · KPL赛研">
-<meta property="og:description" content="KPL 赛事数据产品：赛程比分、战队/选手/英雄数据、BP 分析、逐局复盘与实时胜率预测。2019–2026 全历史。">
+<meta property="og:description" content="KPL 赛事数据产品：赛程比分、战队/选手/英雄数据、BP 分析、逐局复盘与实时胜率预测。2016–2026 全历史。">
 <meta property="og:image" content="https://hccccc01333.github.io/KPLdata-site/assets/brand/kpl-research-social.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="assets/arena.css?v=1">
-<link rel="stylesheet" href="assets/arena-world.css?v=20261026">
-<script src="assets/arena-world.js?v=20261030a" type="module"></script>
-<link rel="stylesheet" href="assets/card-motion.css?v=1">
-<script src="assets/card-motion.js?v=1" type="module"></script>
 <link rel="stylesheet" href="assets/light.css?v=20261030a">
 <link rel="stylesheet" href="assets/theme.css?v=20261030b">
+<link rel="stylesheet" href="assets/site-v2.css?v=20261112a">
+<link rel="stylesheet" href="assets/bp-v2.css?v=20261112a">
 </head>
-<body data-page="bp.html">
+<body data-page="bp.html" class="v2-page bp-page">
 <header id="siteHeader" class="topbar"></header>
 
-<header class="page-hero">
-  <div class="wrap">
-    <div class="ph-kicker mono">DRAFT · BP 分析</div>
-    <h1>BP 分析与预测</h1>
-    <p>基于全部 {N} 局真实 BP 的<b>八维交叉分析</b>：战队 × 对手 × 赛季年份 × 具体赛事 × 赛段 × 局序 × 阵营 × 赛果，
-      任意组合查看 BP 倾向，并按官方选人顺序逐步预测下一手概率。</p>
+<header class="lg-hero">
+  <div class="lg-hero-gridlines" aria-hidden="true"></div>
+  <div class="v2-wrap">
+    <div class="v2-kicker"><i></i>DRAFT<b>·</b>BP 分析</div>
+    <h1 class="v2-h1">BP 分析与预测</h1>
+    <p class="v2-lead">基于全部 {N} 局真实 BP 的<b>八维交叉分析</b>：战队 × 对手 × 赛季年份 × 具体赛事 × 赛段 × 局序 × 阵营 × 赛果，任意组合查看 BP 倾向，并按官方选人顺序逐步预测下一手概率。</p>
+    <p class="v2-note mono" style="margin-top:10px">口径：官方 BP 序列，按赛制完整统计（20 / 18 / 16 / 14 手）；少选或双方禁用手位不一致的记录整场排除、不做补推。</p>
+    <div class="v2-stats" style="margin-top:26px">
+      <div class="v2-stat"><b class="v2-mono" id="bpStatGames">—</b><span>有效 BP 局</span></div>
+      <div class="v2-stat"><b class="v2-mono" id="bpStatTeams">—</b><span>覆盖战队</span></div>
+      <div class="v2-stat"><b class="v2-mono" id="bpStatHands">—</b><span>手位 / 局</span></div>
+      <div class="v2-stat"><b class="v2-mono" id="bpStatLeagues">—</b><span>覆盖赛事</span></div>
+    </div>
   </div>
 </header>
 
-<main class="wrap" style="margin-top:26px">
+<main class="wrap bp-main">
   <div class="mode-bar">
     <div class="seg" id="bpMode">
       <button data-mode="board" class="on">官方赛事板</button>
@@ -122,7 +55,7 @@
       <h2><i></i>对阵假设工作台</h2>
       <span class="block-note mono">两队 + 关键英雄假设 → 即时胜率变化 · 下方是条件浏览与落子模拟</span>
     </div>
-    <div class="panel" style="padding:16px 18px">
+    <div class="panel bp-bench-panel">
       <div class="wb-grid">
         <label class="fld"><span>数据范围</span><select id="wbScope"></select></label>
         <label class="fld"><span>A 方战队</span><select id="wbA"></select></label>
@@ -149,7 +82,8 @@
   </section>
 
   <div class="block-head mod analyze"><h2><i></i>BP 条件分析</h2>
-    <span class="block-note mono">八维交叉：战队 × 对手 × 年份 × 赛事 × 赛段 × 局序 × 阵营 × 赛果</span></div>
+    <span class="block-note mono">八维交叉：战队 × 对手 × 年份 × 赛事 × 赛段 × 局序 × 阵营 × 赛果</span>
+    <span class="bp-format mono">口径：<a href="?fmt=20" id="fmt20" title="2024 年度总决赛起">20 手</a><a href="?fmt=18" id="fmt18" title="2018–2024 旧赛制">18 手</a><a href="?fmt=16" id="fmt16" title="2017 赛季">16 手</a><a href="?fmt=14" id="fmt14" title="2016 赛季">14 手</a></span></div>
   <div class="filterbar mod analyze" style="flex-direction:column;align-items:stretch;gap:12px">
     <div class="bp-dims">
       <label class="fld"><span>视角战队</span><select id="selTeam"></select></label>
@@ -211,19 +145,30 @@
 
 <footer id="siteFooter" class="footer"></footer>
 
-<script src="assets/data.js?v=85"></script>
-<script src="assets/seasons.js?v=85"></script>
-<script src="assets/bp.js?v=85"></script>
-<script src="assets/team_data.js?v=85"></script>
-<script src="assets/common.js?v=20261102-brand"></script>
+<script src="assets/data.js?v=20261103"></script>
+<script src="assets/seasons.js?v=20261103"></script>
+<script src="assets/bp.js?v=20261103"></script>
+<script src="assets/team_data.js?v=20261103"></script>
+<script src="assets/common.js?v=20261110-curve"></script>
 <script>
 (function () {
   "use strict";
   var D = KPL.data, K = KPL, $ = function (s) { return document.querySelector(s); };
   K.init();
   var BP = window.KPL_BP;
-  document.querySelector(".page-hero p").innerHTML =
-    document.querySelector(".page-hero p").innerHTML.replace("{N}", K.fmtInt(BP.totalBattles));
+  var wantParam = new URLSearchParams(location.search).get("fmt");
+  var wantFmt = ["14", "16", "18", "20"].indexOf(wantParam) >= 0 ? wantParam : "20";
+  var FMT = (BP.templates && BP.templates[wantFmt]) ? wantFmt : "20";
+  if (BP.templates && BP.templates[FMT]) {
+    BP.template = BP.templates[FMT];
+    BP.prior = BP.priors[FMT];
+    BP.games = BP.games.filter(function (g) { return (g[8] || "20") === FMT; });
+    BP.totalBattles = (BP.totalBattlesByFormat || {})[FMT] || BP.games.length;
+  }
+  var fmtLink = document.getElementById("fmt" + FMT);
+  if (fmtLink) fmtLink.classList.add("on");
+  document.querySelector(".lg-hero p").innerHTML =
+    document.querySelector(".lg-hero p").innerHTML.replace("{N}", K.fmtInt(BP.totalBattles));
   $("#hvNote").textContent = "谁在 ban 它 / 谁在选它（基于全部 " + K.fmtInt(BP.totalBattles) + " 局）";
 
   var heroIcon = {};
@@ -843,6 +788,23 @@
     }
     boot();
   })();
+})();
+</script>
+<!-- V2 头版指标带：只读取上面脚本已生成的数据，不参与任何业务逻辑 -->
+<script>
+(function () {
+  "use strict";
+  var BP = window.KPL_BP, K = window.KPL;
+  if (!BP) return;
+  var set = function (id, v) { var el = document.getElementById(id); if (el && v != null) el.textContent = v; };
+  var fmt = function (v) { return K && K.fmtInt ? K.fmtInt(v) : String(v); };
+  var games = BP.games || [];
+  var teams = {}, leagues = {};
+  games.forEach(function (g) { teams[g[3]] = 1; teams[g[4]] = 1; leagues[g[1]] = 1; });
+  set("bpStatGames", fmt(BP.totalBattles || games.length));
+  set("bpStatTeams", fmt(Object.keys(teams).length));
+  set("bpStatHands", (BP.template || []).length || "—");
+  set("bpStatLeagues", fmt(Object.keys(leagues).length));
 })();
 </script>
 </body>

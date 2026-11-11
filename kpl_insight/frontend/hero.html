@@ -8,7 +8,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230A111C'/%3E%3Crect x='3' y='3' width='26' height='26' rx='4' fill='none' stroke='%23F6C021' stroke-width='2'/%3E%3Ctext x='16' y='22' font-family='Arial,sans-serif' font-size='16' font-weight='bold' fill='%23F6C021' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="assets/style.css?v=20261102-brand">
 <link rel="stylesheet" href="assets/pages.css?v=20261102-brand">
-<link rel="stylesheet" href="assets/v55.css?v=87">
+<link rel="stylesheet" href="assets/v55.css?v=92">
 <style>
 /* 职业哥同款：选手 × 出装 × 代表对局 */
 .pro-warn{margin:8px 0 4px;padding:9px 12px;border-left:3px solid var(--red);background:rgba(255,255,255,.03);
@@ -31,18 +31,16 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="KPL赛研">
 <meta property="og:title" content="英雄详情 · KPL赛研">
-<meta property="og:description" content="KPL 赛事数据产品：赛程比分、战队/选手/英雄数据、BP 分析、逐局复盘与实时胜率预测。2019–2026 全历史。">
+<meta property="og:description" content="KPL 赛事数据产品：赛程比分、战队/选手/英雄数据、BP 分析、逐局复盘与实时胜率预测。2016–2026 全历史。">
 <meta property="og:image" content="https://hccccc01333.github.io/KPLdata-site/assets/brand/kpl-research-social.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="assets/arena.css?v=1">
-<link rel="stylesheet" href="assets/arena-world.css?v=20261026">
-<script src="assets/arena-world.js?v=20261030a" type="module"></script>
-<link rel="stylesheet" href="assets/card-motion.css?v=1">
-<script src="assets/card-motion.js?v=1" type="module"></script>
 <link rel="stylesheet" href="assets/light.css?v=20261030a">
 <link rel="stylesheet" href="assets/theme.css?v=20261030b">
+<link rel="stylesheet" href="assets/site-v2.css?v=20261112a">
+<link rel="stylesheet" href="assets/hero-v2.css?v=20261112a">
 </head>
-<body data-page="heroes.html">
+<body data-page="heroes.html" class="v2-page hero-page">
 <header id="siteHeader" class="topbar"></header>
 <div id="heroHead"></div>
 <main class="wrap" id="main" style="margin-top:26px"></main>
@@ -54,7 +52,7 @@
 <script src="assets/pro_hero.js?v=85"></script>
 <script src="assets/hero_growth.js?v=85"></script>
 <script src="assets/seasons.js?v=85"></script>
-<script src="assets/common.js?v=20261102-brand"></script>
+<script src="assets/common.js?v=20261110-curve"></script>
 <script src="assets/share.js?v=20261102-brand"></script>
 <script>
 (function () {
@@ -64,7 +62,7 @@
   var id = new URLSearchParams(location.search).get("id");
   // 两层数据：
   //   H    = details.heroes 的逐局明细（本赛季高频英雄，含最近出场 / 对位 / 三人组合）
-  //   HIST = seasons 全量聚合（2019–2026 所有赛事，英雄列表就是从这里来的）
+  //   HIST = seasons 全量聚合（2016–2026 所有赛事，英雄列表就是从这里来的）
   // 以前只查 H，列表里 133 个英雄有 109 个点进来直接"未找到"，等于死链。
   var H = null;
   (DT.heroes || []).forEach(function (h) { if (h.name === id) H = h; });
@@ -72,11 +70,14 @@
   ((K.scopeOf("all") || {}).heroes || []).forEach(function (h) { if (h.name === id) HIST = h; });
 
   if (!H && !HIST) {
-    $("#heroHead").innerHTML = '<header class="page-hero"><div class="wrap">' +
-      '<div class="ph-kicker mono">HERO · 英雄</div><h1>未找到该英雄</h1>' +
-      "<p>英雄名单覆盖 2019–2026 全部赛事共 " + (((K.scopeOf("all") || {}).heroes) || []).length +
-      " 个英雄；请从英雄页或站内搜索进入。</p>" +
-      '<div class="slide-cta" style="margin-top:18px"><a class="btn primary" href="heroes.html">返回英雄梯度</a></div></div></header>';
+    $("#heroHead").innerHTML = '<header class="lg-hero detail-hero"><div class="lg-hero-gridlines" aria-hidden="true"></div>' +
+      '<div class="v2-wrap"><nav class="v2-crumb"><a href="heroes.html">英雄图鉴</a><span class="sep">/</span><b>未找到</b></nav>' +
+      '<div class="v2-kicker"><i></i>HERO<b>·</b>英雄</div>' +
+      '<h1 class="v2-h1">未找到该英雄</h1>' +
+      "<p class=\"v2-lead\">英雄名单覆盖 2016–2026 全部赛事共 " + (((K.scopeOf("all") || {}).heroes) || []).length +
+      " 个英雄；请从英雄页或站内搜索进入，或检查链接里的 id 是否正确。</p>" +
+      '<div class="v2-actions" style="margin-top:24px"><a class="v2-btn solid" href="heroes.html">返回英雄图鉴 <span class="arr">→</span></a></div>' +
+      "</div></header>";
     return;
   }
 
@@ -96,7 +97,7 @@
       kind: "英雄档案",
       title: id,
       icon: (H.icon || ""),
-      sub: "2019–2026 全赛事 · " + K.fmtInt(g) + " 次出场",
+      sub: "2016–2026 全赛事 · " + K.fmtInt(g) + " 次出场",
       stats: st,
       note: "口径：全部赛事聚合（含预选赛 / 常规赛 / 季后赛），样本 " + K.fmtInt(g) + " 局；" +
         "职业哥同款来自逐局出装明细，职业实战不等于排位推荐。",
@@ -167,19 +168,23 @@
     var headSub = games
       ? "全部赛事 " + K.fmtInt(games) + " 次出场 · 赢下 " + K.fmtInt(wins) + " 局"
       : "全部赛事无出场记录 · 被禁用 " + K.fmtInt(hero.bans) + " 次";
-    $("#heroHead").innerHTML = '<header class="page-hero"><div class="wrap"><div class="hd-top">' +
-      (hero.icon ? '<img class="hd-ava" src="' + K.esc(hero.icon) + '" alt="">' : "") +
-      '<div><div class="hd-name">' + K.esc(hero.name) +
-      ' <span class="tier ' + hero.tier + '" style="vertical-align:middle">' + hero.tier + "</span></div>" +
-      '<div class="hd-sub">' + headSub + "</div></div></div></div></header>";
-    var wr = hero.wr, cells =
-      '<div class="hd-stats">' +
-      '<div class="hd-cell hl"><div class="k">胜率</div><div class="v">' + (games ? K.pct(wr) : "—") + '</div><div class="s">' +
-      (games ? K.fmtInt(wins) + " 胜 / " + K.fmtInt(games) + " 局（2019–2026 全赛事）" : "无出场样本") + "</div></div>" +
-      '<div class="hd-cell"><div class="k">出场</div><div class="v">' + K.fmtInt(hero.games) + '</div><div class="s">全部赛事累计</div></div>' +
-      '<div class="hd-cell"><div class="k">禁用</div><div class="v">' + K.fmtInt(hero.bans) + '</div><div class="s">被禁次数</div></div>' +
-      '<div class="hd-cell"><div class="k">强度档位</div><div class="v">' + hero.tier + '</div><div class="s">按胜率分档 S/A/B/C</div></div>' +
-      "</div>";
+    $("#heroHead").innerHTML = '<header class="lg-hero detail-hero"><div class="lg-hero-gridlines" aria-hidden="true"></div><div class="v2-wrap">' +
+      '<nav class="v2-crumb"><a href="heroes.html">英雄图鉴</a><span class="sep">/</span><b>' + K.esc(hero.name) + "</b></nav>" +
+      '<div class="v2-kicker"><i></i>HERO<b>·</b>英雄档案</div>' +
+      '<div class="detail-id">' +
+      (hero.icon ? '<span class="detail-ava hero-ava"><img src="' + K.esc(hero.icon) + '" alt=""></span>' : "") +
+      '<div class="detail-id-main"><h1 class="v2-h1">' + K.esc(hero.name) +
+      ' <span class="v2-tag tier-' + K.esc(hero.tier || "C") + '">' + K.esc(hero.tier || "—") + "</span></h1>" +
+      '<p class="v2-lead">' + headSub + "</p></div></div>" +
+      '<div class="v2-stats detail-stats" style="margin-top:26px">' +
+      '<div class="v2-stat"><b class="v2-mono">' + (games ? K.pct(hero.wr) : "—") + "</b><span>单局胜率" +
+      (games ? " · " + K.fmtInt(wins) + " 胜" : " · 无出场样本") + "</span></div>" +
+      '<div class="v2-stat"><b class="v2-mono">' + K.fmtInt(hero.games) + "</b><span>出场次数 · 全部赛事</span></div>" +
+      '<div class="v2-stat"><b class="v2-mono">' + K.fmtInt(hero.bans) + "</b><span>被禁用次数</span></div>" +
+      '<div class="v2-stat"><b class="v2-mono">' + K.esc(hero.tier || "—") + "</b><span>强度档位 · 按胜率 S/A/B/C</span></div>" +
+      "</div>" +
+      '<div class="detail-actions"></div>' +
+      "</div></header>";
     var extra =
       '<div class="panel" style="grid-column:1/-1"><div class="panel-title">联赛级均值 <em class="mono">该英雄出场的对局聚合</em></div>' +
       '<div class="hd-stats">' +
@@ -188,7 +193,7 @@
       '<div class="hd-cell"><div class="k">承伤占比</div><div class="v">' + (hero.bh == null ? "—" : Number(hero.bh).toFixed(1) + "%") + '</div><div class="s">队内承伤占比</div></div>' +
       '<div class="hd-cell"><div class="k">场均经济</div><div class="v">' + (hero.gold == null ? "—" : K.fmtInt(hero.gold)) + '</div><div class="s">单局金币</div></div>' +
       "</div></div>";
-    $("#main").innerHTML = cells +
+    $("#main").innerHTML =
       '<div class="hd-grid" style="margin-top:18px">' +
       '<div class="panel" style="grid-column:1/-1"><div class="panel-title">逐年表现 <em class="mono">出场数 / 胜率 / 禁用率</em></div>' +
       yearTrendHTML(hero.by, hero.games) + "</div>" +
@@ -201,26 +206,29 @@
       '<a href="heroes.html" style="color:var(--gold)"> 回英雄梯度 </a>按「数据范围」切换到具体赛段可以看当年的口径。</div></div>' +
       "</div>";
     mountGrowthChart(hero.name);
-    SHARE.mount($("#heroHead"), heroShareSpec, "kpldata-hero.png");
+    SHARE.mount($("#heroHead .detail-actions"), heroShareSpec, "kpldata-hero.png");
     K.refresh();
   }
 
   if (!H) { renderAggregateOnly(HIST); return; }
 
   var wrTxt = K.pct(H.wr), wins = Math.round(H.games * H.wr);
-  $("#heroHead").innerHTML = '<header class="page-hero"><div class="wrap"><div class="hd-top">' +
-    (H.icon ? '<img class="hd-ava" src="' + K.esc(H.icon) + '" alt="">' : "") +
-    '<div><div class="hd-name">' + K.esc(H.name) +
-    ' <span class="tier ' + H.tier + '" style="vertical-align:middle">' + H.tier + "</span></div>" +
-    '<div class="hd-sub">本赛季 ' + H.games + " 次出场 · 赢下 " + wins + " 局</div></div></div></div></header>";
-
-  var statCells =
-    '<div class="hd-stats">' +
-    '<div class="hd-cell hl"><div class="k">胜率</div><div class="v">' + wrTxt + '</div><div class="s">' + wins + " 胜 / " + H.games + " 局</div></div>" +
-    '<div class="hd-cell"><div class="k">出场次数</div><div class="v" data-count="' + H.games + '" data-dec="0">0</div><div class="s">选用率 ' + K.pct(H.pickRate) + "</div></div>" +
-    '<div class="hd-cell"><div class="k">禁用率</div><div class="v">' + K.pct(H.banRate) + '</div><div class="s">被禁用比例</div></div>' +
-    '<div class="hd-cell"><div class="k">强度档位</div><div class="v">' + H.tier + '</div><div class="s">按胜率分档 S/A/B/C</div></div>' +
-    "</div>";
+  $("#heroHead").innerHTML = '<header class="lg-hero detail-hero"><div class="lg-hero-gridlines" aria-hidden="true"></div><div class="v2-wrap">' +
+    '<nav class="v2-crumb"><a href="heroes.html">英雄图鉴</a><span class="sep">/</span><b>' + K.esc(H.name) + "</b></nav>" +
+    '<div class="v2-kicker"><i></i>HERO<b>·</b>英雄档案</div>' +
+    '<div class="detail-id">' +
+    (H.icon ? '<span class="detail-ava hero-ava"><img src="' + K.esc(H.icon) + '" alt=""></span>' : "") +
+    '<div class="detail-id-main"><h1 class="v2-h1">' + K.esc(H.name) +
+    ' <span class="v2-tag tier-' + K.esc(H.tier || "C") + '">' + K.esc(H.tier || "—") + "</span></h1>" +
+    '<p class="v2-lead">本赛季 ' + H.games + " 次出场 · 赢下 " + wins + " 局</p></div></div>" +
+    '<div class="v2-stats detail-stats" style="margin-top:26px">' +
+    '<div class="v2-stat"><b class="v2-mono">' + wrTxt + "</b><span>本赛季胜率 · " + wins + " 胜 / " + H.games + " 局</span></div>" +
+    '<div class="v2-stat"><b class="v2-mono" data-count="' + H.games + '" data-dec="0">0</b><span>出场次数 · 选用率 ' + K.pct(H.pickRate) + "</span></div>" +
+    '<div class="v2-stat"><b class="v2-mono">' + K.pct(H.banRate) + "</b><span>禁用率 · 被禁用比例</span></div>" +
+    '<div class="v2-stat"><b class="v2-mono">' + K.esc(H.tier) + "</b><span>强度档位 · 按胜率 S/A/B/C</span></div>" +
+    "</div>" +
+    '<div class="detail-actions"></div>' +
+    "</div></header>";
 
   function usageRows(list, kind) {
     if (!list.length) return '<div class="empty-tip">暂无数据</div>';
@@ -345,7 +353,7 @@
   var yearPanel = HIST ? '<div class="panel" style="grid-column:1/-1"><div class="panel-title">逐年表现' +
     ' <em class="mono">全部赛事 ' + K.fmtInt(HIST.games) + " 局 · 本赛季 " + K.fmtInt(H.games) + " 局</em></div>" +
     yearTrendHTML(HIST.by, HIST.games) + "</div>" : "";
-  $("#main").innerHTML = statCells + yearPanel +
+  $("#main").innerHTML = yearPanel +
     '<div class="hd-grid" style="margin-top:18px">' +
     '<div class="panel"><div class="panel-title">选手使用榜 <em class="mono">按使用场次</em></div>' + usageRows(H.players || [], "player") + "</div>" +
     '<div class="panel"><div class="panel-title">战队使用</div>' + usageRows(H.teams || [], "team") + "</div>" +
@@ -358,7 +366,7 @@
     muHTML + "</div>" +
     "</div>";
   mountGrowthChart(H.name);
-  SHARE.mount($("#heroHead"), heroShareSpec, "kpldata-hero.png");
+  SHARE.mount($("#heroHead .detail-actions"), heroShareSpec, "kpldata-hero.png");
 
   K.refresh();
 })();

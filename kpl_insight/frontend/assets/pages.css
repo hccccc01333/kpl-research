@@ -627,6 +627,46 @@ select:disabled{opacity:.55 !important;cursor:not-allowed}
 .rp-story-lead{margin:10px 0 15px;max-width:1100px;font-size:17.5px;line-height:1.78;color:var(--ink);font-weight:600;
                letter-spacing:.005em}
 .rp-story-lead b{color:#8A5A00;font-weight:900}
+.rp-kpis{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
+.rp-kpi{display:inline-flex;align-items:baseline;gap:6px;padding:6px 10px;border:1px solid var(--line);
+        border-radius:9px;background:var(--card2)}
+.rp-kpi b{font-size:15px;font-weight:900;font-variant-numeric:tabular-nums;color:var(--ink)}
+.rp-kpi b.up{color:#0F8A78}.rp-kpi b.down{color:#D5374B}
+.rp-kpi em{font-style:normal;font-size:11px;color:var(--muted)}
+.rp-kpi.warn{border-color:rgba(213,55,75,.35);background:rgba(213,55,75,.06)}
+.rp-node-wrap{margin:0 0 12px;overflow-x:auto}
+.rp-node-table{width:100%;border-collapse:collapse;font-size:12px;min-width:640px}
+.rp-node-table th{padding:6px 8px;text-align:left;font-size:10.5px;letter-spacing:.4px;color:var(--muted);
+                  font-weight:700;border-bottom:1px solid var(--line)}
+.rp-node-table td{padding:8px;border-top:1px solid var(--line);vertical-align:top;color:var(--ink2)}
+.rp-node-table td.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+.rp-node-table td em{font-style:normal;font-weight:800;margin-left:4px;font-size:11px}
+.rp-node-table td em.up,.rp-node-table td em.down{color:#0F8A78}
+.rp-node-table td em.down{color:#D5374B}
+.rp-node{cursor:pointer;outline:none}
+.rp-node:hover,.rp-node:focus{background:rgba(246,192,33,.07)}
+.rp-node-i{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;margin-right:6px;
+           border-radius:50%;background:rgba(240,47,85,.10);color:#D5374B;font-size:10px;font-weight:900}
+.rp-dir{display:inline-block;padding:1px 6px;border-radius:4px;background:rgba(15,138,120,.10);
+        color:#0F8A78;font-size:10.5px;font-weight:800}
+.rp-dir.warn{background:rgba(213,55,75,.10);color:#D5374B}
+.rp-ledger-hd{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.rp-ledger-hd .rp-pt{margin:0}
+.rp-ledger-filter{display:flex;gap:4px;margin-left:auto}
+.rp-ledger-filter button{padding:3px 8px;border:1px solid var(--line2);border-radius:6px;background:var(--card2);
+                         color:var(--muted);font-size:11px;cursor:pointer}
+.rp-ledger-filter button.on{border-color:var(--gold);color:var(--ink);background:var(--gold)}
+.rp-ledger-row{cursor:pointer}
+.rp-ledger-row:hover{background:rgba(246,192,33,.07)}
+.rp-tp-fold{margin-top:12px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--card)}
+.rp-tp-fold summary{cursor:pointer;font-size:12.5px;font-weight:800;color:var(--ink);display:flex;
+                    justify-content:space-between;gap:10px}
+.rp-tp-fold summary .mono{font-weight:500;color:var(--muted);font-size:10.5px}
+.rp-tp-fold .rp-tp-item{margin-top:8px}
+.rp-chart-legend{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:6px 2px 4px;
+                 font-size:10.5px;color:var(--muted)}
+.rp-chart-legend i{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:4px;vertical-align:1px}
+.rp-chart-legend .mono{margin-left:auto;font-size:10px}
 .rp-story-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 .rp-moment{display:flex;flex-direction:column;gap:5px;min-width:0;text-align:left;cursor:pointer;
            padding:11px 12px 10px;border:1px solid var(--line);border-radius:11px;background:rgba(255,255,255,.88);
@@ -673,6 +713,7 @@ select:disabled{opacity:.55 !important;cursor:not-allowed}
 }
 .rp-head{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
 .rp-tabs{display:flex;gap:6px}
+.rp-tabs-single .rp-tab{cursor:default}
 .rp-tab{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:9px;cursor:pointer;
         border:1px solid var(--line);background:var(--card2);color:var(--ink2);font-size:13.5px;font-weight:700}
 .rp-tab:hover{border-color:var(--line2);color:var(--ink)}
@@ -680,7 +721,7 @@ select:disabled{opacity:.55 !important;cursor:not-allowed}
 .rp-tab i{font-style:normal;font-size:11px;opacity:.75;font-weight:600}
 .rp-tab.on i{opacity:.8}
 .rp-meta{font-size:12px;color:var(--muted);margin-left:auto}
-.rp-chart{width:100%}
+.rp-chart{width:100%;background:var(--card);border:1px solid var(--line);border-radius:11px;padding:10px 12px 4px;margin:2px 0 8px;overflow:hidden}
 .rp-chart svg{width:100%;height:auto;display:block;cursor:crosshair}
 .rp-tl{display:flex;flex-direction:column;gap:6px}
 .rp-tl input[type=range]{width:100%;accent-color:#F6C021;height:22px}
@@ -713,12 +754,21 @@ select:disabled{opacity:.55 !important;cursor:not-allowed}
 .rp-evidence .rp-disc{margin:2px 0 0;font-size:11.5px;color:var(--muted);line-height:1.6;
                         border-top:1px dashed var(--line);padding-top:7px}
 .rp-evs{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:13px 15px}
-.rp-events{display:flex;flex-wrap:wrap;gap:8px}
+.rp-events{display:flex;flex-wrap:wrap;gap:8px;max-height:240px;overflow:auto;padding-right:4px}
 .rp-ev{display:inline-flex;align-items:center;gap:7px;padding:6px 11px;border-radius:8px;cursor:pointer;
        border:1px solid var(--line2);background:var(--card2);color:var(--ink2);font-size:12.5px}
 .rp-ev:hover{border-color:var(--gold);color:var(--ink)}
 .rp-ev.on{border-color:var(--gold);color:#151006;background:var(--gold);font-weight:700}
 .rp-ev .t{font-size:11px;opacity:.8}
+.rp-ev .rp-evdg{font-style:normal;font-size:10.5px;font-weight:800;padding:1px 5px;border-radius:4px;
+                background:rgba(15,138,120,.10);color:#0F8A78;font-variant-numeric:tabular-nums}
+.rp-ev .rp-evdg.down{background:rgba(213,55,75,.10);color:#D5374B}
+.rp-ev .rp-evt{font-style:normal;font-size:10.5px;color:var(--muted)}
+.rp-gold-src{margin-left:8px;font-size:10px;color:var(--muted);border:1px solid var(--line2);
+             border-radius:5px;padding:1px 5px;font-weight:500;letter-spacing:.1px}
+.rp-ledger{margin-top:12px}
+.rp-ledger .rp-tbl td,.rp-ledger .rp-tbl th{font-size:11.5px}
+.rp-ledger .rp-tbl td:nth-child(2){max-width:260px;white-space:normal;line-height:1.45}
 
 
 .rp-src{margin-left:8px;padding:2px 7px;border-radius:6px;font-size:10.5px;letter-spacing:.2px}
@@ -1647,7 +1697,10 @@ select:disabled{opacity:.55 !important;cursor:not-allowed}
 /* ==================================================================
    V6.4 · 教练档案 V2（标签化 + 相似教练）
    ================================================================== */
-.coach-blurb{margin-top:10px;padding:9px 12px;border:1px solid var(--line);border-radius:9px;background:var(--card2);font-size:12px;color:var(--ink2);line-height:1.6}
+.coach-blurb{margin-top:10px;padding:9px 12px;border:1px solid var(--line);border-radius:9px;background:var(--card2);font-size:12px;color:var(--ink2);line-height:1.6;display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px}
+.coach-blurb .coach-blurb-sep{font-style:normal;opacity:.35;margin:0 2px}
+.coach-blurb .tbp-chip{display:inline-flex;align-items:center;gap:4px;padding:2px 8px 2px 3px;border:1px solid var(--line2);border-radius:999px;background:#fff}
+.coach-blurb .tbp-chip .tbp-hicon{width:16px;height:16px;border-radius:50%;object-fit:cover}
 .coach-similar-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 .coach-similar{padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--card2);min-width:0}
 .coach-similar-head{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
@@ -1660,3 +1713,181 @@ select:disabled{opacity:.55 !important;cursor:not-allowed}
 .coach-similar-foot{margin-top:9px;font-size:10px;color:var(--muted)}
 @media(max-width:1000px){.coach-similar-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:760px){.coach-similar-grid{grid-template-columns:1fr}}
+
+/* V6.4 · 曲线 tooltip / 分路小图 */
+.live-chart{position:relative}
+.lc-tip{position:absolute;z-index:4;min-width:132px;padding:7px 9px;border-radius:8px;border:1px solid var(--line2);
+  background:var(--card);color:var(--ink);font-size:11px;line-height:1.45;pointer-events:none;opacity:0;transition:opacity .12s}
+.lc-tip b{font-family:var(--mono)}
+.lc-tip div{display:flex;align-items:center;gap:6px;white-space:nowrap;margin-top:3px}
+.lc-tip i{width:8px;height:8px;border-radius:50%;flex:none}
+.rp-sm-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.rp-sm{border:1px solid var(--line);border-radius:12px;background:var(--card2);padding:10px 12px;min-width:0}
+.rp-sm-t{font-size:11px;color:var(--muted);margin-bottom:4px}
+.rp-sm-c .lc-legend{font-size:10px}
+@media(max-width:1000px){.rp-sm-grid{grid-template-columns:1fr}}
+
+/* V6.4 · 数据曲线分组 */
+.curve-groups{display:flex;flex-wrap:wrap;gap:8px 16px;margin:4px 0 8px}
+.curve-group{display:flex;align-items:center;gap:7px;min-width:0}
+.curve-label{font-size:10.5px;color:var(--muted);flex:none}
+.curve-groups .seg{margin-left:0}
+@media(max-width:560px){
+  .curve-groups{flex-direction:column;align-items:stretch;gap:6px}
+  .curve-group{flex-wrap:nowrap;align-items:center;gap:6px;min-width:0}
+  .curve-label{width:28px}
+  .curve-group .seg{width:auto;flex:1;min-width:0;overflow-x:auto;justify-content:flex-start}
+  .curve-group .seg button{flex:none;white-space:nowrap;padding-left:9px;padding-right:9px}
+}
+
+/* V6.4 · 复盘二级标签 */
+.rp-tabs2{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:2px 0 10px}
+.rp-tabs2 .seg{margin-left:0}
+.rp-tab-note{font-size:10.5px;color:var(--muted)}
+@media(max-width:760px){.rp-tabs2{align-items:flex-start;flex-direction:column}.rp-tabs2 .seg{width:100%;overflow-x:auto}}
+
+/* V6.4 · 选手页子页签 */
+.player-tabs{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:2px 0 14px}
+.player-tabs .seg{margin-left:0}
+.player-tab-note{font-size:10.5px;color:var(--muted)}
+@media(max-width:760px){.player-tabs{align-items:flex-start;flex-direction:column}.player-tabs .seg{width:100%;overflow-x:auto}}
+
+/* V6.4 · 比赛页一级页签 */
+.match-tabs{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:2px 0 14px}
+.match-tabs .seg{margin-left:0}
+.match-tab-note{font-size:10.5px;color:var(--muted)}
+@media(max-width:760px){.match-tabs{align-items:flex-start;flex-direction:column}.match-tabs .seg{width:100%;overflow-x:auto}}
+
+/* ==================================================================
+   V6.6 · 选手页「搭档与对位」排版优化
+   ================================================================== */
+.rel-panel .panel-title{align-items:baseline;flex-wrap:wrap;gap:6px 10px}
+.rel-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;align-items:start}
+.rel-block{padding:14px;border:1px solid var(--line);border-radius:12px;background:var(--card2);min-width:0}
+.rel-block h4{margin:0;font-size:14px;font-weight:800;color:var(--ink)}
+.rel-sub{margin:5px 0 10px;font-size:10.5px;color:var(--muted);line-height:1.5}
+.rel-card{padding:10px 11px;border:1px solid var(--line);border-radius:10px;background:var(--card);margin-bottom:9px;min-width:0}
+.rel-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.rel-people{display:flex;align-items:center;flex-wrap:wrap;gap:5px;font-size:12px;font-weight:700;color:var(--ink)}
+.rel-sep{width:4px;height:4px;border-radius:50%;background:var(--line2);display:inline-block}
+.rel-score{font-family:var(--mono);font-size:12.5px;font-weight:800;white-space:nowrap}
+.rel-score.up{color:#7BE0A3}
+.rel-score.down{color:#F2A3AE}
+.rel-kv{display:flex;gap:8px;flex-wrap:wrap;margin-top:5px;font-size:10.5px;color:var(--muted)}
+.rel-kv span{white-space:nowrap}
+.rel-chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
+.rel-chip{display:inline-flex;align-items:center;gap:5px;padding:3px 7px;border:1px solid var(--line2);
+  border-radius:999px;background:var(--card2);color:var(--ink2);font-size:10.5px}
+.rel-chip img{width:16px;height:16px;border-radius:4px;object-fit:cover}
+.rel-chip em{font-style:normal;color:var(--muted);font-size:9.5px}
+.rel-row{display:flex;align-items:center;gap:9px;width:100%;padding:7px 5px;border:0;border-bottom:1px solid var(--line);
+  background:transparent;color:var(--ink2);font:inherit;text-align:left;text-decoration:none;cursor:pointer}
+.rel-row:last-child{border-bottom:0}
+.rel-row:hover{background:rgba(255,255,255,.04)}
+.rel-avatar{width:26px;height:26px;border-radius:8px;object-fit:cover;border:1px solid var(--line2);background:var(--card2);
+  display:grid;place-items:center;font-size:11px;font-weight:800;color:var(--muted);flex:none}
+.rel-avatar.alt{border-radius:50%}
+.rel-main{flex:1;min-width:0}
+.rel-main b{display:block;font-size:12px;font-weight:700;color:var(--ink)}
+.rel-main small{display:block;font-size:10px;color:var(--muted);margin-top:1px}
+.rel-delta{font-family:var(--mono);font-size:11.5px;font-weight:800;white-space:nowrap}
+.rel-delta.up{color:#7BE0A3}
+.rel-delta.down{color:#F2A3AE}
+.rel-empty{padding:12px;border-radius:9px;background:var(--card);color:var(--muted);font-size:11px}
+.rel-note{margin-top:12px;padding-top:10px;border-top:1px solid var(--line)}
+.rel-note b{display:block;font-size:11px;color:var(--ink2);margin-bottom:5px}
+.rel-note span{display:block;font-size:10px;color:var(--muted);line-height:1.6;margin-bottom:3px}
+.rel-rival-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:14px;align-items:start}
+.rel-rival-list{padding:14px;border:1px solid var(--line);border-radius:12px;background:var(--card2);min-width:0}
+.rel-rival-list h4{margin:0 0 8px;font-size:13px;font-weight:800;color:var(--ink)}
+.rel-rival-list .rel-sub{margin-top:8px}
+.rival-node text{cursor:pointer}
+.rival-node:hover circle{stroke-width:3.2}
+@media(max-width:1000px){
+  .rel-grid{grid-template-columns:1fr}
+  .rel-rival-grid{grid-template-columns:1fr}
+}
+@media(max-width:760px){
+  .rel-block{padding:12px}
+  .rel-card{padding:9px}
+  .rel-row{gap:8px}
+  .rel-avatar{width:24px;height:24px}
+}
+
+/* V6.7 · 数据曲线当前帧摘要 */
+.curve-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:6px 0 10px}
+.curve-summary div{padding:7px 9px;border:1px solid var(--line);border-radius:9px;background:var(--card2);min-width:0}
+.curve-summary span{display:block;font-size:9.5px;color:var(--muted)}
+.curve-summary b{display:block;font-family:var(--mono);font-size:13.5px;font-weight:800;margin-top:2px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.curve-summary b.up{color:#7BE0A3}
+.curve-summary b.down{color:#F2A3AE}
+html.light-site .curve-summary b.up{color:#0F8A78}
+html.light-site .curve-summary b.down{color:#C43A4B}
+@media(max-width:560px){.curve-summary{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* V6.7 · 雷达对比与差值 */
+.cmp-arrow{font-size:8.5px;margin-right:3px;opacity:.85}
+
+/* V6.7 · 教练 BP 指纹与任期时间轴 */
+.cfp-bars{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:12px}
+.cfp-bars span{display:block;font-size:11px;font-weight:700;color:var(--ink2);margin-bottom:5px}
+.cfp-bar{display:flex;height:16px;border-radius:8px;overflow:hidden;background:rgba(157,178,204,.14)}
+.cfp-bar i{display:block;height:100%;min-width:2px;transition:width .28s cubic-bezier(.2,.7,.3,1)}
+.cfp-empty{padding:4px 0;font-size:10.5px;color:var(--muted)}
+.ct-timeline{margin-bottom:12px;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--card2)}
+.ct-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.ct-head b{font-size:13px;font-weight:800;color:var(--ink)}
+.ct-head span{font-size:10.5px;color:var(--muted)}
+.ct-row{display:grid;grid-template-columns:96px minmax(0,1fr) 82px;gap:9px;align-items:center;padding:4px 0;font-size:11px}
+.ct-team{color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ct-track{position:relative;height:12px;border-radius:6px;background:rgba(157,178,204,.14)}
+.ct-track i{position:absolute;top:0;height:100%;min-width:6px;border-radius:6px;background:linear-gradient(90deg,#F6C021,#F2A3AE)}
+.ct-track i.nobp{background:transparent;border:1px dashed rgba(157,178,204,.72)}
+.ct-meta{text-align:right;color:var(--muted)}
+@media(max-width:760px){
+  .cfp-bars{grid-template-columns:1fr}
+  .ct-row{grid-template-columns:94px minmax(0,1fr) 70px;gap:6px}
+}
+
+/* 方法说明页 method.html */
+.mlayers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:12px}
+@media(max-width:860px){.mlayers{grid-template-columns:1fr}}
+.mcol{padding:14px 16px;border:1px solid var(--line);border-radius:10px;background:var(--card2)}
+.mcol > b{display:block;font-size:13px;margin-bottom:6px;color:var(--ink)}
+.mcol p{margin:0;font-size:12.5px;line-height:1.75;color:var(--ink2)}
+.mtable{width:100%;border-collapse:collapse;margin-top:10px;font-size:12.5px}
+.mtable th{text-align:left;font-weight:600;color:var(--muted);border-bottom:1px solid var(--line);padding:8px 10px;white-space:nowrap}
+.mtable td{padding:8px 10px;border-bottom:1px solid var(--line);color:var(--ink2);vertical-align:top}
+.mtable td.num{font-family:var(--mono);text-align:right;white-space:nowrap;color:var(--ink)}
+.msteps{margin:12px 0 0;padding-left:20px;font-size:12.5px;line-height:1.85;color:var(--ink2)}
+.msteps li{margin-bottom:9px}
+.mfail{margin:12px 0 0;padding-left:18px;font-size:12.5px;line-height:1.85;color:var(--ink2)}
+.mfail li{margin-bottom:9px}
+
+/* 从头看到尾 walkthrough.html */
+.wt-list{display:flex;flex-direction:column;gap:14px;margin-top:14px}
+.wt-item{display:grid;grid-template-columns:44px minmax(0,1fr);gap:14px;padding:16px 18px;
+  border:1px solid var(--line);border-radius:12px;background:var(--card2)}
+.wt-num{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:#edf3ff;
+  color:var(--brand);font-family:var(--mono);font-size:13px;font-weight:700}
+.wt-body h3{font-size:15px;margin:2px 0 6px;color:var(--ink)}
+.wt-q{font-size:12.5px;color:var(--muted);margin:0 0 8px}
+.wt-d{font-size:12.5px;line-height:1.8;color:var(--ink2);margin:0 0 10px}
+.wt-links{display:flex;flex-wrap:wrap;gap:8px;margin:2px 0 10px}
+.wt-link{font-size:12px;padding:6px 12px;border-radius:999px;border:1px solid var(--line2);
+  color:var(--brand);background:#fff;text-decoration:none;transition:border-color .15s}
+.wt-link:hover{border-color:var(--brand)}
+.wt-caveat{font-size:11.5px;line-height:1.7;color:var(--muted);margin:0;
+  padding-top:8px;border-top:1px dashed var(--line)}
+@media(max-width:700px){.wt-item{grid-template-columns:1fr;gap:8px}}
+
+/* 胜负天平的三档色带 */
+.win-ribbon{margin-top:10px}
+.win-ribbon-bar{display:flex;height:8px;border-radius:4px;overflow:hidden;background:#EEF2F7}
+.win-ribbon-bar i{display:block;height:100%;opacity:.9}
+.win-ribbon-bar i:hover{opacity:1;outline:1px solid rgba(0,0,0,.18)}
+.win-ribbon-legend{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-top:7px;
+  font-size:11.5px;color:var(--muted);line-height:1.6}
+.win-ribbon-legend span{display:inline-flex;align-items:center;gap:5px}
+.win-ribbon-legend span::before{content:"";width:8px;height:8px;border-radius:2px;background:currentColor;opacity:.85}
+.win-ribbon-legend em{font-style:normal;opacity:.75}

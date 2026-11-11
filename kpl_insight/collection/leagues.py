@@ -109,10 +109,10 @@ def get_leagues() -> list[dict]:
     return leagues
 
 
-def fetch_schedule(league_id: str):
+def fetch_schedule(league_id: str, force: bool = False):
     path = HIST / league_id / "schedule.json"
     cached = jload(path)
-    if cached is not None:
+    if cached is not None and not force:
         # 联赛有未结束的场次时强制重拉（比分/状态实时变化）
         unfinished = any(int(m.get("status") or 0) != 2 for m in cached if isinstance(m, dict))
         if not unfinished:
@@ -125,7 +125,33 @@ def fetch_schedule(league_id: str):
     return matches
 
 
-def fetch_match(league_id: str, match: dict):
+def archive_is_incomplete(saved) -> bool:
+    """已归档的比赛是否还缺东西。
+
+    归档存在不等于归档完整：比赛日最后一次刷新可能发生在决胜局之前，之后赛程里的
+    `status` 变成 2，缓存规则就再也不会碰它。2026110801 就是这样停在
+    「status=1 + 只存 2 局」，而官方是 7 局已完赛——首页把它当「正在进行」展示了两天。
+    """
+    if not isinstance(saved, dict):
+        return False
+    inner = saved.get("match") or {}
+    try:
+        if int(inner.get("status") or 0) != 2:
+            return True
+    except (TypeError, ValueError):
+        return True
+    try:
+        expected = (int((inner.get("camp1") or {}).get("score") or 0)
+                    + int((inner.get("camp2") or {}).get("score") or 0))
+    except (TypeError, ValueError):
+        return False
+    battles = saved.get("battles")
+    if not isinstance(battles, list):
+        return True
+    return bool(expected) and len(battles) < expected
+
+
+def fetch_match(league_id: str, match: dict, force: bool = False):
     mid = str(match.get("match_id") or "")
     if not mid:
         return None
@@ -134,7 +160,9 @@ def fetch_match(league_id: str, match: dict):
     _today = _dt.date.today().isoformat()
     _is_today = str(match.get("start_time") or "")[:10] == _today
     _live = int(match.get("status") or 0) == 1
-    if jload(path) is not None and not _is_today and not _live:
+    saved = jload(path)
+    _incomplete = archive_is_incomplete(saved)
+    if not force and saved is not None and not _is_today and not _live and not _incomplete:
         with _lock:
             _stats["matches_skip"] += 1
         return path
@@ -161,7 +189,7 @@ def fetch_match(league_id: str, match: dict):
     return path
 
 
-def run(league_ids: list[str] | None, jobs: int) -> None:
+def run(league_ids: list[str] | None, jobs: int, force_match_ids: set[str] | None = None) -> None:
     leagues = get_leagues()
     if league_ids:
         want = {str(x) for x in league_ids}
@@ -170,14 +198,21 @@ def run(league_ids: list[str] | None, jobs: int) -> None:
     t0 = time.time()
     for i, lg in enumerate(leagues):
         lid = lg["league_id"]
-        schedule = fetch_schedule(lid)
+        schedule = fetch_schedule(lid, force=bool(force_match_ids))
         if not schedule:
             print(f"[{i+1}/{len(leagues)}] {lid} {lg['league_name']}: 赛程为空，跳过", flush=True)
             continue
         finished = [m for m in schedule if int(m.get("status") or 0) == 2 or m.get("win_camp")]
+        if force_match_ids:
+            targets = [m for m in schedule if str(m.get("match_id") or "") in force_match_ids]
+            found = {str(m.get("match_id") or "") for m in targets}
+            missing = force_match_ids - found
+            if missing:
+                print(f"[{i+1}/{len(leagues)}] {lid} 未在赛程中找到: {sorted(missing)}", flush=True)
+            schedule = targets
         lg_t0 = time.time()
         with ThreadPoolExecutor(max_workers=jobs) as pool:
-            futs = [pool.submit(fetch_match, lid, m) for m in schedule if m.get("match_id")]
+            futs = [pool.submit(fetch_match, lid, m, bool(force_match_ids)) for m in schedule if m.get("match_id")]
             for _ in as_completed(futs):
                 pass
         print(
@@ -215,12 +250,19 @@ def main() -> None:
     ap.add_argument("--all", action="store_true")
     ap.add_argument("--jobs", type=int, default=8)
     ap.add_argument("--summary", action="store_true")
+    ap.add_argument(
+        "--match-id",
+        nargs="*",
+        default=None,
+        help="只强制刷新这些 match_id（绕过赛程/大场缓存，需配合 --leagues）",
+    )
     args = ap.parse_args()
     if args.summary:
         summary()
         return
     if args.all or args.leagues:
-        run(args.leagues, args.jobs)
+        force_ids = {str(x) for x in (args.match_id or [])} or None
+        run(args.leagues, args.jobs, force_ids)
     else:
         ap.print_help()
 

@@ -8,32 +8,34 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230A111C'/%3E%3Ctext x='16' y='22' font-family='Arial' font-size='16' font-weight='bold' fill='%23F6C021' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="assets/style.css?v=20261102-brand">
 <link rel="stylesheet" href="assets/pages.css?v=20261102-brand">
-<link rel="stylesheet" href="assets/v55.css?v=87">
+<link rel="stylesheet" href="assets/v55.css?v=92">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="KPL赛研">
 <meta property="og:title" content="精选对局 · KPL赛研">
 <meta property="og:description" content="按规则自动筛出的翻盘局、拉锯局、波动局与资源战，点进去直接落到关键分钟。">
 <link rel="stylesheet" href="assets/arena.css?v=1">
 <link rel="stylesheet" href="assets/arena-world.css?v=20261026">
-<script src="assets/arena-world.js?v=20261030a" type="module"></script>
 <link rel="stylesheet" href="assets/card-motion.css?v=1">
 <script src="assets/card-motion.js?v=1" type="module"></script>
 <link rel="stylesheet" href="assets/light.css?v=20261030a">
 <link rel="stylesheet" href="assets/theme.css?v=20261030b">
+<link rel="stylesheet" href="assets/replay.css?v=20261104g">
+<link rel="stylesheet" href="assets/site-v2.css?v=20261112a">
+<link rel="stylesheet" href="assets/picks-v2.css?v=20261112a">
 </head>
-<body data-page="schedule.html">
+<body data-page="schedule.html" class="replay-page picks-page v2-page">
 <header id="siteHeader" class="topbar"></header>
 
-<header class="page-hero">
-  <div class="wrap">
-    <div class="ph-kicker mono">PICKS · 精选对局</div>
-    <h1>精选对局</h1>
-    <p>不是编辑推荐，是<b>规则筛出来的</b>：翻盘局、拉锯局、波动局、资源战。每条都写明触发条件，
-      点进去会直接落到关键分钟（复盘时间轴已定位好）。</p>
-    <div class="ph-meta mono">
-      <span>可判定对局 <b id="pkTotal">—</b></span><i>/</i>
-      <span>入选 <b id="pkPicked">—</b></span><i>/</i>
-      <span>规则版本 <b id="pkAt">—</b></span>
+<header class="lg-hero">
+  <div class="lg-hero-gridlines" aria-hidden="true"></div>
+  <div class="v2-wrap">
+    <div class="v2-kicker"><i></i>PICKS<b>·</b>精选对局</div>
+    <h1 class="v2-h1">精选对局</h1>
+    <p class="v2-lead">不是编辑推荐，是<strong>规则筛出来的</strong>：翻盘局、拉锯局、波动局、资源战。每条都写明触发条件，点进去直接落到关键分钟（复盘时间轴已定位好）。</p>
+    <div class="v2-stats lg-kpis" style="margin-top:26px">
+      <div class="v2-stat"><b class="v2-mono" id="pkTotal">—</b><span>可判定对局</span></div>
+      <div class="v2-stat"><b class="v2-mono" id="pkPicked">—</b><span>入选</span></div>
+      <div class="v2-stat"><b class="v2-mono" id="pkAt">—</b><span>规则版本</span></div>
     </div>
   </div>
 </header>
@@ -52,6 +54,7 @@
   </div>
 
   <div class="pick-grid" id="pickGrid"></div>
+  <div class="picks-more"><button id="pkMore" type="button">显示更多</button></div>
 
   <div class="panel" style="margin-top:18px">
     <div class="panel-title">筛选规则 <em class="mono">全部来自逐分钟数据，可复核</em></div>
@@ -69,7 +72,7 @@
 <script src="assets/seasons.js?v=85"></script>
 <script src="assets/coverage.js?v=85"></script>
 <script src="assets/picks.js?v=85"></script>
-<script src="assets/common.js?v=20261102-brand"></script>
+<script src="assets/common.js?v=20261110-curve"></script>
 <script>
 (function () {
   "use strict";
@@ -78,6 +81,8 @@
   var P = window.KPL_PICKS || { rows: [], rules: [] };
   var rows = P.rows || [];
   var cur = "";
+  var PAGE = 16;
+  var shown = PAGE;
 
   $("#pkTotal").textContent = (P.totalBattles || rows.length) + " 局";
   $("#pkPicked").textContent = (P.picked || rows.length) + " 条";
@@ -94,6 +99,42 @@
     return "<div>· <b>" + K.esc(r.label) + "</b>：" + K.esc(r.rule) + cnt + "</div>";
   }).join("");
 
+  var TEAM_ICONS = {};
+  try {
+    var allTeams = (window.KPL_SEASONS && KPL_SEASONS.scopes && KPL_SEASONS.scopes.all && KPL_SEASONS.scopes.all.teams) || [];
+    allTeams.forEach(function (t) { if (t.team && t.icon) TEAM_ICONS[t.team] = t.icon; });
+  } catch (e) {}
+
+  function usableIcon(icon) {
+    if (!icon) return "";
+    if (/\/team\/team\.png(?:$|\?)/.test(icon)) return "";
+    return icon;
+  }
+  function initialOf(name) {
+    var s = String(name || "?").replace(/[^一-龥A-Za-z0-9]/g, "");
+    return (s.slice(0, 1) || "?").toUpperCase();
+  }
+  function logoHTML(name) {
+    var icon = usableIcon(TEAM_ICONS[name] || "");
+    var initial = K.esc(initialOf(name));
+    return '<span class="pk-logo' + (icon ? "" : " is-fallback") + '" data-initial="' + initial + '">' +
+      (icon ? '<img src="' + K.esc(icon) + '" alt="" loading="lazy" ' +
+        " onerror=\"this.parentNode.classList.add('is-fallback');this.remove()\">" : "") + "</span>";
+  }
+  function teamHTML(name, side, win) {
+    var logo = logoHTML(name);
+    var label = "<b>" + K.esc(name) + "</b>";
+    return '<span class="pk-team ' + side + (win ? " is-win" : "") + '">' +
+      (side === "home" ? logo + label : label + logo) + "</span>";
+  }
+  function primaryTag(r) {
+    var tags = r.tags || [];
+    return tags.filter(function (t) { return t.k === "comeback"; })[0] ||
+      tags.filter(function (t) { return t.k === "swing"; })[0] ||
+      tags.filter(function (t) { return t.k === "long"; })[0] ||
+      tags[0] || null;
+  }
+
   function jumpMinute(r) {
     // 翻盘局落到"最低点"，其余落到波动最大那段的起点（都没有才不带 &m=）
     if (r.minMinute != null) return Math.round(r.minMinute);
@@ -102,29 +143,50 @@
   }
 
   function card(r) {
-    var tags = r.tags.map(function (t) {
-      return '<span class="pk-tag ' + t.k + '" title="' + K.esc(t.rule || "") + '">' + K.esc(t.label) +
-        '<em>' + K.esc(t.note) + "</em></span>";
+    var primary = primaryTag(r);
+    var tags = (r.tags || []).map(function (t) {
+      return '<span class="pk-tag ' + t.k + '" title="' + K.esc(t.rule || "") + '">' + K.esc(t.label) + "</span>";
     }).join("");
     var m = jumpMinute(r);
-    var href = "match.html?id=" + encodeURIComponent(r.matchId) + "&g=" + (r.seq || 1) + (m != null ? "&m=" + m : "");
-    return '<a class="pick-card" href="' + href + '">' +
+    var href = "game.html?id=" + encodeURIComponent(r.battleId) + (m != null ? "&m=" + m : "");
+    var w1 = r.winner === r.t1, w2 = r.winner === r.t2;
+    var minP = r.minProb != null ? Math.round(r.minProb * 100) : null;
+    var swing = Math.round((r.swing || 0) * 100);
+    var hook = primary ? '<p class="pk-hook"><span class="pk-hook-k">' + K.esc(primary.label) + "</span>" +
+      K.esc(primary.note) + "</p>" : "";
+    return '<a class="pick-card' + (primary ? " pk-lead-" + primary.k : "") + '" href="' + href + '">' +
       '<div class="pk-top"><span class="pk-date mono">' + K.esc(String(r.date).slice(5)) + "</span>" +
-      '<span class="pk-vs">' + K.esc(r.t1) + " vs " + K.esc(r.t2) + "</span>" +
-      '<span class="pk-g mono">G' + (r.seq || 1) + " · " + r.dur.toFixed(0) + "′</span></div>" +
       '<div class="pk-tags">' + tags + "</div>" +
-      '<div class="pk-foot mono">胜方 ' + K.esc(r.winner) +
-      (r.minProb != null ? " · 最低胜率 " + Math.round(r.minProb * 100) + "%" : "") +
-      " · 波动 " + Math.round(r.swing * 100) + "pp · 事件 " + r.events + "</div>" +
-      '<span class="pk-go">看这段 →</span></a>';
+      '<span class="pk-g mono">G' + (r.seq || 1) + " · " + r.dur.toFixed(0) + "′</span></div>" +
+      '<div class="pk-match">' + teamHTML(r.t1, "home", w1) +
+      '<span class="pk-mid"><span class="pk-vs">VS</span></span>' +
+      teamHTML(r.t2, "away", w2) + "</div>" + hook +
+      (function () {
+        var stats = [];
+        if (minP != null) stats.push(["最低胜率", minP + "<i>%</i>"]);
+        stats.push(["胜率波动", swing + "<i>pp</i>"]);
+        stats.push(["结构事件", (r.events || 0) + "<i>个</i>"]);
+        return '<div class="pk-stats' + (stats.length === 2 ? " is-two" : "") + '">' +
+          stats.map(function (x) { return '<div class="pk-stat"><span>' + x[0] + "</span><b>" + x[1] + "</b></div>"; }).join("") +
+          "</div>";
+      })() +
+      '<div class="pk-foot"><span>胜方 <b>' + K.esc(r.winner) + "</b></span>" +
+      '<span class="pk-go">看这段 <i>→</i></span></div></a>';
   }
 
   function render() {
     var list = cur ? rows.filter(function (r) {
       return r.tags.some(function (t) { return t.k === cur; });
     }) : rows;
-    $("#pickGrid").innerHTML = list.length ? list.map(card).join("")
+    if (shown > list.length) shown = Math.max(PAGE, list.length);
+    var view = list.slice(0, shown);
+    $("#pickGrid").innerHTML = list.length ? view.map(card).join("")
       : '<div class="empty-tip">该标签下暂无入选对局</div>';
+    var more = $("#pkMore");
+    if (more) {
+      more.hidden = shown >= list.length;
+      more.textContent = "显示更多（已显示 " + Math.min(shown, list.length) + " / " + list.length + "）";
+    }
     $("#pkNote").textContent = (cur ? "筛选：" + cur + " · " : "") + list.length + " 条（按综合分排序）";
   }
 
@@ -132,11 +194,18 @@
     var b = e.target.closest("button"); if (!b) return;
     Array.prototype.forEach.call(this.children, function (x) { x.classList.toggle("on", x === b); });
     cur = b.getAttribute("data-k");
+    shown = PAGE;
+    render();
+  });
+
+  $("#pkMore").addEventListener("click", function () {
+    shown += PAGE;
     render();
   });
 
   render();
 })();
 </script>
+<script src="assets/replay-ui.js?v=20261104e"></script>
 </body>
 </html>

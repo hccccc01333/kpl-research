@@ -71,9 +71,9 @@
         '<div><div class="coach-name">' + esc(c.name) + "</div>" +
         '<div class="coach-sub">' + esc(teams) + " · " + esc(t.seasonName) + " · " + esc(t.team) + "</div></div></div>" +
       '<div class="coach-kpis">' +
-        '<div><b>' + K.fmtInt(t.series.games) + "</b><span>大场</span></div>" +
-        '<div><b>' + pct(t.series.wr) + "</b><span>大场胜率</span></div>" +
-        '<div><b>' + K.fmtInt(t.bp.games) + "</b><span>完整 BP 局</span></div>" +
+        '<div><b>' + K.fmtInt(t.series.games) + "</b><span>本任期大场</span></div>" +
+        '<div><b>' + pct(t.series.wr) + "</b><span>本任期胜率</span></div>" +
+        '<div><b>' + K.fmtInt(t.bp.games) + '</b><span>本任期 BP 局' + (t.bp.partialGames ? "（含残缺）" : "") + "</span></div>" +
         '<div><b>' + K.fmtInt(c.tenures.length) + "</b><span>收录任期</span></div>" +
       "</div>";
   }
@@ -92,15 +92,69 @@
       '<div class="block-note">' + esc(t.note || "") + " 当前教练不能回填往年赛果；换帅 / 角色不明确不纳入 BP 归属。</div>";
   }
 
+  function fingerprintBars(t) {
+    var b = t.bp || {};
+    var colors = ["#F6C021", "#8FC7F0", "#B98CE0", "#F2A3AE", "#7BE0A3"];
+    function bar(list, total, emptyText) {
+      if (!list || !list.length || !total) return '<div class="cfp-empty">' + emptyText + "</div>";
+      return '<div class="cfp-bar">' + list.slice(0, 5).map(function (r, i) {
+        var w = Math.max(2, Number(r.n || 0) / total * 100);
+        var tip = heroName(r.i) + "：" + K.fmtInt(r.n) + " 手";
+        return '<i style="width:' + w.toFixed(2) + '%;background:' + colors[i % colors.length] + '" title="' + esc(tip) + '"></i>';
+      }).join("") + "</div>";
+    }
+    return '<div class="cfp-bars">' +
+      '<div><span>选用结构</span>' + bar(b.topPicks, b.picks, "本任期没有完整 BP 选用") + "</div>" +
+      '<div><span>禁用结构</span>' + bar(b.topBans, b.bans, "本任期没有完整 BP 禁用") + "</div>" +
+      "</div>";
+  }
+
+  function tenureTimeline(c) {
+    var rows = coachTenures(c.id);
+    if (!rows.length) return "";
+    var starts = rows.map(function (r) { return r.validFrom || ""; }).filter(Boolean).sort();
+    var ends = rows.map(function (r) { return r.validTo || ""; }).filter(Boolean).sort();
+    var start = starts[0], end = ends[ends.length - 1];
+    var time = function (v) { return new Date(v + "T00:00:00").getTime(); };
+    var span = Math.max(1, time(end) - time(start));
+    var tracks = rows.map(function (r) {
+      var x = Math.max(0, (time(r.validFrom) - time(start)) / span * 100);
+      var w = Math.max(4, (time(r.validTo) - time(r.validFrom)) / span * 100);
+      var hasBp = Number(r.bp.games || 0) > 0;
+      var part = r.bp && r.bp.partialGames ? "（含 " + K.fmtInt(r.bp.partialGames) + " 局残缺）" : "";
+      return '<div class="ct-row">' +
+        '<span class="ct-team" title="' + esc(r.team + " · " + r.seasonName) + '">' +
+        esc(seasonShort(r.seasonName)) + "</span>" +
+        '<span class="ct-track"><i class="' + (hasBp ? "" : "nobp") + '" style="left:' + x.toFixed(2) + "%;width:" + w.toFixed(2) + '%" title="' +
+        esc(r.seasonName + " · " + r.validFrom + " → " + r.validTo + (hasBp ? " · BP " + K.fmtInt(r.bp.games) + " 局" + part : " · 无 BP")) + '"></i></span>' +
+        '<span class="ct-meta mono">' + (hasBp ? K.fmtInt(r.bp.games) + " BP 局" : "无 BP") + "</span></div>";
+    }).join("");
+    return '<div class="ct-timeline"><div class="ct-head"><b>任期时间轴</b><span class="mono">' +
+      start + " → " + end + "</span></div>" + tracks +
+      '<div class="ct-note">橙色段 = 该任期有 BP 指纹的区间（按赛制完整：20/18/16/14 手都算），粉色段 = 只有赛果、无 BP；虚线 = 整个任期都没有 BP。</div></div>';
+  }
+
+  // 时间轴每行要能一眼区分；队名对同一教练几乎恒定，赛季才是真正的区分维度。
+  function seasonShort(name) {
+    var text = String(name || "").replace(/\s+/g, " ").trim();
+    // 先只处理「2022年KPL」这种紧贴的数字年份，避免把「年度总决赛」的“年”当成后缀吃掉
+    text = text.replace(/^(\d{4})\s*年/, "$1 ");
+    text = text.replace(/KPL/gi, "");
+    text = text.replace(/(\d{4})/g, function (year) { return year.slice(2); });
+    return text.replace(/\s+/g, " ").trim() || "—";
+  }
+
   function finger(t) {
-    var b = t.bp;
+    var b = t.bp || {};
     var picks = b.topPicks || [];
     $("#coachFingerprint").innerHTML =
+      fingerprintBars(b) +
       '<div class="coach-stat-grid">' +
         '<div><b>' + K.fmtInt(b.uniquePicks) + '</b><span>选用英雄</span><em>有效 ' + (b.effectiveHeroes == null ? "—" : b.effectiveHeroes) + " 个</em></div>" +
         '<div><b>' + pct(b.topShare) + '</b><span>最高选用占比</span><em>' + (b.topPick == null ? "—" : esc(heroName(b.topPick))) + "</em></div>" +
         '<div><b>' + K.fmtInt(b.uniqueBans) + '</b><span>禁用英雄</span><em>' + K.fmtInt(b.bans) + " 手</em></div>" +
-        '<div><b>' + K.fmtInt(b.games) + '</b><span>BP 样本</span><em>' + K.fmtInt(b.picks) + " 个选用手位</em></div>" +
+        '<div><b>' + K.fmtInt(b.games) + '</b><span>BP 样本</span><em>' + K.fmtInt(b.picks) + " 个选用手位" +
+        (b.partialGames ? " · 含 " + K.fmtInt(b.partialGames) + " 局残缺" : "") + "</em></div>" +
       "</div>" +
       '<div class="tbp-table-wrap" style="max-height:420px"><table id="coachPicksTable"></table></div>' +
       '<div class="block-note">选用率 = 该队选用手数 / 本任期全部选用手数；联盟率取同赛事全部完整 BP；Lift 只描述偏好强度，胜率是赛果描述。</div>';
@@ -147,7 +201,7 @@
 
   function tenureHistory(c) {
     var rows = coachTenures(c.id);
-    $("#coachTenures").innerHTML = '<div class="tbp-table-wrap"><table class="tbp-compact"><thead><tr>' +
+    $("#coachTenures").innerHTML = tenureTimeline(c) + '<div class="tbp-table-wrap"><table class="tbp-compact"><thead><tr>' +
       "<th>赛季</th><th>战队</th><th>任期</th><th class='num'>大场</th><th class='num'>大场胜率</th><th class='num'>BP 局</th><th>来源</th>" +
       "</tr></thead><tbody>" + rows.map(function (r) {
         return '<tr data-tenure="' + esc(r.id) + '" tabindex="0" class="' + (r.id === tenureId ? "on" : "") + '">' +
@@ -191,7 +245,7 @@
       '<div class="coach-coverage-grid">' +
         '<div><b>' + K.fmtInt(c.teamSeasons) + '</b><span>纳入队-赛季</span></div>' +
         '<div><b>' + K.fmtInt(c.coaches) + '</b><span>教练</span></div>' +
-        '<div><b>' + K.fmtInt(c.bpGames) + '</b><span>去重完整 BP 局</span></div>' +
+        '<div><b>' + K.fmtInt(c.bpGames) + '</b><span>去重 BP 局</span></div>' +
         '<div><b>' + K.fmtInt(c.excludedTeamSeasons) + '</b><span>未纳入队-赛季</span></div>' +
       "</div>" +
       '<div class="block-note">来源：' + esc(D.sourceMode || "—") + "；" + esc(c.start || "") + " – " + esc(c.end || "") + "。只纳入赛季内主教练唯一的战队；中途换帅 / 角色不明确 " + K.fmtInt(c.excludedTeamSeasons) + " 个队-赛季不进入 BP 归属。</div>" +
@@ -202,14 +256,18 @@
   }
 
 
+  function heroChip(index) {
+    return '<span class="tbp-chip">' + heroIcon(index) + esc(heroName(index)) + "</span>";
+  }
+
   function blurb(t) {
-    var picks = (t.bp.topPicks || []).slice(0, 2).map(function (r) { return heroName(r.i); });
-    var against = (t.bp.topAgainst || []).slice(0, 1).map(function (r) { return heroName(r.i); });
+    var picks = (t.bp.topPicks || []).slice(0, 2);
+    var against = (t.bp.topAgainst || []).slice(0, 1);
     var parts = [];
-    if (t.series.games) parts.push("大场 " + K.fmtInt(t.series.games) + " 场 " + pct(t.series.wr));
-    if (picks.length) parts.push("常用 " + picks.join(" / "));
-    if (against.length) parts.push("最常被 Ban " + against.join(" / "));
-    return parts.join(" · ");
+    if (t.series.games) parts.push("<span>本任期大场 " + K.fmtInt(t.series.games) + " 场 · " + pct(t.series.wr) + "</span>");
+    if (picks.length) parts.push("<span>常用</span> " + picks.map(function (r) { return heroChip(r.i); }).join(""));
+    if (against.length) parts.push("<span>最常被 Ban</span> " + against.map(function (r) { return heroChip(r.i); }).join(""));
+    return parts.join('<i class="coach-blurb-sep">·</i>');
   }
 
   function similarPanel(c) {
@@ -217,7 +275,7 @@
     var box = $("#coachSimilar");
     if (!rows.length) {
       box.innerHTML = '<div class="empty-tip">样本不足，暂不生成相似教练。</div>' +
-        '<div class="block-note">相似度按「前 10 常用英雄 + 前 10 常用禁用」的 Jaccard 重合度合成；只作风格描述，不代表水平高低。</div>';
+        '<div class="block-note">相似度按「前 10 常用英雄 + 前 10 常用禁用」的 Jaccard 重合度合成；只作风格描述，不代表水平高低。2020 春季赛之前官方无 BP 数据，不参与 BP 相似度；只统计赛制完整的 BP 局（20/18/16/14 手），少选或双方禁用手位不一致的记录整场排除。</div>';
       return;
     }
     box.innerHTML = '<div class="coach-similar-grid">' + rows.map(function (r) {
@@ -248,7 +306,7 @@
     tenureHistory(c);
     evidence(t);
     coveragePanel();
-    $("#coachBlurb").textContent = blurb(t);
+    $("#coachBlurb").innerHTML = blurb(t);
     $("#coachMeta").textContent = "数据更新 " + (D.generatedAt || "—") + " · 赛季名单口径 · " + K.fmtInt((D.coverage || {}).teamSeasons) + " 个队-赛季";
     $("#coachCareer").innerHTML =
       '<div class="coach-career-item"><b>' + K.fmtInt(c.series) + "</b><span>生涯大场样本</span></div>" +

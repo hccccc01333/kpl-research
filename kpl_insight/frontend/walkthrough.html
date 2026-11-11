@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="v55 light-site">
+<head>
+<script src="assets/theme.js?v=20261030b"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>一局怎么从头看到尾 · KPL赛研</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230A111C'/%3E%3Crect x='3' y='3' width='26' height='26' rx='4' fill='none' stroke='%23F6C021' stroke-width='2'/%3E%3Ctext x='16' y='22' font-family='Arial,sans-serif' font-size='16' font-weight='bold' fill='%23F6C021' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/style.css?v=20261110-method">
+<link rel="stylesheet" href="assets/pages.css?v=20261110-walk">
+<link rel="stylesheet" href="assets/v55.css?v=92">
+<meta name="description" content="用一场真实比赛，把赛前、BP、局内、复盘、系列赛五步走一遍：每步打开哪一页、会看到什么、不能证明什么。">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="KPL赛研">
+<meta property="og:title" content="一局怎么从头看到尾 · KPL赛研">
+<meta property="og:description" content="五步走完一场比赛：赛前交手、BP 习惯、局内胜率、逐分钟复盘、系列赛归总。">
+<meta property="og:image" content="https://hccccc01333.github.io/KPLdata-site/assets/brand/kpl-research-social.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="assets/light.css?v=20261110-cards">
+<link rel="stylesheet" href="assets/theme.css?v=20261030b">
+<link rel="stylesheet" href="assets/site-v2.css?v=20261112a">
+<link rel="stylesheet" href="assets/doc-v2.css?v=20261112a">
+</head>
+<body data-page="walkthrough.html" class="v2-page doc-page walkthrough-page">
+<header id="siteHeader" class="topbar"></header>
+
+<header class="lg-hero">
+  <div class="lg-hero-gridlines" aria-hidden="true"></div>
+  <div class="v2-wrap">
+    <div class="v2-kicker"><i></i>WALKTHROUGH<b>·</b>从头看到尾</div>
+    <h1 class="v2-h1">一场比赛，五步走完</h1>
+    <p class="v2-lead">从“谁占优”到“哪一刻走掉的”，这套工具是同一条线上的五个位置。下面每一步都写清楚：打开哪一页、会看到什么、<b>以及它不能证明什么</b>。</p>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="block">
+    <div class="panel">
+      <div class="panel-title">示范用的是哪一局 <em class="mono">SAMPLE</em></div>
+      <div class="block-note">
+        2026-10-30 · 上海EDG.M vs 杭州LGD.NBW 第 1 局（21 分钟，上海EDG.M 获胜）。
+        选它的原因是：有逐分钟数据、有完整 BP，而且第 8.8 分钟出现一次 68 个百分点的胜率波动——
+        正好用来说明"转折"长什么样。下面每个链接都直接落到这一局，不需要你先自己找。
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="panel">
+      <div class="panel-title">五步 <em class="mono">THE FLOW</em></div>
+      <div class="wt-list">
+
+        <div class="wt-item">
+          <span class="wt-num">01</span>
+          <div class="wt-body">
+            <h3>赛前：这两队以前怎么打的</h3>
+            <p class="wt-q">你此刻的问题：这场谁占优？翻旧账能看出什么？</p>
+            <p class="wt-d">先看历史交锋与逐年走势，再换成其它赛制试探一下概率。历史不预测未来，但它能告诉你"这对手对他是不是一直很难打"。</p>
+            <div class="wt-links">
+              <a class="wt-link" href="h2h.html?a=%E4%B8%8A%E6%B5%B7EDG.M&amp;b=%E6%9D%AD%E5%B7%9ELGD.NBW">打开两队交手 ↗</a>
+              <a class="wt-link" href="simulator.html">换成 BO7 试试 ↗</a>
+            </div>
+            <p class="wt-caveat">不能证明：历史交锋不等于当下状态；模拟是模型估算，不是定论。</p>
+          </div>
+        </div>
+
+        <div class="wt-item">
+          <span class="wt-num">02</span>
+          <div class="wt-body">
+            <h3>BP：他们怎么选阵容</h3>
+            <p class="wt-q">你此刻的问题：这支队偏爱什么、又忌惮什么？</p>
+            <p class="wt-d">先在这局的逐手回放里看实际选择，再看战队的长期习惯：选用集中度、同赛事 Lift、五种竞争状态（己方选用 / 己方禁用 / 对手选用 / 对手禁用 / 未出现）。</p>
+            <div class="wt-links">
+              <a class="wt-link" href="bp-studio.html?id=2026103001&amp;g=1">看这一局的逐手选禁 ↗</a>
+              <a class="wt-link" href="team-bp.html">看战队长期 BP 习惯 ↗</a>
+            </div>
+            <p class="wt-caveat">不能证明：偏好不等于擅长；BP 顺序暂不分析；四种赛制（20/18/16/14 手）都算完整，残缺记录整场排除。</p>
+          </div>
+        </div>
+
+        <div class="wt-item">
+          <span class="wt-num">03</span>
+          <div class="wt-body">
+            <h3>局内：打到这一刻谁更可能赢</h3>
+            <p class="wt-q">你此刻的问题：第 9 分钟，经济差这么大，还稳吗？</p>
+            <p class="wt-d">把经济、资源与胜率放到同一条时间轴上拖动。胜率旁边有模型版本与置信标记——低置信的段落会明确标出来，不假装确定。</p>
+            <div class="wt-links">
+              <a class="wt-link" href="sandbox.html">拖时间轴看这局 ↗</a>
+              <a class="wt-link" href="predict.html">看模型公开的命中率 ↗</a>
+            </div>
+            <p class="wt-caveat">不能证明：概率不是判断；翻盘局上早期模型基本失效（准确率低于随机），已在方法页写明。实时跟踪需在本地启动采集。</p>
+          </div>
+        </div>
+
+        <div class="wt-item">
+          <span class="wt-num">04</span>
+          <div class="wt-body">
+            <h3>复盘：转折出在哪一分钟</h3>
+            <p class="wt-q">你此刻的问题：这局是哪一刻走掉的？</p>
+            <p class="wt-d">直接落到第 9 分钟那一屏，对照经济、击杀、推塔与资源四条曲线，再回录像看具体那一波。这一页不替你下结论，只把值得回看的时段挑出来。</p>
+            <div class="wt-links">
+              <a class="wt-link" href="match.html?id=2026103001&amp;g=1&amp;m=9">落到第 9 分钟 ↗</a>
+              <a class="wt-link" href="picks.html">看同类局形的精选 ↗</a>
+            </div>
+            <p class="wt-caveat">不能证明：统计变化不等于因果——事件附近的胜率变化只是时间邻接证据。</p>
+          </div>
+        </div>
+
+        <div class="wt-item">
+          <span class="wt-num">05</span>
+          <div class="wt-body">
+            <h3>系列赛：一局怎么变成一轮</h3>
+            <p class="wt-q">你此刻的问题：把这几局放在一起，能说明什么？</p>
+            <p class="wt-d">单局的胜负放进系列赛才有意义：全局 BP 消耗了哪些英雄、比分怎么走到这里、哪些时段值得重新看。</p>
+            <div class="wt-links">
+              <a class="wt-link" href="series.html">打开系列赛研究 ↗</a>
+              <a class="wt-link" href="method.html">回头看方法与口径 ↗</a>
+            </div>
+            <p class="wt-caveat">不能证明：缺手记录不补推、不补造不存在的选禁过程；系列赛结论不替代教练判断。</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="panel">
+      <div class="panel-title">走完这一遍，你会得到什么 <em class="mono">TAKEAWAY</em></div>
+      <div class="block-note">
+        不是"会用六个功能"，而是能分清三句话：
+        <b>哪句可以直接引用</b>（官方赛果、阵容、BP）、
+        <b>哪句是统计代理</b>（地图压力、后期成长）、
+        <b>哪句只是模型估算</b>（胜率曲线、模拟结果）。
+        分得清这三层，这套工具才用得踏实——这也是<a href="method.html">方法与口径</a>那一页想讲的事；具体到每项数据从哪来、多久更新一次，见<a href="about.html">数据说明</a>。
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer id="siteFooter" class="footer"></footer>
+<script src="assets/data.js?v=20261110"></script>
+<script src="assets/site_totals.js?v=20261110"></script>
+<script src="assets/common.js?v=20261110-curve"></script>
+<script>
+(function () {
+  "use strict";
+  window.KPL.init();
+})();
+</script>
+</body>
+</html>

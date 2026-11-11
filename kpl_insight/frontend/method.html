@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="v55 light-site">
+<head>
+<script src="assets/theme.js?v=20261030b"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>方法与口径 · KPL赛研</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230A111C'/%3E%3Crect x='3' y='3' width='26' height='26' rx='4' fill='none' stroke='%23F6C021' stroke-width='2'/%3E%3Ctext x='16' y='22' font-family='Arial,sans-serif' font-size='16' font-weight='bold' fill='%23F6C021' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/style.css?v=20261110-method">
+<link rel="stylesheet" href="assets/pages.css?v=20261110-method">
+<link rel="stylesheet" href="assets/v55.css?v=92">
+<meta name="description" content="KPL赛研的方法说明：数据从哪来、模型怎么训、指标怎么验、哪里还不准。把可信与不可信都写在明面上。">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="KPL赛研">
+<meta property="og:title" content="方法与口径 · KPL赛研">
+<meta property="og:description" content="数据分层、训练口径、评估方式与已知边界——这个平台怎么算出来的，一页看完。">
+<meta property="og:image" content="https://hccccc01333.github.io/KPLdata-site/assets/brand/kpl-research-social.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="assets/light.css?v=20261030a">
+<link rel="stylesheet" href="assets/theme.css?v=20261030b">
+<link rel="stylesheet" href="assets/site-v2.css?v=20261112a">
+<link rel="stylesheet" href="assets/doc-v2.css?v=20261112a">
+</head>
+<body data-page="method.html" class="v2-page doc-page method-page">
+<header id="siteHeader" class="topbar"></header>
+
+<header class="lg-hero">
+  <div class="lg-hero-gridlines" aria-hidden="true"></div>
+  <div class="v2-wrap">
+    <div class="v2-kicker"><i></i>METHOD<b>·</b>方法与口径</div>
+    <h1 class="v2-h1">这些数字是怎么来的</h1>
+    <p class="v2-lead">数据分三层、模型按时间硬隔离验证、每个指标都带着它的样本量。能算的说清楚口径，算不准的直接写出来——这一页的目的不是让人相信，是让人能核对。</p>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="block">
+    <div class="panel">
+      <div class="panel-title">先把三类东西分开 <em class="mono">THREE LAYERS</em></div>
+      <div class="block-note">站内每个数字都属于下面三类之一，不混着说。</div>
+      <div class="mlayers" style="margin-top:12px">
+        <div class="mcol"><b>① 官方原始</b><p>比分、阵容、逐局 BP、局内快照，全部来自腾讯 KPL 公开接口，照抄不加工。缺少的字段留空，不补 0、不推演。</p></div>
+        <div class="mcol"><b>② 统计代理</b><p>「地图压力」「后期成长」这类指标由统计字段推导，是代理特征——<b>不等于</b>从视频识别出了选手位置、技能或战术。</p></div>
+        <div class="mcol"><b>③ 模型估算</b><p>胜率曲线、系列赛模拟、赛前概率。标「估算」，带样本量与置信口径；它是概率，不是判断。</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="panel">
+      <div class="panel-title">数据覆盖到哪一步 <em class="mono">COVERAGE</em></div>
+      <table class="mtable">
+        <thead><tr><th>层面</th><th>数量</th><th>说明</th></tr></thead>
+        <tbody>
+          <tr><td>大场</td><td class="num" id="mthMatches">3,486</td><td>2016–2026；2016–2018 为外部补充口径</td></tr>
+          <tr><td>小局</td><td class="num" id="mthBattles">11,211</td><td>含赛果与阵容</td></tr>
+          <tr><td>完整 BP</td><td class="num">10,000+</td><td>按赛制完整（20/18/16/14 手都算）；2019 官方无 BP 数据</td></tr>
+          <tr><td>逐分钟快照</td><td class="num">约 1%</td><td><b>这是本平台最薄的一层</b>；精确局数与占比见<a href="about.html">数据说明</a>页的实时数字</td></tr>
+        </tbody>
+      </table>
+      <div class="block-note" style="margin-top:10px">
+        逐分钟胜率只覆盖这一小部分（约 1%）；其余比赛只展示赛果、BP 与选手数据，
+        <b>不用赛后重放曲线冒充当时的直播判断</b>。
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="panel">
+      <div class="panel-title">模型怎么训、怎么验 <em class="mono">TRAINING &amp; VALIDATION</em></div>
+      <ol class="msteps">
+        <li><b>按整局、按时间切三段。</b>train 拟合、calib 只拟合校准器、test 只报指标，三段互不重叠。
+          不用随机切——局内快照高度相关，随机切会让同一局的相邻帧分落训练与测试。</li>
+        <li><b>模型选择留在训练段内。</b>LR / RF / ET / GBDT 与投票权重都在 train 里用组内切分比，不碰 test。</li>
+        <li><b>校准器单独拟合。</b>isotonic / Platt 只吃 calib 段；换模型版本后校准表必须重拟合，
+          指纹不匹配时线上直接拒绝使用，而不是硬套旧曲线。</li>
+        <li><b>评估口径分开报。</b>固定时间点命中率（第 8 / 12 / 16 分钟）、Brier、AUC 分开列；
+          「最后一帧命中率」只作对照——比赛快结束时接近 100% 是口径使然，不是模型能力。</li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="panel">
+      <div class="panel-title">当前模型的实际成绩 <em class="mono">V12 · 2026-11-10</em></div>
+      <table class="mtable">
+        <thead><tr><th>口径</th><th>样本</th><th>Brier</th><th>命中率</th><th>AUC</th></tr></thead>
+        <tbody>
+          <tr><td>留出集（20 局 / 298 帧）</td><td class="num">298</td><td class="num">0.177</td><td class="num">71.8%</td><td class="num">0.872</td></tr>
+          <tr><td>更严的 holdout（60 局 / 857 帧）</td><td class="num">857</td><td class="num">0.231</td><td class="num">67.1%</td><td class="num">0.742</td></tr>
+        </tbody>
+      </table>
+      <div class="block-note" style="margin-top:10px">
+        两行都真实：样本从 20 局扩到 60 局，AUC 掉 0.13、Brier 涨 0.05。
+        <b>对外一句话应引用更严的那一行</b>，而不是更好的那一行。
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="panel">
+      <div class="panel-title">算不准的地方，写在前面 <em class="mono">KNOWN FAILURES</em></div>
+      <ul class="mfail">
+        <li><b>翻盘局基本失效。</b>最早期（开局段）在 6 局翻盘局上准确率 <b>14.6%</b>、Brier 0.416——低于随机。
+          原因是早期专家几乎只跟经济差走，而翻盘局的本质就是经济差不代表结果。这不是调阈值能修的。</li>
+        <li><b>直播预测比事后重放差。</b>同一批帧上直播 Brier 0.217、重放 0.134，差 0.083；方向一致率只有 80.2%。
+          两个原因分不开：当时代码更旧 + 实时链路有延迟。</li>
+        <li><b>阵营口径天然会翻转。</b>本局 camp1 与大场 camp1 约 <b>50%</b> 不是同一队。
+          任何按位置对齐的写法都会错，必须落到队名 / team_id。</li>
+        <li><b>无法解释因果。</b>事件附近胜率变化只能给时间邻接证据，不能证明是它造成了输赢。</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="panel">
+      <div class="panel-title">数据坏了怎么发现 <em class="mono">QUALITY GATES</em></div>
+      <div class="block-note">
+        四类数据源各有门禁：局内快照（时间轴缺口 / 重复落盘 / 回显校验）、
+        赛后归档（逐局胜方能否加出官方比分 / 局数不超 BO / 阵营身份 / BP 完整度）、
+        营地战报（归档的是不是这一场 / schema）、站点资产（跨页同口径一致性 / 资产是否落后于数据）。
+      </div>
+      <ul class="mfail" style="margin-top:10px">
+        <li><b>基线是棘轮。</b>存量问题冻结为基线，只拦「比现状更差」；想让基线变松必须显式操作，且每条都留原因。</li>
+        <li><b>报告自带溯源。</b>每份质量报告记录输入路径、大小、修改时间——报告能自证读的是哪批文件。</li>
+        <li><b>源头缺陷与本地缺陷分开。</b>官方接口本身少给局的场次（如 2019 缺小局）单独记账，不伪装成通过，也不反复报警。</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="panel">
+      <div class="panel-title">不适合用它做什么 <em class="mono">LIMITS</em></div>
+      <div class="block-note">
+        不作官方结论、不作下注依据、不用于跨版本强弱比较；视频解析仍在研究，不作为稳定功能对外承诺。
+        赛程与比分请以官方发布为准。这是一个个人搭建的学习型数据产品，与腾讯无关联。
+      </div>
+      <p style="margin-top:12px"><a class="v2-btn sm" href="about.html">看数据来源与更新方式</a></p>
+    </div>
+  </section>
+
+</main>
+
+<footer id="siteFooter" class="footer"></footer>
+<script src="assets/data.js?v=20261110"></script>
+<script src="assets/site_totals.js?v=20261110"></script>
+<script src="assets/common.js?v=20261110-curve"></script>
+<script>
+(function () {
+  "use strict";
+  var K = window.KPL, T = window.KPL_TOTALS || {};
+  K.init();                                  // 顶栏 / 页脚 / 搜索都由它渲染
+  function fill(id, value) {
+    var el = document.getElementById(id);
+    if (el && value) el.textContent = K.fmtInt(value);
+  }
+  fill("mthMatches", T.matches);
+  fill("mthBattles", T.battles);
+})();
+</script>
+</body>
+</html>

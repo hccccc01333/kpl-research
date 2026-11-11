@@ -217,11 +217,21 @@ def midlate_blend_weight(minute: float) -> float:
     return (m - BLEND_START) / (BLEND_END - BLEND_START)
 
 
-def battle_timestamp(battle_id: str) -> int:
+# 本次训练因「官方缺字段」被剔除的帧数。写进 train_status，便于对照数据质量变化。
+DROPPED_MISSING_FIELDS = 0
+
+
+def battle_timestamp(battle_id: str) -> int | None:
+    """battle_id 第三段是开局 Unix 秒。
+
+    解析失败以前返回 0，于是这类局在按时间切分时被排到最前面、落进训练段——
+    既歪曲了时间顺序，也可能造成跨期泄漏。现在返回 None，让调用方显式处理。
+    """
     try:
-        return int(str(battle_id).rsplit("_", 1)[-1])
+        value = int(str(battle_id).rsplit("_", 1)[-1])
     except (TypeError, ValueError):
-        return 0
+        return None
+    return value if value > 0 else None
 
 
 def write_train_status(payload: dict) -> None:
@@ -436,9 +446,14 @@ def list_labeled_real_battles(min_snaps: int = 4, *, from_raw: bool = False) -> 
                 "ts": battle_timestamp(battle_dir.name),
             }
         )
+    unparsable = [str(row["battle_id"]) for row in rows if row["ts"] is None]
+    if unparsable:
+        raise RuntimeError(
+            f"{len(unparsable)} 个 battle_id 的第三段不是合法时间戳，无法按时间切分"
+            f"（会导致跨期泄漏）：{', '.join(unparsable[:5])}"
+        )
     rows.sort(key=lambda x: x["ts"])
     return rows
-
 
 def extract_real_snapshots(
     per_battle_wr: dict[str, dict[str, float]],
@@ -447,6 +462,7 @@ def extract_real_snapshots(
     *,
     from_raw: bool = False,
 ) -> pd.DataFrame:
+    global DROPPED_MISSING_FIELDS
     exclude_ids = exclude_ids or set()
     rows = []
     for battle in list_labeled_real_battles(from_raw=from_raw):
@@ -455,6 +471,14 @@ def extract_real_snapshots(
             continue
         snaps = battle["snapshots"]
         win_camp = battle["win_camp"]
+        # 官方缺字段的帧以前会被补 0 后当成真实观测学进去；现在直接剔除并计数。
+        valid = [s for s in snaps if not s.get("missing_camp_fields")]
+        dropped = len(snaps) - len(valid)
+        if dropped:
+            DROPPED_MISSING_FIELDS += dropped
+        if not valid:
+            continue
+        snaps = valid
         camp1 = snaps[0].get("camp1_team", "")
         camp2 = snaps[0].get("camp2_team", "")
         team_wr = team_wr_for_battle(bid, camp1, camp2, per_battle_wr, fallback_wr)
@@ -753,8 +777,19 @@ def split_train_calib_test(
     return train, calib, test
 
 
-def train_v9_model(verbose: bool = True, *, from_raw: bool = False) -> dict:
-    """Train V12 phase-blend model; keep function name for monitor compatibility."""
+def train_v9_model(
+    verbose: bool = True,
+    *,
+    from_raw: bool = False,
+    n_calib_battles: int | None = None,
+    n_test_battles: int | None = None,
+    save: bool = True,
+) -> dict:
+    """Train V12 phase-blend model; keep function name for monitor compatibility.
+
+    n_calib_battles / n_test_battles / save 供评估与门禁使用（scripts/gate_holdout60.py）：
+    覆盖切分常量、且 save=False 时不写生产 artifact 与 train_status.json。
+    """
     if verbose:
         print("=== KPL V12 Early/Midlate + Gold Guard Training ===")
         root = resolve_snapshot_root(from_raw=from_raw)
@@ -771,7 +806,11 @@ def train_v9_model(verbose: bool = True, *, from_raw: bool = False) -> dict:
 
     labeled = list_labeled_real_battles(from_raw=from_raw)
     # 三段硬隔离：calib 只拟合校准器，test 只报指标
-    train_labeled, calib_battles, test_battles = split_train_calib_test(labeled)
+    train_labeled, calib_battles, test_battles = split_train_calib_test(
+        labeled,
+        n_calib=CALIB_REAL_BATTLES if n_calib_battles is None else n_calib_battles,
+        n_test=TEST_REAL_BATTLES if n_test_battles is None else n_test_battles,
+    )
     calib_ids = {b["battle_id"] for b in calib_battles}
     test_ids = {b["battle_id"] for b in test_battles}
     held_out_ids = calib_ids | test_ids
@@ -1015,6 +1054,7 @@ def train_v9_model(verbose: bool = True, *, from_raw: bool = False) -> dict:
         "test_rows": int(len(test)),
         "real_rows": int(len(real_df)),
         "sim_rows": int(len(sim_df)),
+        "dropped_missing_fields": int(DROPPED_MISSING_FIELDS),
         "shrinkage_diag": clip_diag if holdout_metrics else {},
         "trained_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "notes": [
@@ -1028,52 +1068,55 @@ def train_v9_model(verbose: bool = True, *, from_raw: bool = False) -> dict:
             "Comeback + swing + mid-minute sample upweight; no early label-flip.",
         ],
     }
-    out = MODEL_DIR / "v9_official_platform.joblib"
-    joblib.dump(artifact, out)
-    backup = REALTIME_DIR / "model_backup" / out.name
-    try:
-        backup.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(out, backup)
-    except OSError:
-        pass
+    if save:
+        out = MODEL_DIR / "v9_official_platform.joblib"
+        joblib.dump(artifact, out)
+        backup = REALTIME_DIR / "model_backup" / out.name
+        try:
+            backup.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(out, backup)
+        except OSError:
+            pass
 
-    holdout_all = holdout_metrics.get("all", {})
-    comeback_all = comeback_metrics.get("all", {})
-    write_train_status(
-        {
-            "state": "ready",
-            "reason": "manual_train",
-            "version": "V12",
-            "model_name": artifact["model_name"],
-            "early_model": "RF-only",
-            "trained_at": artifact["trained_at"],
-            "auc": scores.get("VotingMidlate", {}).get("auc"),
-            "accuracy": scores.get("VotingMidlate", {}).get("accuracy"),
-            "holdout_real_brier": holdout_all.get("brier"),
-            "holdout_real_ece": holdout_all.get("ece"),
-            "holdout_early_brier": holdout_metrics.get("early", {}).get("brier"),
-            "holdout_mid_brier": holdout_metrics.get("mid", {}).get("brier"),
-            "holdout_late_brier": holdout_metrics.get("late", {}).get("brier"),
-            "comeback_acc": comeback_all.get("accuracy"),
-            "comeback_brier": comeback_all.get("brier"),
-            "worst_battle_acc": per_battle_acc[0]["acc"] if per_battle_acc else None,
-            "holdout_battles": artifact["holdout_battles"],
-            "calib_battles": artifact["calib_battles"],
-            "split": artifact["split"],
-            "holdout_n_battles": len(test_ids),
-            "holdout_n_snapshots": int(holdout_metrics.get("all", {}).get("n") or 0),
-            "calib_n_battles": len(calib_ids),
-            "early_prob_clip": list(early_clip),
-            "use_time_shrinkage": False,
-            "use_gold_guard": True,
-            "midlate_calibrator": artifact.get("midlate_calibrator_name"),
-            "real_rows": artifact["real_rows"],
-            "sim_rows": artifact["sim_rows"],
-            "calibrator": f"early_isotonic+midlate_{artifact.get('midlate_calibrator_name', 'none')}",
-        }
-    )
-    if verbose:
-        print(f"saved: {out}")
+        holdout_all = holdout_metrics.get("all", {})
+        comeback_all = comeback_metrics.get("all", {})
+        write_train_status(
+            {
+                "state": "ready",
+                "reason": "manual_train",
+                "version": "V12",
+                "model_name": artifact["model_name"],
+                "early_model": "RF-only",
+                "trained_at": artifact["trained_at"],
+                "auc": scores.get("VotingMidlate", {}).get("auc"),
+                "accuracy": scores.get("VotingMidlate", {}).get("accuracy"),
+                "holdout_real_brier": holdout_all.get("brier"),
+                "holdout_real_ece": holdout_all.get("ece"),
+                "holdout_early_brier": holdout_metrics.get("early", {}).get("brier"),
+                "holdout_mid_brier": holdout_metrics.get("mid", {}).get("brier"),
+                "holdout_late_brier": holdout_metrics.get("late", {}).get("brier"),
+                "comeback_acc": comeback_all.get("accuracy"),
+                "comeback_brier": comeback_all.get("brier"),
+                "worst_battle_acc": per_battle_acc[0]["acc"] if per_battle_acc else None,
+                "holdout_battles": artifact["holdout_battles"],
+                "calib_battles": artifact["calib_battles"],
+                "split": artifact["split"],
+                "holdout_n_battles": len(test_ids),
+                "holdout_n_snapshots": int(holdout_metrics.get("all", {}).get("n") or 0),
+                "calib_n_battles": len(calib_ids),
+                "early_prob_clip": list(early_clip),
+                "use_time_shrinkage": False,
+                "use_gold_guard": True,
+                "midlate_calibrator": artifact.get("midlate_calibrator_name"),
+                "real_rows": artifact["real_rows"],
+                "sim_rows": artifact["sim_rows"],
+                "calibrator": f"early_isotonic+midlate_{artifact.get('midlate_calibrator_name', 'none')}",
+            }
+        )
+        if verbose:
+            print(f"saved: {out}")
+    elif verbose:
+        print("save=False：只评估，不写生产 artifact 与 train_status")
     return artifact
 
 

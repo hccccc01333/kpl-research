@@ -8,7 +8,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='5' fill='%230A111C'/%3E%3Crect x='3' y='3' width='26' height='26' rx='4' fill='none' stroke='%23F6C021' stroke-width='2'/%3E%3Ctext x='16' y='22' font-family='Arial,sans-serif' font-size='16' font-weight='bold' fill='%23F6C021' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="assets/style.css?v=20261102-brand">
 <link rel="stylesheet" href="assets/pages.css?v=20261102-brand">
-<link rel="stylesheet" href="assets/v55.css?v=87">
+<link rel="stylesheet" href="assets/v55.css?v=92">
 <link rel="stylesheet" href="assets/sandbox.css?v=4">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="KPL赛研">
@@ -17,38 +17,37 @@
 <meta property="og:image" content="https://kpldata-site.hccccc01333.workers.dev/assets/shots/sandbox.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="assets/arena.css?v=1">
-<link rel="stylesheet" href="assets/arena-world.css?v=20261026">
-<script src="assets/arena-world.js?v=20261030a" type="module"></script>
-<link rel="stylesheet" href="assets/card-motion.css?v=1">
-<script src="assets/card-motion.js?v=1" type="module"></script>
 <link rel="stylesheet" href="assets/light.css?v=20261030a">
 <link rel="stylesheet" href="assets/theme.css?v=20261030b">
+<link rel="stylesheet" href="assets/site-v2.css?v=20261112a">
+<link rel="stylesheet" href="assets/sandbox-v2.css?v=20261112a">
 </head>
-<body data-page="sandbox.html">
+<body data-page="sandbox.html" class="v2-page sandbox-page">
 <header id="siteHeader" class="topbar"></header>
 
-<header class="page-hero">
-  <div class="wrap">
-    <div class="ph-kicker mono">SANDBOX · 胜率沙盘</div>
-    <h1>这局现在谁更可能赢？</h1>
-    <p>选一场比赛，拖到任意一分钟：右边会直接告诉你模型当时觉得谁更可能赢，以及历史上最像的 40 局最后是谁赢了。
+<header class="lg-hero sb-hero">
+  <div class="lg-hero-gridlines" aria-hidden="true"></div>
+  <div class="v2-wrap">
+    <div class="v2-kicker"><i></i>SANDBOX<b>·</b>胜率沙盘</div>
+    <h1 class="v2-h1">这局现在谁更可能赢？</h1>
+    <p class="v2-lead">选一场比赛，拖到任意一分钟：右边会直接告诉你模型当时觉得谁更可能赢，以及历史上最像的 40 局最后是谁赢了。
       页面不预测比分，也不承诺一定准，只把“当时的判断 + 类似局面的结果”摆出来。</p>
     <div class="sb-howto" aria-label="使用步骤">
       <span><b>1</b> 选一局</span>
       <span><b>2</b> 拖时间条</span>
       <span><b>3</b> 对照历史</span>
     </div>
-    <div class="ph-meta mono">
-      <span>能查历史的比赛 <b id="sbMetaBattles">—</b></span><i>/</i>
-      <span>可以对照的时刻 <b id="sbMetaFrames">—</b></span><i>/</i>
-      <span>模型版本 <b id="sbModelVer">—</b></span><i>/</i>
-      <span>模型考试 <b id="sbModelN">—</b></span><i>/</i>
-      <span>数据更新 <b id="sbMetaUpdated">—</b></span>
+    <div class="v2-stats sb-hero-stats" style="margin-top:26px">
+      <div class="v2-stat"><b class="v2-mono" id="sbMetaBattles">—</b><span>能查历史的比赛</span></div>
+      <div class="v2-stat"><b class="v2-mono" id="sbMetaFrames">—</b><span>可以对照的时刻</span></div>
+      <div class="v2-stat"><b class="v2-mono" id="sbModelVer">—</b><span>模型版本</span></div>
+      <div class="v2-stat"><b class="v2-mono" id="sbModelN">—</b><span>模型考试</span></div>
+      <div class="v2-stat"><b class="v2-mono" id="sbMetaUpdated">—</b><span>数据更新</span></div>
     </div>
   </div>
 </header>
 
-<main class="wrap sb-main">
+<main class="wrap sb-main" style="margin-top:22px">
   <div id="sbJumpNote" class="sb-jump-note" hidden></div>
   <div class="sb-plain" id="sbPlain">
     <div class="big">选一场比赛，拖一下时间条，就能看到这一刻的解释。</div>
@@ -107,14 +106,14 @@
         <button type="button" data-mode="hist" class="on">看历史结果</button>
         <button type="button" data-mode="model">看模型判断</button>
       </div>
-      <button class="btn ghost sm" id="sbRandom" type="button">随便看一局</button>
-      <button class="btn ghost sm" id="sbComeback" type="button">看一场翻盘</button>
-      <button class="btn ghost sm" id="sbBlowout" type="button">看一场碾压</button>
+      <button class="v2-btn sm" id="sbRandom" type="button">随便看一局</button>
+      <button class="v2-btn sm" id="sbComeback" type="button">看一场翻盘</button>
+      <button class="v2-btn sm" id="sbBlowout" type="button">看一场碾压</button>
     </div>
 
     <div class="sb-layout">
       <div class="panel sb-chart-panel">
-        <div class="sb-surface-wrap">
+        <div class="sb-surface-wrap sb-plot">
           <div id="sbSurface" class="sb-surface"></div>
           <div class="sb-tip" id="sbTip"></div>
         </div>
@@ -123,7 +122,7 @@
           <div class="panel-title">模型每一分钟的判断 <em id="sbCurveMeta">—</em></div>
           <span class="block-note mono">拖动或点击曲线，时间条会跟着走</span>
         </div>
-        <div id="sbCurve" class="sb-curve"></div>
+        <div class="sb-plot sb-plot-curve"><div id="sbCurve" class="sb-curve"></div></div>
       </div>
 
       <aside class="sb-side">
@@ -152,7 +151,7 @@
       </div>
       <div class="panel">
         <div class="panel-title">模型说 70%，实际赢了多少？ <em>直播记录，不是考试</em></div>
-        <div id="sbReliability" class="sb-reliability"></div>
+        <div class="sb-plot sb-plot-reliability"><div id="sbReliability" class="sb-reliability"></div></div>
         <div class="sb-rel-note" id="sbRelNote">—</div>
       </div>
     </div>
@@ -177,7 +176,7 @@
 <script src="assets/data.js?v=85"></script>
 <script src="assets/seasons.js?v=85"></script>
 <script src="assets/sandbox.js?v=2"></script>
-<script src="assets/common.js?v=20261102-brand"></script>
+<script src="assets/common.js?v=20261110-curve"></script>
 <script src="assets/sandbox_app.js?v=4"></script>
 </body>
 </html>

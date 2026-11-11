@@ -1,6 +1,12 @@
 """
 KPL 数据中心 · 全新前端
 
+设计基准：docs/architecture.md「动态数据构成主义」
+    - 浅色工作台，深蓝 #005691 结构色，橙 #FF8C00 主强调
+    - 全站等宽字体（Roboto Mono），非对称网格，几何块，克制动效
+    - 图表自建高质量主题：阶段分区、渐变面积、事件标记、统一 hover
+    - 交互：主图点击下钻、模块联动、全局上下文
+
 运行：streamlit run apps/dashboard.py
 """
 from __future__ import annotations

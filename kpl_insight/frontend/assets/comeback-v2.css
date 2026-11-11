@@ -1,0 +1,350 @@
+/* ==========================================================================
+   KPL 赛研 · 翻盘路径研究所（comeback）V2
+   与 players / teams / coach 共用 site-v2.css 的 token；本文件只做本页视觉层。
+   旧 pages.css / v55.css / arena.css 的全局 !important 规则（面板透明无框、
+   .hd-cell 只留右描边、块间距 60px）用 `html.v55 body.comeback-page ...` 提权覆盖。
+   ========================================================================== */
+
+/* ==========================================================================
+   0. 页面基底 / 头版
+   ========================================================================== */
+body.comeback-page {
+  background: var(--v2-bg) !important;
+  color: var(--v2-ink);
+  font-family: var(--v2-sans);
+  font-size: 15px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+body.comeback-page main { min-width: 0; }
+body.comeback-page img { max-width: 100%; }
+
+body.comeback-page .lg-hero .v2-lead b,
+body.comeback-page .lg-hero .v2-lead strong {
+  color: var(--v2-ink);
+  font-weight: 600;
+}
+body.comeback-page .lg-hero .v2-lead #cbWin {
+  font-family: var(--v2-mono);
+  font-weight: 700;
+  color: var(--v2-gold);
+}
+
+/* 头版指标带：JS 往 #cbKpi 写 4 个 .hd-cell，这里按 .v2-stat 口径重排 */
+html.v55 body.comeback-page #cbKpi {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 1px !important;
+  border-top: 1px solid var(--v2-line) !important;
+  padding-top: clamp(16px, 1.8vw, 22px) !important;
+  margin-top: 26px !important;
+}
+html.v55 body.comeback-page #cbKpi .hd-cell {
+  display: block !important;
+  padding: 0 20px !important;
+  border: 0 !important;
+  border-left: 1px solid var(--v2-line) !important;
+  border-radius: 0 !important;
+  background: none !important;
+  min-width: 0;
+}
+html.v55 body.comeback-page #cbKpi .hd-cell:first-child {
+  padding-left: 0 !important;
+  border-left: 0 !important;
+}
+html.v55 body.comeback-page #cbKpi .hd-cell .k {
+  font-size: 11px;
+  letter-spacing: .04em;
+  color: var(--v2-ink-3) !important;
+}
+html.v55 body.comeback-page #cbKpi .hd-cell .v {
+  font-family: var(--v2-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: clamp(20px, 2.1vw, 29px);
+  font-weight: 700 !important;
+  line-height: 1.1;
+  letter-spacing: -.02em;
+  color: var(--v2-ink) !important;
+  margin: 0;
+}
+html.v55 body.comeback-page #cbKpi .hd-cell .s {
+  margin-top: 6px;
+  font-size: 11px;
+  line-height: 1.55;
+  color: var(--v2-ink-3) !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 生成分享图：放在指标带下面，不挤进 4 列数字里 */
+body.comeback-page .cb-share { margin-top: 20px; }
+html.v55 body.comeback-page .cb-share .btn.share-fab {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  height: 34px !important;
+  margin-top: 0 !important;
+  padding: 0 15px !important;
+  border: 1px solid var(--v2-line-2) !important;
+  border-radius: 9px !important;
+  background: transparent !important;
+  color: var(--v2-ink-2) !important;
+  font-family: var(--v2-sans) !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0;
+  box-shadow: none !important;
+  cursor: pointer;
+  transition: color .18s, border-color .18s, background-color .18s;
+}
+html.v55 body.comeback-page .cb-share .btn.share-fab:hover {
+  color: var(--v2-ink) !important;
+  border-color: var(--v2-ink-3) !important;
+  background: var(--v2-card) !important;
+}
+
+/* ==========================================================================
+   1. 区块标题
+   ========================================================================== */
+html.v55 body.comeback-page .block { margin-top: clamp(26px, 3.2vw, 40px) !important; }
+html.v55 body.comeback-page .block:first-of-type { margin-top: 0 !important; }
+html.v55 body.comeback-page .block-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px 18px;
+  flex-wrap: wrap;
+  margin: 0 0 12px !important;
+  padding: 0 !important;
+  border: 0 !important;
+}
+html.v55 body.comeback-page .block-head h2 {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800 !important;
+  letter-spacing: 0;
+  line-height: 1.35;
+  color: var(--v2-ink);
+}
+html.v55 body.comeback-page .block-head h2 i {
+  display: inline-block;
+  flex: none;
+  width: 3px !important;
+  height: 15px !important;
+  margin: 0 10px 0 0;
+  border-radius: 2px !important;
+  background: var(--v2-gold) !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+html.v55 body.comeback-page .block-head .block-note {
+  margin: 0 !important;
+  font-family: var(--v2-mono);
+  font-size: 10px !important;
+  letter-spacing: .02em;
+  color: var(--v2-ink-3) !important;
+}
+
+/* ==========================================================================
+   2. 面板
+   ========================================================================== */
+html.v55 body.comeback-page .panel {
+  padding: 18px 20px !important;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 18px !important;
+  background: var(--v2-card) !important;
+  box-shadow: var(--v2-shadow-sm) !important;
+  margin: 0 !important;
+  min-width: 0;
+  overflow: visible !important;
+}
+html.v55 body.comeback-page .panel.table-panel { padding: 6px 18px 10px !important; }
+
+/* 两栏分布图 */
+body.comeback-page .cb-two {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(14px, 1.8vw, 20px);
+  align-items: start;
+}
+body.comeback-page .cb-two > .block { min-width: 0; margin-top: 0 !important; }
+
+/* 分布条：label + bar + 计数 */
+body.comeback-page .cb-row {
+  display: grid !important;
+  grid-template-columns: 84px minmax(0, 1fr) 118px;
+  align-items: center;
+  gap: 10px;
+  margin: 0 !important;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--v2-line);
+  font-size: 12.5px;
+}
+body.comeback-page .cb-row:first-child { padding-top: 2px; }
+body.comeback-page .cb-row:last-child { border-bottom: 0; padding-bottom: 2px; }
+body.comeback-page .cb-row > .k {
+  flex: none;
+  width: auto !important;
+  font-size: 11.5px;
+  color: var(--v2-ink-2);
+  white-space: nowrap;
+}
+body.comeback-page .cb-bar {
+  flex: none;
+  display: block;
+  height: 6px !important;
+  border-radius: 999px !important;
+  background: var(--v2-inset) !important;
+  overflow: hidden;
+}
+body.comeback-page .cb-bar i {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(var(--v2-blue-rgb), .5), var(--v2-blue));
+}
+body.comeback-page .cb-row > .v {
+  flex: none;
+  width: auto !important;
+  text-align: right;
+  font-family: var(--v2-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 10.5px !important;
+  color: var(--v2-ink-3) !important;
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   3. 表格（典型翻盘榜）
+   ========================================================================== */
+body.comeback-page .table-scroll {
+  margin: 0 -18px;
+  padding: 0 18px;
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--v2-line-2) transparent;
+}
+body.comeback-page .table-scroll::-webkit-scrollbar { height: 8px; }
+body.comeback-page .table-scroll::-webkit-scrollbar-thumb { background: var(--v2-line-2); border-radius: 99px; }
+body.comeback-page .table-scroll::-webkit-scrollbar-track { background: transparent; }
+
+html.v55 body.comeback-page .tbl {
+  width: 100%;
+  min-width: 660px;
+  border-collapse: collapse;
+  border-spacing: 0;
+  font-size: 12px;
+}
+html.v55 body.comeback-page .tbl thead th {
+  padding: 11px 10px !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--v2-line) !important;
+  background: none !important;
+  font-family: var(--v2-mono);
+  font-size: 9.5px !important;
+  font-weight: 500 !important;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  text-align: left;
+  color: var(--v2-ink-3) !important;
+  white-space: nowrap;
+}
+html.v55 body.comeback-page .tbl thead th:first-child { padding-left: 2px !important; }
+html.v55 body.comeback-page .tbl thead th.num { text-align: right; }
+html.v55 body.comeback-page .tbl tbody td {
+  padding: 10px !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--v2-line) !important;
+  background: none !important;
+  font-size: 12px !important;
+  line-height: 1.55;
+  color: var(--v2-ink-2) !important;
+  vertical-align: middle;
+}
+html.v55 body.comeback-page .tbl tbody td:first-child { padding-left: 2px !important; }
+html.v55 body.comeback-page .tbl tbody td.num { text-align: right; font-variant-numeric: tabular-nums; }
+html.v55 body.comeback-page .tbl tbody tr:last-child td { border-bottom: 0 !important; }
+html.v55 body.comeback-page .tbl tbody tr:hover { background: var(--v2-inset) !important; }
+body.comeback-page .tbl .mono { font-family: var(--v2-mono); font-size: 11px; color: var(--v2-ink-3); white-space: nowrap; }
+body.comeback-page .tbl td .mono { color: var(--v2-ink-3); }
+body.comeback-page .tbl .team-cell { font-weight: 700; color: var(--v2-ink); }
+html.v55 body.comeback-page .tbl .cb-low { color: var(--v2-red) !important; font-weight: 700; }
+html.v55 body.comeback-page .tbl a.go {
+  color: var(--v2-gold) !important;
+  font-weight: 700;
+  font-size: 11.5px;
+  white-space: nowrap;
+}
+html.v55 body.comeback-page .tbl a.go:hover { color: var(--v2-ink) !important; }
+
+/* ==========================================================================
+   4. 口径说明
+   ========================================================================== */
+html.v55 body.comeback-page .panel.note-panel { margin-top: clamp(26px, 3.2vw, 40px) !important; }
+html.v55 body.comeback-page .panel-title {
+  display: flex !important;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  margin: 0 0 12px !important;
+  padding: 0 0 10px !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--v2-line) !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  letter-spacing: -.01em;
+  color: var(--v2-ink) !important;
+}
+html.v55 body.comeback-page .panel-title::before { display: none !important; content: none !important; }
+html.v55 body.comeback-page .panel-title em {
+  font-style: normal !important;
+  font-weight: 400;
+  font-family: var(--v2-mono);
+  font-size: 9.5px;
+  color: var(--v2-ink-3) !important;
+}
+html.v55 body.comeback-page .panel .block-note {
+  font-size: 11px !important;
+  line-height: 1.95;
+  color: var(--v2-ink-3) !important;
+}
+html.v55 body.comeback-page .panel .block-note b {
+  color: var(--v2-ink-2) !important;
+  font-weight: 700 !important;
+}
+
+/* ==========================================================================
+   5. 响应式
+   ========================================================================== */
+@media (max-width: 900px) {
+  html.v55 body.comeback-page #cbKpi {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    row-gap: 18px;
+  }
+  html.v55 body.comeback-page #cbKpi .hd-cell:nth-child(3) {
+    padding-left: 0 !important;
+    border-left: 0 !important;
+  }
+  body.comeback-page .cb-two { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  html.v55 body.comeback-page #cbKpi { grid-template-columns: minmax(0, 1fr) !important; row-gap: 14px; }
+  html.v55 body.comeback-page #cbKpi .hd-cell {
+    padding-left: 0 !important;
+    border-left: 0 !important;
+  }
+  html.v55 body.comeback-page .block { margin-top: 24px !important; }
+  html.v55 body.comeback-page .block-head h2 { font-size: 17px; }
+  html.v55 body.comeback-page .block-head .block-note { flex-basis: 100%; }
+  html.v55 body.comeback-page .panel { padding: 16px !important; }
+  html.v55 body.comeback-page .panel.table-panel { padding: 4px 16px 8px !important; }
+  body.comeback-page .table-scroll { margin: 0 -16px; padding: 0 16px; }
+  html.v55 body.comeback-page .tbl { min-width: 620px; }
+  body.comeback-page .cb-row { grid-template-columns: 76px minmax(0, 1fr) 106px; gap: 8px; }
+  body.comeback-page .cb-row > .v { font-size: 10px !important; }
+}

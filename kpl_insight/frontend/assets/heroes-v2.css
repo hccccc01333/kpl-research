@@ -1,0 +1,154 @@
+/* ==========================================================================
+   KPL 赛研 · 英雄图鉴（heroes）V2
+   ========================================================================== */
+
+.heroes-page .hero-grid {
+  display: grid !important;
+  grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+  gap: clamp(10px, 1.3vw, 14px) !important;
+  margin-bottom: clamp(18px, 2.2vw, 26px);
+}
+
+.heroes-page .hcard {
+  display: flex !important;
+  flex-direction: column;
+  gap: 7px;
+  padding: 10px;
+  border-radius: 14px;
+  border: 1px solid var(--v2-line) !important;
+  background: var(--v2-card) !important;
+  box-shadow: var(--v2-shadow-sm) !important;
+  min-width: 0;
+  color: var(--v2-ink);
+  transition: border-color .18s, transform .18s, box-shadow .18s;
+  opacity: 1 !important;
+  transform: none;
+}
+.heroes-page .hcard:hover {
+  border-color: var(--v2-line-2) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: var(--v2-shadow-lg) !important;
+}
+.heroes-page .hcard img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 10px;
+  background: var(--v2-inset);
+  border: 1px solid var(--v2-line);
+}
+.heroes-page .hcard .nm {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--v2-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.heroes-page .hcard .tier {
+  flex: none;
+  margin-left: auto;
+  font-family: var(--v2-mono);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  padding: 1px 5px;
+  border-radius: 4px;
+  border: 1px solid var(--v2-line);
+  color: var(--v2-ink-3);
+}
+.heroes-page .hcard .tier.S { color: var(--v2-win); border-color: rgba(var(--v2-gold-rgb), .45); background: rgba(var(--v2-gold-rgb), .07); }
+.heroes-page .hcard .tier.A { color: var(--v2-blue); border-color: rgba(var(--v2-blue-rgb), .35); }
+.heroes-page .hcard .wr {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px;
+  font-size: 9.5px;
+  color: var(--v2-ink-3);
+}
+.heroes-page .hcard .wr b {
+  font-family: var(--v2-mono);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--v2-ink);
+  white-space: nowrap;
+}
+.heroes-page .hcard .minibar { height: 3px; border-radius: 3px; background: var(--v2-line); overflow: hidden; }
+.heroes-page .hcard .minibar i { display: block; height: 100%; border-radius: 3px; background: rgba(var(--v2-blue-rgb), .65); }
+.heroes-page .hcard .sub {
+  font-family: var(--v2-mono);
+  font-size: 8.5px;
+  color: var(--v2-ink-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 散点图 ----------------------------------------------------------------- */
+.heroes-page #scatter svg { display: block; width: 100%; height: auto; }
+.heroes-page #scatter .sc-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.heroes-page #scatter .empty-tip { padding: 24px 10px; text-align: center; color: var(--v2-ink-3); font-size: 12px; }
+.heroes-page .lc-legend {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  padding: 2px 2px 12px;
+  font-size: 10.5px;
+  color: var(--v2-ink-3);
+}
+.heroes-page .lc-legend i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; vertical-align: 0; }
+
+/* 同位置对位 ------------------------------------------------------------- */
+.heroes-page #muTabs { margin-left: auto; }
+.heroes-page .table-panel { overflow-x: auto; }
+/* 窄屏横向滚动的提示（桌面隐藏） */
+.heroes-page .scroll-hint {
+  display: none;
+  margin: -2px 2px 8px;
+  font-family: var(--v2-mono);
+  font-size: 9.5px;
+  letter-spacing: .04em;
+  color: var(--v2-ink-3);
+}
+.heroes-page .team-cell { display: inline-flex; align-items: center; gap: 6px; }
+.heroes-page .team-cell img { width: 18px; height: 18px; border-radius: 4px; object-fit: contain; }
+.heroes-page .tbl td .chip,
+.heroes-page .tbl td .mono { font-family: var(--v2-mono); }
+.heroes-page .tbl td .chip {
+  display: inline-flex;
+  align-items: center;
+  height: 18px;
+  padding: 0 6px;
+  border-radius: 4px;
+  border: 1px solid var(--v2-line);
+  font-size: 9px;
+  color: var(--v2-ink-3);
+}
+
+/* 响应式 ----------------------------------------------------------------- */
+@media (max-width: 1180px) {
+  .heroes-page .hero-grid { grid-template-columns: repeat(5, minmax(0, 1fr)) !important; }
+}
+@media (max-width: 980px) {
+  .heroes-page .hero-grid { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; }
+}
+@media (max-width: 760px) {
+  .heroes-page .hero-grid { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+  /* 窄屏：散点图 / 对位表保持可读，在容器内横向滚动而不是压缩变形 */
+  .heroes-page #scatter .sc-scroll svg { min-width: 640px; }
+  .heroes-page .table-panel .tbl { min-width: 660px; }
+  .heroes-page .lc-legend { gap: 6px 12px; }
+  .heroes-page .block-head { align-items: flex-start; }
+  .heroes-page #muTabs { margin-left: 0; max-width: 100%; overflow-x: auto; }
+  .heroes-page .scroll-hint { display: block; }
+}
+@media (max-width: 520px) {
+  .heroes-page .hero-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  .heroes-page .block-head h2 em { display: none; }
+  .heroes-page .lc-legend { font-size: 10px; }
+}

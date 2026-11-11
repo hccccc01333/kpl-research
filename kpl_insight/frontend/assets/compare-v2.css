@@ -1,0 +1,494 @@
+/* ==========================================================================
+   KPL 赛研 · 对比组 V2 轻量换肤（compare / compare-team / compare-player / compare-lane）
+   只改视觉层：compare.js 渲染的 DOM、id、事件与数据口径完全不变。
+   依赖 site-v2.css 的 token / lg-hero / v2-stats；本文件负责「数据范围条 +
+   筛选条 + 雷达卡 + 对照表 + 口径面板」的 V2 版式（面板 18px、筛选条 14px）。
+   旧主题（arena.css / light.css / pages.css / v55.css）大量使用 !important，
+   因此这里统一用 `html.v55 body.cmp-page …` 前缀提权覆盖。
+   ========================================================================== */
+
+.cmp-page { background: var(--v2-bg); color: var(--v2-ink); }
+
+/* compare.js 会往表格/图例里写 var(--gold) / var(--muted)（最高值金色、缺失值灰），
+   在对比区作用域内映射到 V2 语义色，避免旧主题把「金色」变成蓝色/白色。 */
+.cmp-page .cmp-grid { --gold: var(--v2-gold); --muted: var(--v2-ink-3); }
+
+/* hero 站内链接（原文案链接保留 inline 着色，仅补 hover 下划线） ----------------- */
+body.cmp-page .v2-lead a { border-bottom: 1px solid transparent; transition: border-color .16s; }
+body.cmp-page .v2-lead a:hover { border-bottom-color: currentColor; }
+
+/* ==========================================================================
+   1. 数据范围条（scopebar）
+   ========================================================================== */
+html.v55 body.cmp-page .scopebar {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: flex-end !important;
+  justify-content: flex-start !important;
+  flex-wrap: wrap !important;
+  gap: 12px 16px;
+  margin: 20px 0 22px !important;
+  padding: 14px 18px !important;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 16px !important;
+  background: var(--v2-card) !important;
+  box-shadow: var(--v2-shadow-sm) !important;
+}
+html.v55 body.cmp-page .scopebar > * { margin-left: 0 !important; }
+html.v55 body.cmp-page .scopebar .scope-lab {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  flex: none;
+  padding-bottom: 11px;
+  font-family: var(--v2-mono);
+  font-size: 9.5px;
+  font-weight: 500;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--v2-ink-3) !important;
+}
+html.v55 body.cmp-page .scopebar .scope-lab svg { width: 13px; height: 13px; color: var(--v2-ink-3); }
+html.v55 body.cmp-page .scopebar .fld {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  flex: 0 0 auto;
+}
+html.v55 body.cmp-page .scopebar .scope-meta {
+  margin-left: auto !important;
+  padding-bottom: 10px;
+  font-family: var(--v2-mono);
+  font-size: 10px;
+  color: var(--v2-ink-3) !important;
+}
+
+/* ==========================================================================
+   2. 筛选条（filterbar / pickers / 趋势开关 / 分享按钮）
+   ========================================================================== */
+html.v55 body.cmp-page .filterbar {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: flex-end !important;
+  justify-content: flex-start !important;
+  flex-wrap: wrap !important;
+  gap: 12px 16px;
+  margin: 18px 0 22px !important;
+  padding: 14px 18px !important;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 14px !important;
+  background: var(--v2-card) !important;
+  box-shadow: var(--v2-shadow-sm) !important;
+}
+html.v55 body.cmp-page .filterbar > * { margin-left: 0 !important; }
+
+html.v55 body.cmp-page .filterbar .fld,
+html.v55 body.cmp-page .pickers .fld {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  flex: 0 0 auto;
+}
+html.v55 body.cmp-page .scopebar .fld > span,
+html.v55 body.cmp-page .filterbar .fld > span,
+html.v55 body.cmp-page .pickers .fld > span {
+  padding-left: 2px;
+  font-family: var(--v2-mono);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--v2-ink-3) !important;
+}
+
+/* 下拉框：与 players / teams 的 V2 表单保持一致 */
+html.v55 body.cmp-page .scopebar select,
+html.v55 body.cmp-page .filterbar select {
+  appearance: none;
+  height: 36px;
+  min-width: 136px;
+  padding: 0 30px 0 11px;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 9px !important;
+  background:
+    linear-gradient(45deg, transparent 50%, var(--v2-ink-3) 50%) calc(100% - 14px) 15px / 4px 4px no-repeat,
+    linear-gradient(135deg, var(--v2-ink-3) 50%, transparent 50%) calc(100% - 10px) 15px / 4px 4px no-repeat,
+    var(--v2-card) !important;
+  color: var(--v2-ink) !important;
+  font-family: var(--v2-sans);
+  font-size: 12.5px;
+  cursor: pointer;
+  color-scheme: light !important;
+}
+html.dark-site body.cmp-page .scopebar select,
+html.dark-site body.cmp-page .filterbar select { color-scheme: dark !important; }
+html.v55 body.cmp-page .scopebar select:focus,
+html.v55 body.cmp-page .filterbar select:focus {
+  outline: none !important;
+  border-color: var(--v2-line-2) !important;
+  box-shadow: 0 0 0 3px rgba(var(--v2-blue-rgb), .12) !important;
+}
+html.v55 body.cmp-page .scopebar select option,
+html.v55 body.cmp-page .filterbar select option { background: var(--v2-card); color: var(--v2-ink); }
+
+/* 对象选择器 */
+html.v55 body.cmp-page .pickers {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px 14px;
+  min-width: 0;
+}
+html.v55 body.cmp-page .pickers .fld { min-width: 0; }
+html.v55 body.cmp-page .pickers select { min-width: 150px; }
+
+/* 趋势视图开关：做成与下拉同高的胶囊按钮 */
+html.v55 body.cmp-page .filterbar .wb-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--v2-line);
+  border-radius: 9px;
+  background: var(--v2-card);
+  color: var(--v2-ink-2);
+  font-family: var(--v2-sans);
+  font-size: 12.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: border-color .16s, color .16s, background-color .16s;
+}
+html.v55 body.cmp-page .filterbar .wb-toggle:hover { border-color: var(--v2-line-2); color: var(--v2-ink); }
+html.v55 body.cmp-page .filterbar .wb-toggle input {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  accent-color: var(--v2-blue);
+}
+
+/* 生成分享图（share.js 注入的 .btn.share-fab，inline 只带 margin-top） */
+html.v55 body.cmp-page .filterbar .share-fab {
+  margin: 0 0 0 auto !important;
+  height: 34px;
+  padding: 0 15px;
+  border: 1px solid var(--v2-line-2) !important;
+  border-radius: 9px !important;
+  background: transparent !important;
+  color: var(--v2-ink-2) !important;
+  box-shadow: none !important;
+  font-family: var(--v2-sans);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color .16s, border-color .16s, background-color .16s;
+}
+html.v55 body.cmp-page .filterbar .share-fab:hover {
+  border-color: var(--v2-ink-3) !important;
+  background: var(--v2-inset) !important;
+  color: var(--v2-ink) !important;
+}
+
+/* ==========================================================================
+   3. 对比区：雷达卡 / 对照表（并排，窄屏堆叠）
+   ========================================================================== */
+html.v55 body.cmp-page .cmp-grid {
+  display: grid;
+  grid-template-columns: minmax(0, .94fr) minmax(0, 1.06fr);
+  gap: 18px;
+  align-items: start;
+}
+
+html.v55 body.cmp-page .cmp-radar,
+html.v55 body.cmp-page .cmp-table {
+  min-width: 0;
+  padding: 18px 20px !important;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 18px !important;
+  background: var(--v2-card) !important;
+  box-shadow: var(--v2-shadow-sm) !important;
+}
+html.v55 body.cmp-page .cmp-table { overflow-x: auto; overscroll-behavior-x: contain; }
+html.v55 body.cmp-page .cmp-radar svg { width: 100%; height: auto; display: block; }
+
+/* 卡片小标题：中文标题 + 等宽英文眉标 */
+html.v55 body.cmp-page .cmp-cap {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--v2-line);
+}
+html.v55 body.cmp-page .cmp-cap b {
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: -.01em;
+  color: var(--v2-ink);
+}
+html.v55 body.cmp-page .cmp-cap em {
+  font-style: normal;
+  font-family: var(--v2-mono);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--v2-ink-3);
+}
+
+/* 图例 ------------------------------------------------------------------ */
+html.v55 body.cmp-page .cmp-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 16px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--v2-line);
+}
+html.v55 body.cmp-page .cmp-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--v2-ink-2);
+}
+html.v55 body.cmp-page .cmp-legend i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+html.v55 body.cmp-page .cmp-legend img { border: 1px solid var(--v2-line); background: var(--v2-card-soft); }
+html.v55 body.cmp-page .cmp-legend .cmp-avg { color: var(--v2-ink-3); font-weight: 500; }
+html.v55 body.cmp-page .cmp-legend .cmp-avg i.dash {
+  width: 16px;
+  height: 0;
+  border-top: 2px dashed var(--v2-ink-3);
+  border-radius: 0;
+  background: none;
+}
+
+/* 对照表 ---------------------------------------------------------------- */
+html.v55 body.cmp-page .cmp-table table { width: 100%; border-collapse: collapse; }
+html.v55 body.cmp-page .cmp-table th,
+html.v55 body.cmp-page .cmp-table td {
+  padding: 10px;
+  border-bottom: 1px solid var(--v2-line);
+  text-align: right;
+  font-size: 12.5px;
+  color: var(--v2-ink-2);
+  vertical-align: middle;
+}
+html.v55 body.cmp-page .cmp-table thead th {
+  padding-top: 2px;
+  font-family: var(--v2-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--v2-ink-3);
+  white-space: nowrap;
+  border-bottom: 1px solid var(--v2-line);
+}
+html.v55 body.cmp-page .cmp-table th:first-child,
+html.v55 body.cmp-page .cmp-table td:first-child {
+  padding-left: 2px;
+  text-align: left;
+  font-size: 12px;
+  color: var(--v2-ink-2);
+  white-space: nowrap;
+}
+html.v55 body.cmp-page .cmp-table thead th:first-child { color: var(--v2-ink-3); }
+html.v55 body.cmp-page .cmp-table thead th:first-child {
+  padding-left: 2px;
+  font-family: var(--v2-mono);
+  font-size: 10px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--v2-ink-3);
+}
+html.v55 body.cmp-page .cmp-table tbody tr:hover { background: var(--v2-inset); }
+html.v55 body.cmp-page .cmp-table tbody tr:last-child td { border-bottom: 0; }
+html.v55 body.cmp-page .cmp-table td b {
+  font-family: var(--v2-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -.01em;
+  color: var(--v2-ink);
+}
+html.v55 body.cmp-page .cmp-table .mono { font-family: var(--v2-mono); }
+html.v55 body.cmp-page .cmp-table th.num,
+html.v55 body.cmp-page .cmp-table td.num { text-align: right; }
+html.v55 body.cmp-page .cmp-table th.cmp-avg-h { color: var(--v2-ink-3); }
+html.v55 body.cmp-page .cmp-table td.cmp-avg-cell { color: var(--v2-ink-3); }
+
+/* 表头对象：头像 + 名称（可点进详情页） */
+html.v55 body.cmp-page .cmp-head {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 7px;
+  font-family: var(--v2-sans);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--v2-ink);
+}
+html.v55 body.cmp-page .cmp-head img {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--v2-line);
+  background: var(--v2-card-soft);
+}
+html.v55 body.cmp-page .cmp-head a { color: inherit; }
+html.v55 body.cmp-page .cmp-head a:hover { color: var(--v2-blue); }
+
+/* 同位置分位 / 差值小注 */
+html.v55 body.cmp-page .cmp-pct {
+  display: block;
+  margin-top: 2px;
+  font-family: var(--v2-mono);
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--v2-ink-3);
+}
+html.v55 body.cmp-page .cmp-arrow { font-size: 8.5px; margin-right: 3px; opacity: .9; }
+
+/* 优势 / 短板摘要 chips */
+html.v55 body.cmp-page .cmp-insights {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--v2-line);
+}
+html.v55 body.cmp-page .cmp-insight {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  line-height: 1.6;
+}
+html.v55 body.cmp-page .cmp-insight b { font-size: 11.5px; font-weight: 700; color: var(--v2-ink); }
+html.v55 body.cmp-page .cmp-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 1px 8px;
+  border: 1px solid var(--v2-line-2);
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--v2-ink-3);
+}
+html.v55 body.cmp-page .cmp-chip.up {
+  color: var(--v2-blue);
+  border-color: rgba(var(--v2-blue-rgb), .32);
+  background: rgba(var(--v2-blue-rgb), .07);
+}
+html.v55 body.cmp-page .cmp-chip.down {
+  color: var(--v2-red);
+  border-color: rgba(var(--v2-red-rgb), .32);
+  background: rgba(var(--v2-red-rgb), .06);
+}
+html.v55 body.cmp-page .cmp-chip.neutral { color: var(--v2-ink-3); background: transparent; }
+
+/* 空态时 compare.js 只清空内容、容器节点仍在：避免留下孤立的分隔线 */
+html.v55 body.cmp-page .cmp-insights:empty,
+html.v55 body.cmp-page .cmp-tip:empty { display: none; }
+
+/* 口径说明 / 空态 -------------------------------------------------------- */
+html.v55 body.cmp-page .cmp-tip {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--v2-line);
+  font-size: 11.5px;
+  line-height: 1.8;
+  color: var(--v2-ink-3) !important;
+}
+html.v55 body.cmp-page .empty-tip {
+  padding: 34px 16px !important;
+  text-align: center;
+  font-size: 12px;
+  color: var(--v2-ink-3) !important;
+}
+
+/* ==========================================================================
+   4. 口径说明面板（compare-lane）
+   ========================================================================== */
+html.v55 body.cmp-page .panel {
+  padding: 18px 20px !important;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 18px !important;
+  background: var(--v2-card) !important;
+  box-shadow: var(--v2-shadow-sm) !important;
+}
+html.v55 body.cmp-page .panel-title {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--v2-line);
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--v2-ink);
+}
+html.v55 body.cmp-page .panel-title::before,
+html.v55 body.cmp-page .panel-title::after { display: none !important; content: none !important; }
+html.v55 body.cmp-page .panel .block-note {
+  font-size: 11.5px;
+  line-height: 1.9;
+  color: var(--v2-ink-3) !important;
+}
+html.v55 body.cmp-page .panel .block-note b { color: var(--v2-ink-2); font-weight: 700; }
+
+/* ==========================================================================
+   5. 响应式：窄屏雷达与表格堆叠，表格在卡片内横向滚动（页面本身不出横向滚动）
+   ========================================================================== */
+@media (max-width: 1120px) {
+  html.v55 body.cmp-page .cmp-grid { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 900px) {
+  html.v55 body.cmp-page .cmp-table table { min-width: 560px; }
+}
+@media (max-width: 760px) {
+  html.v55 body.cmp-page .scopebar,
+  html.v55 body.cmp-page .filterbar { padding: 12px 14px !important; gap: 10px 12px; }
+  html.v55 body.cmp-page .scopebar .scope-lab { padding-bottom: 0; width: 100%; }
+  html.v55 body.cmp-page .scopebar .scope-meta { margin-left: 0 !important; padding-bottom: 0; }
+  html.v55 body.cmp-page .scopebar .fld { flex: 1 1 140px; }
+  html.v55 body.cmp-page .scopebar select { width: 100%; min-width: 0; }
+  html.v55 body.cmp-page .filterbar .fld { flex: 1 1 140px; }
+  html.v55 body.cmp-page .filterbar select { width: 100%; min-width: 0; }
+  html.v55 body.cmp-page .pickers {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px 12px;
+    width: 100%;
+  }
+  html.v55 body.cmp-page .pickers .fld { width: 100%; }
+  html.v55 body.cmp-page .pickers select { width: 100%; }
+  html.v55 body.cmp-page .filterbar .wb-toggle { width: 100%; justify-content: center; }
+  html.v55 body.cmp-page .filterbar .share-fab { width: 100%; margin-left: 0 !important; }
+  html.v55 body.cmp-page .cmp-radar,
+  html.v55 body.cmp-page .cmp-table { padding: 14px !important; border-radius: 16px !important; }
+  html.v55 body.cmp-page .cmp-legend { justify-content: flex-start; gap: 6px 12px; }
+  html.v55 body.cmp-page .cmp-table tbody tr:hover { background: transparent; }
+  html.v55 body.cmp-page .panel { padding: 16px !important; }
+}
+@media (max-width: 344px) {
+  html.v55 body.cmp-page .pickers { grid-template-columns: minmax(0, 1fr); }
+}

@@ -262,13 +262,15 @@ window.KPL = (function () {
      detail 页（match/game/picks）沿用各自分组代表的 data-page，因此天然归组。 */
   var NAV = [
     { ic: "calendar", label: "赛事", href: "schedule.html",
-      pages: ["index.html", "schedule.html", "bracket.html"],
-      sub: [["赛程中心", "schedule.html"], ["赛事进程", "bracket.html"], ["精选对局", "picks.html"]] },
+      pages: ["index.html", "schedule.html", "bracket.html", "walkthrough.html"],
+      sub: [["赛程中心", "schedule.html"], ["赛事进程", "bracket.html"], ["精选对局", "picks.html"], ["从头看到尾", "walkthrough.html"]] },
     { ic: "shield", label: "战队", href: "teams.html",
       pages: ["teams.html", "h2h.html"],
       sub: [["战队榜", "teams.html"], ["交手记录", "h2h.html"]] },
     { ic: "user", label: "选手", href: "players.html",
-      pages: ["players.html"], sub: [] },
+      pages: ["players.html", "compare-player.html", "hero-performance.html"],
+      sub: [["选手榜", "players.html"], ["选手对比", "compare-player.html"],
+            ["逐系列赛英雄表现", "hero-performance.html"]] },
     { ic: "crown", label: "英雄", href: "heroes.html",
       pages: ["heroes.html", "combos.html", "hero-performance.html"],
       sub: [["英雄列表", "heroes.html"], ["英雄组合", "combos.html"], ["英雄表现", "hero-performance.html"]] },
@@ -276,16 +278,16 @@ window.KPL = (function () {
       pages: ["coach.html", "team-bp.html", "bp.html", "bp-studio.html"],
       sub: [["教练档案", "coach.html"], ["战队 BP", "team-bp.html"], ["BP 分析", "bp.html"], ["BP 演播室", "bp-studio.html"]] },
     { ic: "chart", label: "对比", href: "compare.html",
-      pages: ["compare.html", "compare-team.html", "compare-player.html", "compare-lane.html", "stage.html"],
+      pages: ["compare.html", "compare-team.html", "compare-lane.html", "stage.html"],
       sub: [["英雄对比", "compare.html"], ["战队对比", "compare-team.html"],
-            ["选手对比", "compare-player.html"], ["位置对比", "compare-lane.html"],
+            ["位置对比", "compare-lane.html"],
             ["赛段对比", "stage.html"]] },
     { ic: "target", label: "分析", href: "series.html",
       pages: ["series.html", "sandbox.html", "bracket-forecast.html", "predict.html",
-             "comeback.html", "query.html", "find.html", "simulator.html"],
+             "comeback.html", "query.html", "find.html", "simulator.html", "method.html"],
       sub: [["系列赛研究", "series.html"], ["胜率沙盘", "sandbox.html"], ["冠军预测", "bracket-forecast.html"],
             ["实时预测", "predict.html"], ["翻盘研究所", "comeback.html"],
-            ["数据查询", "query.html"], ["智能找局", "find.html"], ["赛前模拟", "simulator.html"]] },
+            ["数据查询", "query.html"], ["智能找局", "find.html"], ["赛前模拟", "simulator.html"], ["方法与口径", "method.html"]] },
     { ic: "layers", label: "荣誉", href: "honors.html",
       pages: ["honors.html", "records.html"],
       sub: [["荣誉中心", "honors.html"], ["赛事纪录", "records.html"]] }
@@ -892,64 +894,312 @@ window.KPL = (function () {
   }
 
   /* ---------- 多系列折线图（指标曲线） ---------- */
+  var _lcSeq = 0;
+  /* ---------- 多系列折线图（指标曲线 V2） ---------- */
+  var _lcSeq = 0;
+  // 阶梯线：概率是逐帧采样的，帧间不知道值。保持上一帧直到下一帧，
+  // 比斜线更诚实，也不会把离散跳变画成"飞来飞去"的斜坡。
+  function stepPath(pts, X, Y) {
+    var d = "";
+    for (var i = 0; i < pts.length; i++) {
+      var x = X(pts[i][0]).toFixed(1), y = Y(pts[i][1]).toFixed(1);
+      if (!i) { d = "M" + x + " " + y; continue; }
+      var py = Y(pts[i - 1][1]).toFixed(1);
+      d += " L" + x + " " + py + " L" + x + " " + y;
+    }
+    return d;
+  }
+
+  // 平滑曲线：控制点必须夹在「本段矩形」内。
+  // 之前用 (p2-p0)/6 这类跨点差分当切线，采样间隔不均匀时（3'→8'→9'）
+  // 控制点会冲到下一段外面，贝塞尔 x 不再单调，曲线看起来「往回走」。
+  function smoothPath(pts, X, Y) {
+    if (pts.length < 3) return pts.map(function (pt, i) { return (i ? "L" : "M") + X(pt[0]).toFixed(1) + " " + Y(pt[1]).toFixed(1); }).join(" ");
+    var d = "M" + X(pts[0][0]).toFixed(1) + " " + Y(pts[0][1]).toFixed(1);
+    for (var i = 0; i < pts.length - 1; i++) {
+      var p0 = pts[Math.max(0, i - 1)], p1 = pts[i], p2 = pts[i + 1], p3 = pts[Math.min(pts.length - 1, i + 2)];
+      var x1 = X(p1[0]), y1 = Y(p1[1]), x2 = X(p2[0]), y2 = Y(p2[1]);
+      var dx = x2 - x1;
+      if (!(dx > 0)) {                       // x 不前移就直接连线，绝不回退
+        d += " L" + x2.toFixed(1) + " " + y2.toFixed(1);
+        continue;
+      }
+      var lo = Math.min(y1, y2), hi = Math.max(y1, y2);
+      var slope1 = (y2 - Y(p0[1])) / Math.max(1e-6, x2 - X(p0[0]));
+      var slope2 = (Y(p3[1]) - y1) / Math.max(1e-6, X(p3[0]) - x1);
+      var c1x = x1 + dx / 3, c1y = Math.min(hi, Math.max(lo, y1 + slope1 * dx / 3));
+      var c2x = x2 - dx / 3, c2y = Math.min(hi, Math.max(lo, y2 - slope2 * dx / 3));
+      d += " C" + c1x.toFixed(1) + " " + c1y.toFixed(1) + " " + c2x.toFixed(1) + " " + c2y.toFixed(1) + " " +
+        x2.toFixed(1) + " " + y2.toFixed(1);
+    }
+    return d;
+  }
   function lineChart(el, opts) {
     var CP2 = chartPalette();
     if (!el) return;
-    var series = (opts.series || []).filter(function (se) { return se.pts && se.pts.length > 1; });
+    // 先把点按 x 排序去重：上游可能是多条来源拼接，x 不一定递增。
+    var series = (opts.series || []).map(function (se) {
+      var pts = (se.pts || []).map(function (pt) { return [Number(pt[0]), Number(pt[1])]; })
+        .filter(function (pt) { return isFinite(pt[0]) && isFinite(pt[1]); })
+        .sort(function (a, b) { return a[0] - b[0]; });
+      var dedup = [];
+      pts.forEach(function (pt) {
+        if (dedup.length && Math.abs(pt[0] - dedup[dedup.length - 1][0]) < 1e-9) dedup[dedup.length - 1] = pt;
+        else dedup.push(pt);
+      });
+      se.pts = dedup;
+      return se;
+    }).filter(function (se) { return se.pts && se.pts.length > 1; });
     if (!series.length) { el.innerHTML = '<div class="empty-tip">暂无可展示的曲线</div>'; return; }
-    var W = 1040, H = opts.height || 280, P = { l: 62, r: 18, t: 20, b: 34 };
+    var events = (opts.events || []).filter(function (e) { return e && isFinite(Number(e.m)) && e.label; });
+    var refLines = (opts.refLines || []).filter(function (r) { return isFinite(Number(r.v)); });
+    var W = 1040, H = opts.height || 280;
+    var P = {
+      l: opts.padLeft == null ? 62 : opts.padLeft,
+      r: opts.padRight == null ? 20 : opts.padRight,
+      t: opts.padTop == null ? 22 : opts.padTop,
+      b: opts.padBottom == null ? 36 : opts.padBottom
+    };
     var xs = [], ys = [];
-    series.forEach(function (se) {
-      se.pts.forEach(function (pt) { xs.push(pt[0]); ys.push(pt[1]); });
-    });
+    series.forEach(function (se) { se.pts.forEach(function (pt) { xs.push(Number(pt[0])); ys.push(Number(pt[1])); }); });
     var xMin = Math.min.apply(null, xs), xMax = Math.max.apply(null, xs);
-    var yMin = Math.min.apply(null, ys), yMax = Math.max.apply(null, ys);
-    if (opts.yZero) { yMin = Math.min(0, yMin); yMax = Math.max(0, yMax); }
-    if (opts.yMin0) { yMin = Math.max(0, yMin); }
-    var pad = (yMax - yMin) * 0.08 || 1;
-    yMin -= pad; yMax += pad;
+    var yMin, yMax;
+    if (opts.yDomain && opts.yDomain.length === 2 && isFinite(opts.yDomain[0]) && isFinite(opts.yDomain[1])) {
+      yMin = Number(opts.yDomain[0]);
+      yMax = Number(opts.yDomain[1]);
+    } else {
+      yMin = Math.min.apply(null, ys);
+      yMax = Math.max.apply(null, ys);
+      if (opts.yZero) yMin = Math.min(0, yMin);
+      if (opts.yMin0) yMin = Math.max(0, yMin);
+      if (opts.symmetric) {
+        var abMax = Math.max(Math.abs(yMin), Math.abs(yMax));
+        yMin = -abMax;
+        yMax = abMax;
+      }
+      var yPad = opts.yPad == null ? (yMax - yMin) * 0.08 : opts.yPad;
+      if (yMax - yMin < 1e-9) yPad = Math.max(1, Math.abs(yMax) * 0.08);
+      yMin -= yPad;
+      yMax += yPad;
+    }
     if (xMax - xMin < 1) xMax = xMin + 1;
-    var X = function (v) { return P.l + (v - xMin) / (xMax - xMin) * (W - P.l - P.r); };
-    var Y = function (v) { return P.t + (1 - (v - yMin) / (yMax - yMin)) * (H - P.t - P.b); };
+    var X = function (v) { return P.l + (Number(v) - xMin) / (xMax - xMin) * (W - P.l - P.r); };
+    var Y = function (v) { return P.t + (1 - (Number(v) - yMin) / (yMax - yMin)) * (H - P.t - P.b); };
     var yFmt = opts.yFmt || function (v) { return Math.round(v); };
-    var s = '<svg viewBox="0 0 ' + W + " " + H + '" preserveAspectRatio="none" role="img">';
-    /* 网格与 y 轴 */
-    for (var gi = 0; gi <= 3; gi++) {
-      var gv = yMin + (yMax - yMin) * gi / 3;
+    var xFmt = opts.xFmt || function (v) { return Math.round(v) + "′"; };
+    var yTicks = opts.yTicks || 4;
+    var xEvery = opts.xEvery || 5;
+    var smooth = opts.smooth !== false;
+    _lcSeq++;
+    var uid = "lc" + _lcSeq;
+    var s = '<svg viewBox="0 0 ' + W + " " + H + '" preserveAspectRatio="none" role="img" aria-label="' + esc(opts.ariaLabel || "指标曲线") + '" tabindex="0">';
+    s += '<defs>';
+    series.forEach(function (se, si) {
+      if (!se.fill) return;
+      s += '<linearGradient id="' + uid + "g" + si + '" x1="0" y1="0" x2="0" y2="1">' +
+        '<stop offset="0%" stop-color="' + se.color + '" stop-opacity="' + (se.fillOpacity == null ? 0.18 : se.fillOpacity) + '"/>' +
+        '<stop offset="100%" stop-color="' + se.color + '" stop-opacity="0"/></linearGradient>';
+    });
+    series.forEach(function (se, si) {
+      if (!se.glow) return;
+      s += '<filter id="' + uid + "gl" + si + '" x="-30%" y="-30%" width="160%" height="160%">' +
+        '<feDropShadow dx="0" dy="0" stdDeviation="4.5" flood-color="' + se.color + '" flood-opacity=".4"/></filter>';
+    });
+    s += '</defs>';
+    /* 背景区带：用于「优势期」等叙事高亮，画在网格之前 */
+    (opts.bands || []).forEach(function (bd) {
+      if (!isFinite(Number(bd.from)) || !isFinite(Number(bd.to))) return;
+      var bx1 = X(Number(bd.from)), bx2 = X(Number(bd.to));
+      var vx1 = Math.max(bx1, P.l), vx2 = Math.min(bx2, W - P.r);
+      if (vx2 - vx1 < 2) return;
+      s += '<rect x="' + vx1.toFixed(1) + '" y="' + P.t + '" width="' + (vx2 - vx1).toFixed(1) +
+        '" height="' + (H - P.t - P.b) + '" fill="' + (bd.color || CP2.mark) +
+        '" opacity="' + (bd.opacity == null ? 0.06 : bd.opacity) + '" rx="4"/>';
+    });
+    for (var gi = 0; gi <= yTicks; gi++) {
+      var gv = yMin + (yMax - yMin) * gi / yTicks;
       var gy = Y(gv).toFixed(1);
       s += '<line x1="' + P.l + '" y1="' + gy + '" x2="' + (W - P.r) + '" y2="' + gy +
-        '" stroke=' + JSON.stringify(CP2.grid) + ' stroke-dasharray="4 6"/>' +
-        '<text x="' + (P.l - 8) + '" y="' + (parseFloat(gy) + 4) + '" text-anchor="end" font-size="10.5" fill=' + JSON.stringify(CP2.label) + ' font-family="Inter,monospace">' + yFmt(gv) + "</text>";
+        '" stroke=' + JSON.stringify(CP2.grid) + ' stroke-dasharray="4 6" opacity=".72"/>' +
+        '<text x="' + (P.l - 9) + '" y="' + (parseFloat(gy) + 4) + '" text-anchor="end" font-size="10.5" ' +
+        'fill=' + JSON.stringify(CP2.label) + ' font-family="Inter,monospace">' + yFmt(gv) + "</text>";
     }
+    refLines.forEach(function (r) {
+      var ry = Y(Number(r.v));
+      if (ry < P.t || ry > H - P.b) return;
+      s += '<line x1="' + P.l + '" y1="' + ry.toFixed(1) + '" x2="' + (W - P.r) + '" y2="' + ry.toFixed(1) +
+        '" stroke="' + (r.color || CP2.axis) + '" stroke-width="' + (r.width || 1.5) + '"' +
+        (r.dash === false ? "" : ' stroke-dasharray="5 4"') + ' opacity="' + (r.opacity == null ? 0.72 : r.opacity) + '"/>';
+      if (r.label) s += '<text x="' + (W - P.r - 4) + '" y="' + (ry - 5).toFixed(1) + '" text-anchor="end" font-size="10" ' +
+        'fill="' + (r.labelColor || r.color || CP2.label) + '" font-family="Inter,monospace">' + esc(r.label) + "</text>";
+    });
     if (yMin < 0 && yMax > 0) {
-      s += '<line x1="' + P.l + '" y1="' + Y(0).toFixed(1) + '" x2="' + (W - P.r) + '" y2="' + Y(0).toFixed(1) + '" stroke=' + JSON.stringify(CP2.axis) + ' />';
+      var zy = Y(0).toFixed(1);
+      s += '<line x1="' + P.l + '" y1="' + zy + '" x2="' + (W - P.r) + '" y2="' + zy + '" stroke=' +
+        JSON.stringify(CP2.axis) + ' opacity=".8"/>';
     }
-    /* x 轴刻度（每 5 分钟） */
-    for (var m = Math.ceil(xMin / 5) * 5; m <= xMax; m += 5) {
-      s += '<text x="' + X(m).toFixed(1) + '" y="' + (H - 12) + '" text-anchor="middle" font-size="10.5" fill=' + JSON.stringify(CP2.label) + ' font-family="Inter,monospace">' + m + "′</text>";
+    // 轴从 0 起：数据若从第 1 分钟开始，也从 0 标起，读者才有"这局打了多久"的参照
+    var x0 = (xMin >= 0 && xMin < xEvery) ? 0 : Math.ceil(xMin / xEvery) * xEvery;
+    for (var m = x0; m <= xMax; m += xEvery) {
+      var gxm = X(m).toFixed(1);
+      // 竖向细网格：把刻度标签和曲线接上，读某一分钟时不用靠眼睛平移
+      s += '<line x1="' + gxm + '" y1="' + P.t + '" x2="' + gxm + '" y2="' + (H - P.b) +
+        '" stroke=' + JSON.stringify(CP2.grid) + ' stroke-dasharray="2 7" opacity=".45"/>';
+      s += '<text x="' + gxm + '" y="' + (H - 12) + '" text-anchor="middle" font-size="10.5" ' +
+        'fill=' + JSON.stringify(CP2.label) + ' font-family="Inter,monospace">' + esc(xFmt(m)) + "</text>";
     }
-    /* 折线 */
-    series.forEach(function (se) {
-      var d = se.pts.map(function (pt, i) {
-        return (i ? "L" : "M") + X(pt[0]).toFixed(1) + " " + Y(pt[1]).toFixed(1);
-      }).join(" ");
-      if (se.fill && se.pts.length > 1) {
-        s += '<path d="' + d + " L" + X(se.pts[se.pts.length - 1][0]).toFixed(1) + " " + Y(Math.max(0, yMin)).toFixed(1) +
-          " L" + X(se.pts[0][0]).toFixed(1) + " " + Y(Math.max(0, yMin)).toFixed(1) + ' Z" fill="' + se.color + '" fill-opacity=".10" stroke="none"/>';
-      }
-      s += '<path d="' + d + '" fill="none" stroke="' + se.color + '" stroke-width="' + (se.width || 2.2) + '"' +
-        (se.dash ? ' stroke-dasharray="6 5"' : "") + ' stroke-linejoin="round" opacity="' + (se.opacity || 1) + '"/>';
-      if (se.dots) {
+    /* 柱状系列：先统计一组里有多少柱状系列，以便并排分组 */
+    var barSeries = series.filter(function (se) { return se.bars; });
+    var barGroupN = Math.max(1, barSeries.length);
+    var barSlot = (W - P.l - P.r) / Math.max(1, xMax - xMin);
+    series.forEach(function (se, si) {
+      if (se.bars) {
+        /* 每分钟一根柱：0 线上下一分为二着色（领先方一眼可见），并排柱按组内序号错位 */
+        var bw = Math.min(Math.max(barSlot * 0.62 / barGroupN, 2), 18);
+        var gi2 = barSeries.indexOf(se);
+        var off = (gi2 - (barGroupN - 1) / 2) * bw;
+        var baseV = yMin >= 0 ? yMin : (yMax <= 0 ? yMax : 0);
+        var by2 = Y(baseV);
         se.pts.forEach(function (pt) {
-          s += '<circle cx="' + X(pt[0]).toFixed(1) + '" cy="' + Y(pt[1]).toFixed(1) + '" r="2.6" fill="' + se.color + '"/>';
+          var v = Number(pt[1]);
+          var vy = Y(v);
+          var col = v >= 0 ? (se.barColors && se.barColors.pos) || se.color
+                           : (se.barColors && se.barColors.neg) || se.color;
+          s += '<rect x="' + (X(pt[0]) - bw / 2 + off).toFixed(1) + '" y="' + Math.min(by2, vy).toFixed(1) +
+            '" width="' + bw.toFixed(1) + '" height="' + Math.max(1.5, Math.abs(by2 - vy)).toFixed(1) +
+            '" rx="' + Math.min(2.5, bw / 3).toFixed(1) + '" fill="' + col + '" opacity="' + (se.opacity == null ? 0.88 : se.opacity) + '"/>';
+        });
+        return;
+      }
+      var d;
+      if (se.step) {
+        d = se.pts.map(function (pt, i) {
+          var x = X(pt[0]).toFixed(1), y = Y(pt[1]).toFixed(1);
+          if (!i) return "M" + x + " " + y;
+          return "L" + X(se.pts[i - 1][0]).toFixed(1) + " " + y + " L" + x + " " + y;
+        }).join(" ");
+      } else {
+        d = opts.step ? stepPath(se.pts, X, Y) : smooth ? smoothPath(se.pts, X, Y) : se.pts.map(function (pt, i) {
+          return (i ? "L" : "M") + X(pt[0]).toFixed(1) + " " + Y(pt[1]).toFixed(1);
+        }).join(" ");
+      }
+      if (se.fill && se.pts.length > 1) {
+        var baseY = se.fillTo == null ? Math.max(yMin, 0) : Number(se.fillTo);
+        var area = d + " L" + X(se.pts[se.pts.length - 1][0]).toFixed(1) + " " + Y(baseY).toFixed(1) +
+          " L" + X(se.pts[0][0]).toFixed(1) + " " + Y(baseY).toFixed(1) + " Z";
+        /* fillSolid：不随高度衰减的纯色填充，适合围绕 0 线上下摆动的差值面积 */
+        s += se.fillSolid
+          ? '<path d="' + area + '" fill="' + se.color + '" fill-opacity="' + (se.fillOpacity == null ? 0.18 : se.fillOpacity) + '" stroke="none"/>'
+          : '<path d="' + area + '" fill="url(#' + uid + "g" + si + ')" stroke="none"/>';
+      }
+      s += se.nostroke ? "" : '<path d="' + d + '" fill="none" stroke="' + se.color + '" stroke-width="' + (se.width || 2.5) + '"' +
+        (se.dash ? ' stroke-dasharray="6 5"' : "") + ' stroke-linejoin="round" stroke-linecap="round" opacity="' + (se.opacity || 1) + '"' +
+        (se.glow ? ' filter="url(#' + uid + "gl" + si + ')"' : "") + "/>";
+      if (se.dots && se.pts.length <= 24) {
+        se.pts.forEach(function (pt) {
+          s += '<circle cx="' + X(pt[0]).toFixed(1) + '" cy="' + Y(pt[1]).toFixed(1) + '" r="2.8" fill="' + se.color + '"/>';
         });
       }
+      /* 增量点：只在数值上涨的分钟画点（累计击杀 / 推塔的「发生时刻」） */
+      if (se.markGrowth) {
+        for (var gi3 = 1; gi3 < se.pts.length; gi3++) {
+          if (Number(se.pts[gi3][1]) > Number(se.pts[gi3 - 1][1])) {
+            s += '<circle cx="' + X(se.pts[gi3][0]).toFixed(1) + '" cy="' + Y(se.pts[gi3][1]).toFixed(1) +
+              '" r="3.4" fill="' + se.color + '" stroke=' + JSON.stringify(CP2.dot) + ' stroke-width="1.6"/>';
+          }
+        }
+      }
     });
-    s += "</svg>";
-    el.innerHTML = (opts.legend === false ? "" :
-      '<div class="lc-legend">' + series.map(function (se) {
+    events.forEach(function (e) {
+      var ex = X(Number(e.m));
+      if (ex < P.l || ex > W - P.r) return;
+      var color = e.color || CP2.label;
+      s += '<g class="lc-event">' +
+        '<line x1="' + ex.toFixed(1) + '" y1="' + P.t + '" x2="' + ex.toFixed(1) + '" y2="' + (H - P.b) +
+        '" stroke="' + color + '" stroke-width="1" stroke-dasharray="3 4" opacity=".38"/>' +
+        '<circle cx="' + ex.toFixed(1) + '" cy="' + (P.t + 5) + '" r="3.4" fill="' + color + '" opacity=".92"/>' +
+        '<title>' + esc(Number(e.m).toFixed(0) + "′ " + e.label) + "</title></g>";
+    });
+    s += '<line id="' + uid + 'cross" x1="0" y1="' + P.t + '" x2="0" y2="' + (H - P.b) +
+      '" stroke=' + JSON.stringify(CP2.axis) + ' stroke-width="1" stroke-dasharray="3 4" opacity="0"/>' +
+      '<circle id="' + uid + 'dot" r="4" fill="' + CP2.dot + '" stroke="' + CP2.mark + '" stroke-width="2.4" opacity="0"/>' +
+      "</svg>";
+    var tip = '<div class="lc-tip" id="' + uid + 'tip"></div>';
+    var legend = "";
+    if (opts.legend !== false) {
+      legend = '<div class="lc-legend">' + series.map(function (se) {
         return '<span><i style="background:' + se.color + (se.dash ? ';opacity:.65' : "") + '"></i>' + esc(se.name) + "</span>";
-      }).join("") + "</div>") + s;
+      }).join("") + "</div>";
+    }
+    el.innerHTML = legend + s + tip;
+
+    var svg = el.querySelector("svg");
+    var tipEl = el.querySelector(".lc-tip");
+    var cross = el.querySelector("#" + uid + "cross");
+    var dot = el.querySelector("#" + uid + "dot");
+    var allPts = [];
+    series.forEach(function (se) { se.pts.forEach(function (pt) { allPts.push({ m: Number(pt[0]), v: Number(pt[1]), se: se }); }); });
+    var nearest = function (target) {
+      var best = null;
+      for (var i = 0; i < allPts.length; i++) {
+        var d = Math.abs(allPts[i].m - target);
+        if (!best || d < best.d) best = { d: d, m: allPts[i].m };
+      }
+      return best;
+    };
+    var nearEvents = function (m) {
+      return events.filter(function (e) { return Math.abs(Number(e.m) - m) <= 0.75; }).slice(0, 2);
+    };
+    var paintHover = function (target, clientX, clientY) {
+      var best = nearest(target);
+      if (!best) return;
+      var evs = nearEvents(best.m);
+      var rows = series.filter(function (se) { return !se.noTip; }).map(function (se) {
+        var near = se.pts.reduce(function (a, pt) {
+          return Math.abs(Number(pt[0]) - best.m) < Math.abs(Number(a[0]) - best.m) ? pt : a;
+        }, se.pts[0]);
+        return '<div><i style="background:' + se.color + '"></i><span>' + esc(se.name) + "</span><b>" + yFmt(Number(near[1])) + "</b></div>";
+      }).join("");
+      var evRows = evs.map(function (e) {
+        return '<div class="ev"><span></span>' + esc(e.label) + "</div>";
+      }).join("");
+      tipEl.innerHTML = '<b>' + esc(xFmt(best.m)) + "</b>" + rows + evRows;
+      tipEl.style.opacity = "1";
+      var box = el.getBoundingClientRect();
+      var left = Math.min(Math.max((clientX == null ? X(best.m) / W * box.width : clientX - box.left) + 12, 6), Math.max(6, box.width - 180));
+      var top = Math.min(Math.max((clientY == null ? P.t / H * box.height : clientY - box.top) - 8, 6), Math.max(6, box.height - 90));
+      tipEl.style.left = left + "px";
+      tipEl.style.top = top + "px";
+      cross.setAttribute("x1", X(best.m).toFixed(1));
+      cross.setAttribute("x2", X(best.m).toFixed(1));
+      cross.setAttribute("opacity", ".62");
+      var first = allPts.filter(function (p) { return p.m === best.m; })[0] || allPts[0];
+      dot.setAttribute("cx", X(first.m).toFixed(1));
+      dot.setAttribute("cy", Y(first.v).toFixed(1));
+      dot.setAttribute("opacity", "1");
+      if (opts.onHover) opts.onHover({ m: best.m, tip: tipEl });
+    };
+    var clearHover = function () {
+      tipEl.style.opacity = "0";
+      cross.setAttribute("opacity", "0");
+      dot.setAttribute("opacity", "0");
+      if (opts.onLeave) opts.onLeave();
+    };
+    if (opts.tooltip !== false) {
+      svg.addEventListener("mousemove", function (e) { paintHover(xMin + ((e.clientX - svg.getBoundingClientRect().left) / svg.getBoundingClientRect().width) * (xMax - xMin), e.clientX, e.clientY); });
+      svg.addEventListener("mouseleave", clearHover);
+      svg.addEventListener("focus", function () { paintHover(xMin + (xMax - xMin) / 2, null, null); });
+      svg.addEventListener("blur", clearHover);
+      svg.addEventListener("keydown", function (e) {
+        var cur = nearest(xMin + (xMax - xMin) / 2);
+        if (!cur) return;
+        var step = opts.keyStep || 1;
+        if (e.key === "ArrowLeft") { paintHover(cur.m - step, null, null); e.preventDefault(); }
+        else if (e.key === "ArrowRight") { paintHover(cur.m + step, null, null); e.preventDefault(); }
+        else if (e.key === "Home") { paintHover(xMin, null, null); e.preventDefault(); }
+        else if (e.key === "End") { paintHover(xMax, null, null); e.preventDefault(); }
+      });
+    }
   }
 
   /* ---------- 实时框架：数据新鲜度探测 + 进行中判定 ---------- */
@@ -1112,11 +1362,13 @@ window.KPL = (function () {
     }
     function render() {
       var running = active();
-      button.disabled = busy || !connected || !!(state && state.external_collector);
-      button.textContent = busy ? '处理中…' : running ? '停止' : '一键启动';
+      var external = !!(state && state.external_collector);
+      button.disabled = busy || !connected || external;
+      // 外部采集已在跑时按钮是禁用的，标签就不该再写「一键启动」——那会让人以为能点。
+      button.textContent = busy ? '处理中…' : external ? '由本地进程启动' : running ? '停止' : '一键启动';
       if (busy) return;
       if (!connected) status.textContent = '请双击“启动网站.bat”打开本地服务。';
-      else if (state.external_collector) status.textContent = '已有采集服务运行中。';
+      else if (external) status.textContent = '已有采集服务运行中。';
       else if (state.running) {
         var labels = {waiting_start:'等待开赛',waiting_schedule:'等待比赛',waiting_battle:'等待对局',waiting_next_match:'等待下一场',day_complete:'今日比赛已结束',error:'采集异常'};
         var record = state.collector_record || {};

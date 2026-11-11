@@ -23,6 +23,7 @@ if sys.platform == "win32":
     sys.stdout.reconfigure(encoding="utf-8", errors="replace", line_buffering=True)
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+from kpl_insight.collection.runtime import ProcessLock, age_seconds, latest_snapshot_age, read_json  # noqa: E402
 from kpl_insight.core import (  # noqa: E402
     PROJECT_ROOT,
     _replay_v11_timeline,
@@ -47,10 +48,39 @@ from kpl_insight.models.display import (  # noqa: E402
 
 SITE = Path(os.environ.get("KPL_SITE_DIR") or Path(__file__).resolve().parents[1] / "frontend").expanduser().resolve()
 OUT = SITE / "assets" / "live.js"
+RUNTIME = PROJECT_ROOT / "data" / "realtime" / "runtime"
 PRIOR_PATH = PROJECT_ROOT / "data" / "realtime" / "prematch_priors.json"
 _MODEL = load_model()
 _MODEL_FP = model_fingerprint(_MODEL)
 DISPLAY_CALIB = load_calibrator(model_fp=_MODEL_FP)
+
+
+def build_health_snapshot() -> dict:
+    """Expose collector health to the site so a silent gap becomes a visible bar."""
+    status = read_json(RUNTIME / "collector_status.json")
+    battle_id = status.get("battle_id")
+    state = status.get("state")
+    heartbeat_age = age_seconds(status.get("updated_at"))
+    poll_age = age_seconds(status.get("last_poll_at"))
+    snapshot_age = latest_snapshot_age(battle_id)
+    live = state in {"live", "polling"} and bool(battle_id)
+    base = {
+        "checkedAt": time.strftime("%Y-%m-%d %H:%M:%S"),
+        "battleId": battle_id,
+        "state": state,
+        "heartbeatAgeSec": None if heartbeat_age is None else round(heartbeat_age, 1),
+        "pollAgeSec": None if poll_age is None else round(poll_age, 1),
+        "snapshotAgeSec": None if snapshot_age is None else round(snapshot_age, 1),
+    }
+    if not live:
+        return {**base, "status": "ok", "message": ""}
+    if heartbeat_age is None or heartbeat_age > 20:
+        return {**base, "status": "offline", "message": "采集心跳中断，正在自动恢复"}
+    if poll_age is not None and poll_age > 20:
+        return {**base, "status": "offline", "message": "采集循环停滞，正在自动恢复"}
+    if snapshot_age is not None and snapshot_age > 30:
+        return {**base, "status": "stale", "message": "官方数据源延迟或暂停"}
+    return {**base, "status": "ok", "message": ""}
 
 
 def load_priors() -> dict:
@@ -128,7 +158,13 @@ def write_archive_shards(hist: dict) -> None:
                 pass
         path.write_text(body, encoding="utf-8")
         wrote += 1
-    # Existing shards are preserved; exporting never removes local archives.
+    # 清掉已不在归档里的场次分片
+    for f in ARCHIVE_DIR.glob("*.js"):
+        if f.stem not in by_match:
+            try:
+                f.unlink()
+            except OSError:
+                pass
     if wrote:
         print(f"  live_hist shards: {wrote} written / {len(by_match)} matches")
 
@@ -486,6 +522,7 @@ def build_once() -> int:
 
     payload = {
         "updatedAt": time.strftime("%Y-%m-%d %H:%M:%S"),
+        "health": build_health_snapshot(),
         "today": find_today_matches(),
         "matches": matches,
         "history": hist_list,
@@ -517,17 +554,24 @@ def main() -> None:
     if args.watch <= 0:
         build_once()
         return
+    lock = ProcessLock("live_watch")
+    if not lock.acquire():
+        print("live watcher already running (live_watch.lock), exiting.")
+        return
     print(f"live loop: every {args.watch}s, Ctrl+C to stop")
-    while True:
-        try:
-            print(f"[{time.strftime('%H:%M:%S')}]")
-            build_once()
-        except KeyboardInterrupt:
-            print("stop.")
-            break
-        except Exception as exc:
-            print(f"  !! {exc}")
-        time.sleep(args.watch)
+    try:
+        while True:
+            try:
+                print(f"[{time.strftime('%H:%M:%S')}]")
+                build_once()
+            except KeyboardInterrupt:
+                print("stop.")
+                break
+            except Exception as exc:
+                print(f"  !! {exc}")
+            time.sleep(args.watch)
+    finally:
+        lock.close()
 
 
 if __name__ == "__main__":

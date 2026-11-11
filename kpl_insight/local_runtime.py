@@ -6,6 +6,7 @@ import csv
 import json
 import os
 from pathlib import Path
+import socket
 import subprocess
 import sys
 import threading
@@ -130,6 +131,275 @@ class RuntimeControl:
         except OSError:
             return True
 
+    def _read_json(self, path: Path) -> dict:
+        try:
+            value = json.loads(path.read_text(encoding="utf-8-sig"))
+            return value if isinstance(value, dict) else {}
+        except (OSError, ValueError):
+            return {}
+
+    @staticmethod
+    def _age(value) -> float | None:
+        try:
+            return max(0.0, (datetime.now() - datetime.fromisoformat(str(value))).total_seconds())
+        except (TypeError, ValueError):
+            return None
+
+    def _snapshot_age(self, battle_id) -> float | None:
+        if not battle_id:
+            return None
+        directory = self.root / "data/realtime/raw_snapshots" / str(battle_id)
+        newest = 0.0
+        try:
+            with os.scandir(directory) as entries:
+                for entry in entries:
+                    if not entry.name.endswith(".json"):
+                        continue
+                    try:
+                        newest = max(newest, entry.stat().st_mtime)
+                    except OSError:
+                        continue
+        except OSError:
+            return None
+        return max(0.0, datetime.now().timestamp() - newest) if newest else None
+
+    def _frame_coverage(self, battle_id, duration=None):
+        path = self.root / "data/realtime/frames" / f"{battle_id}.csv"
+        seconds = set()
+        try:
+            with path.open("r", encoding="utf-8-sig", newline="") as handle:
+                for row in csv.DictReader(handle):
+                    try:
+                        seconds.add(int(float(row.get("snapshot_time_sec") or 0)))
+                    except (TypeError, ValueError):
+                        continue
+        except OSError:
+            return None
+        points = sorted(s for s in seconds if s > 0)
+        if not points:
+            return {"battle_id": battle_id, "frame_count": 0, "issues": ["没有任何帧落盘"]}
+        duration = int(duration or points[-1])
+        probe = list(points)
+        if points[0] > 60:
+            probe.insert(0, 0)
+        if duration and points[-1] < duration - 30:
+            probe.append(duration)
+        gaps = [(b - a, a, b) for a, b in zip(probe, probe[1:]) if b > a]
+        gap, gap_from, gap_to = max(gaps) if gaps else (0, 0, 0)
+        issues = []
+        if points[0] > 60:
+            issues.append(f"开局缺失 {points[0]}s")
+        if duration and points[-1] < duration - 30:
+            issues.append(f"局末缺失 {duration - points[-1]}s")
+        if gap > 30:
+            issues.append(f"最长空档 {gap}s（{gap_from}–{gap_to}s）")
+        return {"battle_id": battle_id, "frame_count": len(points), "first_sec": points[0],
+                "last_sec": points[-1], "duration_sec": duration, "max_gap_sec": gap,
+                "max_gap_from": gap_from, "max_gap_to": gap_to, "issues": issues}
+
+    def _alert_lines(self, limit=6):
+        path = self.runtime / "alerts.jsonl"
+        try:
+            with path.open("rb") as handle:
+                handle.seek(0, os.SEEK_END)
+                size = handle.tell()
+                handle.seek(max(0, size - 12000))
+                text = handle.read().decode("utf-8", errors="replace")
+        except OSError:
+            return []
+        alerts = []
+        for line in text.splitlines()[-limit:]:
+            try:
+                item = json.loads(line)
+            except ValueError:
+                continue
+            title = str(item.get("title") or "")
+            message = str(item.get("message") or "")
+            alerts.append({"at": item.get("at"), "text": f"{title}：{message}".strip("：")})
+        return alerts
+
+    @staticmethod
+    def _ping_health(port) -> dict | None:
+        """Ask the local collector health socket (immune to file-lock staleness)."""
+        try:
+            port = int(port or 0)
+        except (TypeError, ValueError):
+            return None
+        if not port:
+            return None
+        try:
+            with socket.create_connection(("127.0.0.1", port), timeout=0.6) as sock:
+                sock.sendall(b"PING\n")
+                sock.settimeout(0.6)
+                data = sock.recv(512)
+            payload = json.loads(data.decode("utf-8") or "{}")
+            return payload if isinstance(payload, dict) else None
+        except (OSError, ValueError):
+            return None
+
+    def collection_status(self):
+        """Read-only acquisition status for the local panel (no ownership assumed)."""
+        status = self._read_json(self.runtime / "collector_status.json")
+        monitor = self._read_json(self.root / "data/realtime/monitor_status.json")
+        health = self._read_json(self.runtime / "health.json")
+        lease = self._read_json(self.runtime / "collector_lease.json")
+        live_health = self._ping_health(lease.get("health_port"))
+        state = str(status.get("state") or monitor.get("state") or "")
+        if live_health:
+            state = str(live_health.get("state") or state)
+        battle_id = status.get("battle_id")
+        if live_health:
+            battle_id = live_health.get("battle_id") or battle_id
+        minute = None
+        try:
+            source_sec = (live_health or {}).get("source_time_sec") or status.get("source_time_sec")
+            if source_sec:
+                minute = round(float(source_sec) / 60.0, 1)
+            elif monitor.get("minute") is not None:
+                minute = round(float(monitor["minute"]), 1)
+        except (TypeError, ValueError):
+            pass
+        hb = self._age(status.get("updated_at"))
+        poll = self._age(status.get("last_poll_at"))
+        if live_health:
+            # The socket answered: the process is alive even if the status file
+            # is currently held by antivirus.
+            hb = 0.0
+            try:
+                poll_epoch = float(live_health.get("last_poll_epoch") or 0)
+            except (TypeError, ValueError):
+                poll_epoch = 0.0
+            if poll_epoch:
+                poll = max(0.0, datetime.now().timestamp() - poll_epoch)
+        snap = health.get("snapshot_age_sec")
+        if snap is None:
+            snap = self._snapshot_age(battle_id)
+        source_status = status.get("source_status")
+        live = bool(battle_id) and (state in {"live", "running", "polling"} or source_status == 1)
+        labels = {"live": "采集中", "running": "采集中", "polling": "采集中",
+                  "waiting_start": "等待开赛", "waiting_battle": "局间等待",
+                  "waiting_schedule": "等待赛程", "waiting_next_match": "等待下一场",
+                  "day_complete": "今日结束", "starting": "启动中",
+                  "api_error": "接口异常", "error": "采集异常", "stopped": "已停止"}
+        label = labels.get(state, state or "未知")
+        severity = "idle"
+        issue = ""
+        if state in {"error", "stopped"}:
+            severity, label = "error", "采集异常"
+            issue = str(status.get("message") or monitor.get("message") or "")
+        elif state == "api_error" and hb is not None and hb <= 30 and poll is not None and poll <= 30:
+            # A transient official blip (or a pre-created battle that has no
+            # data yet) is not a collector failure; keep it amber.
+            severity, label = "warning", "接口抖动"
+            issue = "官方接口暂时无数据，采集器在重试"
+        elif live and (hb is None or hb > 30):
+            severity, label = "error", "采集中断"
+            issue = f"心跳 {round(hb) if hb is not None else '?'} 秒未更新"
+        elif live and (poll is None or poll > 30):
+            severity, label = "error", "采集循环停滞"
+            issue = f"轮询 {round(poll) if poll is not None else '?'} 秒未更新"
+        elif live and (snap is None or snap > 30):
+            severity, label = "warning", "数据延迟"
+            issue = f"官方源约 {round(snap) if snap is not None else '?'} 秒未推进"
+        elif live:
+            severity, label = "ok", "采集中"
+        elif state in {"waiting_start", "waiting_battle", "waiting_schedule",
+                       "waiting_next_match", "day_complete"}:
+            severity, label = "idle", label
+        elif hb is not None and hb > 30:
+            severity, label = "error", "采集进程无心跳"
+            issue = f"心跳 {round(hb)} 秒未更新"
+        match = status.get("match") or monitor.get("match") or ""
+        if live_health and live_health.get("match"):
+            match = str(live_health.get("match"))
+        match_text = match
+        for suffix in (" · 未开始", " · 进行中", " · 已结束"):
+            match_text = match_text.replace(suffix, "")
+        if live:
+            summary = (f"{label} · {match_text} · {minute or 0:.1f} 分钟"
+                       if match_text else f"{label} · {minute or 0:.1f} 分钟")
+            if snap is not None:
+                summary += f" · 快照 {round(snap)} 秒前"
+        else:
+            summary = f"{label} · {match_text}" if match_text else label
+        leader_pid = status.get("pid")
+        peers = {}
+        for role in ("primary", "standby"):
+            peer = self._read_json(self.runtime / f"peer_{role}.json")
+            if peer:
+                peers[role] = {"pid": peer.get("pid"), "state": peer.get("state"),
+                               "mutex": peer.get("mutex"), "updated_at": peer.get("updated_at")}
+        takeover = self._read_json(self.runtime / "freshness_watchdog.json")
+        takeover_at = takeover.get("acted_at")
+        takeover_age = self._age(takeover_at)
+        duration = None
+        try:
+            if status.get("source_time_sec"):
+                duration = int(float(status["source_time_sec"]))
+        except (TypeError, ValueError):
+            pass
+        current_cov = self._frame_coverage(battle_id, duration) if battle_id else None
+        day = datetime.now().strftime("%Y-%m-%d")
+        report = self._read_json(self.root / "reports" / f"live_coverage_{day}.json")
+        battles = dict(report.get("battles") or {}) if isinstance(report.get("battles"), dict) else {}
+        if current_cov:
+            battles[str(battle_id)] = current_cov
+        interruptions = []
+        if issue:
+            interruptions.append({"at": datetime.now().isoformat(timespec="seconds"),
+                                  "text": f"{label}：{issue}"})
+        if takeover_at and takeover_age is not None and takeover_age < 86400:
+            problems = "；".join(takeover.get("problems") or [])
+            interruptions.append({"at": takeover_at,
+                                  "text": f"自动接管（原进程 {takeover.get('killed_pid')}）{problems}"})
+        for bid, row in battles.items():
+            for gap in (row.get("issues") or []):
+                interruptions.append({"at": row.get("checked_at") or day, "text": f"{bid}: {gap}"})
+        alert_titles = set()
+        for item in self._alert_lines():
+            age = self._age(item.get("at"))
+            if age is not None and age > 43200:
+                continue
+            title_key = str(item.get("text") or "").split("：", 1)[0]
+            if title_key in alert_titles:
+                continue
+            if "单局数据有缺口" in title_key:
+                # Covered by the per-battle coverage row below; avoid duplicates.
+                continue
+            alert_titles.add(title_key)
+            interruptions.append(item)
+        interruptions.sort(key=lambda item: str(item.get("at") or ""), reverse=True)
+        seen = set()
+        unique = []
+        for item in interruptions:
+            key = (item.get("at"), item.get("text"))
+            if key in seen:
+                continue
+            seen.add(key)
+            unique.append(item)
+        meta = []
+        if leader_pid:
+            meta.append(f"主 {leader_pid}")
+        for role, peer in peers.items():
+            if peer.get("pid") and peer.get("pid") != leader_pid:
+                meta.append(f"备 {peer.get('pid')}")
+        if status.get("model_name"):
+            meta.append(f"模型 {status.get('model_name')}")
+        if takeover_at:
+            meta.append(f"最近接管 {str(takeover_at)[11:19]}")
+        return {"state": state, "label": label, "severity": severity, "issue": issue,
+                "summary": summary, "match": match, "battle_id": battle_id,
+                "minute": minute, "heartbeat_age_sec": hb, "poll_age_sec": poll,
+                "snapshot_age_sec": snap, "last_saved_at": status.get("last_saved_at"),
+                "leader_pid": leader_pid, "peers": peers, "meta": " · ".join(meta),
+                "last_takeover": ({"at": takeover_at, "problems": takeover.get("problems") or []}
+                                  if takeover_at else None),
+                "today": {"date": day, "battles": battles, "games": len(battles),
+                          "with_gaps": sum(1 for row in battles.values() if row.get("issues"))},
+                "current_coverage": current_cov,
+                "interruptions": unique[:6],
+                "checked_at": datetime.now().isoformat(timespec="seconds")}
+
     def status(self):
         with self.lock:
             states = {name: {"running": p.poll() is None, "pid": p.pid, "exit_code": p.poll()}
@@ -169,6 +439,7 @@ class RuntimeControl:
                     "error": self.error, "live_updated_at": updated,
                     "collector_record": {k: report.get(k) for k in ("state", "message", "updated_at", "match_id", "battle_id")},
                     "record_age_seconds": record_age, "record_from_current_run": record_current,
+                    "collection": self.collection_status(),
                     "logs": {name: self._tail(name) for name in sorted(self.log_names)}}
 
     def start(self, mode="auto", league=None):

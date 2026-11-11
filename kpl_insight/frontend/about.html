@@ -8,7 +8,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230A111C'/%3E%3Crect x='3' y='3' width='26' height='26' rx='4' fill='none' stroke='%23F6C021' stroke-width='2'/%3E%3Ctext x='16' y='22' font-family='Arial,sans-serif' font-size='16' font-weight='bold' fill='%23F6C021' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="assets/style.css?v=20261102-brand">
 <link rel="stylesheet" href="assets/pages.css?v=20261102-brand">
-<link rel="stylesheet" href="assets/v55.css?v=87">
+<link rel="stylesheet" href="assets/v55.css?v=92">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="KPL赛研">
 <meta property="og:title" content="数据说明 · KPL赛研">
@@ -16,22 +16,21 @@
 <meta property="og:image" content="https://hccccc01333.github.io/KPLdata-site/assets/brand/kpl-research-social.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="assets/arena.css?v=1">
-<link rel="stylesheet" href="assets/arena-world.css?v=20261026">
-<script src="assets/arena-world.js?v=20261030a" type="module"></script>
-<link rel="stylesheet" href="assets/card-motion.css?v=1">
-<script src="assets/card-motion.js?v=1" type="module"></script>
 <link rel="stylesheet" href="assets/light.css?v=20261030a">
 <link rel="stylesheet" href="assets/theme.css?v=20261030b">
+<link rel="stylesheet" href="assets/site-v2.css?v=20261112a">
+<link rel="stylesheet" href="assets/doc-v2.css?v=20261112a">
 </head>
-<body data-page="about.html">
+<body data-page="about.html" class="v2-page doc-page about-page">
 <header id="siteHeader" class="topbar"></header>
 
-<header class="page-hero">
-  <div class="wrap">
-    <div class="ph-kicker mono">DATA · 数据说明</div>
-    <h1>数据说明与口径</h1>
-    <p>数据从哪来、多久更新一次、每个数字怎么算——全部写在明面上。个人搭建的赛事数据产品，非官方，
-      赛程与比分请对照官方发布使用。</p>
+<header class="lg-hero">
+  <div class="lg-hero-gridlines" aria-hidden="true"></div>
+  <div class="v2-wrap">
+    <div class="v2-kicker"><i></i>DATA<b>·</b>数据说明</div>
+    <h1 class="v2-h1">数据说明与口径</h1>
+    <p class="v2-lead">数据从哪来、多久更新一次、每个数字怎么算——全部写在明面上。个人搭建的赛事数据产品，非官方，赛程与比分请对照官方发布使用。<br>
+      想看这些口径落到一次具体使用是什么样？<a href="walkthrough.html">跟着一场比赛走一遍 ↗</a></p>
   </div>
 </header>
 
@@ -232,7 +231,7 @@
 <script src="assets/details.js?v=85"></script>
 <script src="assets/seasons.js?v=85"></script>
 <script src="assets/replay/index.js?v=85"></script>
-<script src="assets/common.js?v=20261102-brand"></script>
+<script src="assets/common.js?v=20261110-curve"></script>
 <script>
 (function () {
   "use strict";
@@ -243,7 +242,7 @@
     ? { matches: KPL_TOTALS.matches, battles: KPL_TOTALS.battles }
     : ((window.KPL_SEASONS && KPL_SEASONS.scopes && KPL_SEASONS.scopes.all)
       ? KPL_SEASONS.scopes.all.totals : { matches: D.stats.matches, battles: D.stats.battles });
-  $("#kvRange").textContent = "2019–2026 全历史 · " + ((window.KPL_TOTALS && KPL_TOTALS.leagues) || 33) +
+  $("#kvRange").textContent = "2016–2026 全历史（2016–2018 为外部补充口径） · " + ((window.KPL_TOTALS && KPL_TOTALS.leagues) || 33) +
     " 个赛事（联赛 / 世冠 / 挑战者杯 / 年度总决赛）· 已收录 " +
     K.fmtInt(T.matches) + " 场比赛 / " + K.fmtInt(T.battles) + " 局";
 
@@ -258,7 +257,7 @@
   if ($("#covPct")) $("#covPct").textContent = T.battles ? (covN / T.battles * 100).toFixed(1) + "%" : "—";
 
   var stack = [
-    { k: "覆盖赛事", v: (window.KPL_TOTALS && KPL_TOTALS.leagues) || 33, s: "2019–2026 八个年度" },
+    { k: "覆盖赛事", v: (window.KPL_TOTALS && KPL_TOTALS.leagues) || 33, s: "2016–2026 十一个年度" },
     { k: "收录比赛", v: T.matches, s: "大场 · 比分已核对" },
     { k: "收录对局", v: T.battles, s: "逐局 BP / 选手 / 出装" },
     { k: "局内快照", v: D.stats.snapshotDirs, s: "场次原始帧（实时链路）" }
@@ -297,7 +296,8 @@
     ["2026-08", "前端改版为模块化数据看板（赛程 / 战队 / 选手 / 英雄）"],
     ["2026-10", "数据批量回补 + 模型重训（当口径下误差 0.199 → 0.143）"],
     ["2026-10", "接入年度总决赛；对外产品站上线"],
-    ["2026-10", "全历史接入：2019–2026 全部 33 个赛事、11,000+ 局"],
+    ["2026-11", "2016–2018 外部历史补充接入：wanplus + scoregg 共 584 场大场 / 1,906 局，数据范围回溯到 2016-09-17"],
+    ["2026-10", "全历史接入：2016–2026 全部 38 个赛事、12,000+ 局"],
     ["2026-10", "实时链路：1 秒采集 + 30 秒实时页 + 全自动归档闭环"],
     ["2026-10", "BP 八维分析、英雄组合协同算法、模型预测公开统计页"],
     ["2026-10", "评估口径重构：训练 / 校准 / 考试三段硬隔离，作废旧口径指标并重算"]

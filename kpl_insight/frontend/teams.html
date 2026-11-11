@@ -8,36 +8,36 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='5' fill='%230A111C'/%3E%3Crect x='3' y='3' width='26' height='26' rx='4' fill='none' stroke='%23F6C021' stroke-width='2'/%3E%3Ctext x='16' y='22' font-family='Arial,sans-serif' font-size='16' font-weight='bold' fill='%23F6C021' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="assets/style.css?v=20261102-brand">
 <link rel="stylesheet" href="assets/pages.css?v=20261102-brand">
-<link rel="stylesheet" href="assets/v55.css?v=87">
+<link rel="stylesheet" href="assets/v55.css?v=92">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="KPL赛研">
 <meta property="og:title" content="战队 · KPL赛研">
-<meta property="og:description" content="KPL 赛事数据产品：赛程比分、战队/选手/英雄数据、BP 分析、逐局复盘与实时胜率预测。2019–2026 全历史。">
+<meta property="og:description" content="KPL 赛事数据产品：赛程比分、战队/选手/英雄数据、BP 分析、逐局复盘与实时胜率预测。2016–2026 全历史。">
 <meta property="og:image" content="https://hccccc01333.github.io/KPLdata-site/assets/brand/kpl-research-social.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="assets/arena.css?v=1">
-<link rel="stylesheet" href="assets/arena-world.css?v=20261026">
-<script src="assets/arena-world.js?v=20261030a" type="module"></script>
-<link rel="stylesheet" href="assets/card-motion.css?v=1">
-<script src="assets/card-motion.js?v=1" type="module"></script>
 <link rel="stylesheet" href="assets/light.css?v=20261030a">
 <link rel="stylesheet" href="assets/theme.css?v=20261030b">
+<link rel="stylesheet" href="assets/site-v2.css?v=20261112a">
+<link rel="stylesheet" href="assets/teams-v2.css?v=20261112a">
 </head>
-<body data-page="teams.html">
+<body data-page="teams.html" class="v2-page teams-page">
 <header id="siteHeader" class="topbar"></header>
 
-<header class="page-hero">
-  <div class="wrap">
-    <div class="ph-kicker mono">TEAMS · 战队</div>
-    <h1>战队战力榜</h1>
-    <p>2019–2026 全部战队的<b>多维战力分</b>（对手强度校正胜率 / 局分优势 / 经济 / 对抗 / 推进 / 资源 / 稳定性），
-      不是单一胜率排序。可用上方「数据范围」切换年份或单个赛事，战力分与能力雷达都会按所选基准重算；
-      想看两队的历史恩怨，直接用
-      <a href="h2h.html" style="color:var(--gold);font-weight:700">「交手记录」</a> 对起来查。</p>
-    <div class="ph-meta mono">
-      <span>战队 <b id="tCount">—</b></span><i>/</i>
-      <span>范围对局 <b id="tGames">—</b></span><i>/</i>
-      <span>数据时钟 <b id="genAt">—</b></span>
+<header class="lg-hero">
+  <div class="lg-hero-gridlines" aria-hidden="true"></div>
+  <div class="v2-wrap">
+    <div class="v2-kicker"><i></i>TEAMS<b>·</b>战队</div>
+    <h1 class="v2-h1">战队战力榜</h1>
+    <p class="v2-lead">2016–2026 全部战队的<strong>多维战力分</strong>：对手强度校正胜率 / 局分优势 / 经济 / 对抗 / 推进 / 资源，不是单一胜率排序。可用「数据范围」切换年份或单个赛事；想看两队恩怨，直接用「交手记录」对起来查。</p>
+    <div class="v2-actions" style="margin-top:20px">
+      <a class="v2-btn" href="h2h.html">交手记录 <span class="arr">→</span></a>
+      <a class="v2-btn" href="schedule.html">赛程中心 <span class="arr">→</span></a>
+    </div>
+    <div class="v2-stats lg-kpis" style="margin-top:26px">
+      <div class="v2-stat"><b class="v2-mono" id="tCount">—</b><span>战队</span></div>
+      <div class="v2-stat"><b class="v2-mono" id="tGames">—</b><span>范围对局</span></div>
+      <div class="v2-stat"><b class="v2-mono" id="genAt">—</b><span>数据时钟</span></div>
     </div>
   </div>
 </header>
@@ -66,6 +66,10 @@
     <button class="btn ghost sm" id="expBtn" type="button">导出 CSV</button>
   </div>
   <div class="team-grid" id="teamGrid"></div>
+  <div class="teams-more">
+    <button class="v2-btn sm" id="moreBtn" type="button" hidden>显示更多</button>
+    <span class="teams-more-note mono" id="moreNote"></span>
+  </div>
 </main>
 
 <footer id="siteFooter" class="footer"></footer>
@@ -73,7 +77,7 @@
 <script src="assets/data.js?v=85"></script>
 <script src="assets/seasons.js?v=85"></script>
 <script src="assets/power.js?v=85"></script>
-<script src="assets/common.js?v=20261102-brand"></script>
+<script src="assets/common.js?v=20261110-curve"></script>
 <script>
 (function () {
   "use strict";
@@ -83,6 +87,7 @@
   $("#genAt").textContent = D.generatedAt;
 
   var curScope = "all";
+  var shown = 24;
   var DIMS = [["wr", "胜率"], ["mm", "局分"], ["gold", "经济"], ["kill", "对抗"], ["tower", "推进"], ["res", "资源"]];
 
   function powerScope(id) { return P.scopes[id] || { n: 0, threshold: { g: 0, m: 0 }, teams: [] }; }
@@ -133,6 +138,7 @@
     var src = K.scopeOf(curScope) || {};
     var min = parseInt($("#fMin").value, 10) || 0;
     var teams = sc.teams.filter(function (t) { return t.g >= min; });
+    var visible = teams.slice(0, shown);
     var scored = teams.filter(function (t) { return t.score !== undefined; });
     var unscored = teams.filter(function (t) { return t.score === undefined; });
 
@@ -143,7 +149,7 @@
       sc.threshold.m + " 大场 · " + (P.meta.algorithmVersion || "power-v1");
 
     var rank = 0;
-    $("#teamGrid").innerHTML = teams.map(function (t) {
+    $("#teamGrid").innerHTML = visible.map(function (t) {
       var isScored = t.score !== undefined;
       rank = isScored ? rank + 1 : rank;
       var tier = K.tierOf(t.wr);
@@ -180,6 +186,16 @@
         "</details></div>";
     }).join("");
 
+    var moreBtn = $("#moreBtn");
+    if (moreBtn) {
+      if (teams.length > shown) {
+        moreBtn.hidden = false;
+        moreBtn.textContent = "显示更多（已显示 " + Math.min(shown, teams.length) + " / " + teams.length + " 队）";
+      } else {
+        moreBtn.hidden = true;
+      }
+    }
+
     /* 数据简报 */
     if (scored.length) {
       var top = scored[0];
@@ -200,7 +216,8 @@
     K.refresh();
   }
 
-  $("#fMin").addEventListener("change", render);
+  $("#fMin").addEventListener("change", function () { shown = 24; render(); });
+  $("#moreBtn").addEventListener("click", function () { shown += 24; render(); });
   $("#expBtn").addEventListener("click", function () {
     var sc = powerScope(curScope);
     var min = parseInt($("#fMin").value, 10) || 0;
@@ -217,7 +234,7 @@
     K.exportCSV("战队战力榜_" + K.scopeName(curScope) + ".csv", rows);
   });
 
-  curScope = K.scopeBar("#scopeBar", function (id) { curScope = id; render(); }) || "all";
+  curScope = K.scopeBar("#scopeBar", function (id) { curScope = id; shown = 24; render(); }) || "all";
   render();
 })();
 </script>

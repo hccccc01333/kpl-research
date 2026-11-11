@@ -1,0 +1,563 @@
+/* ==========================================================================
+   KPL 赛研 · 英雄详情（hero）V2
+   与 players / heroes 榜单页共用 site-v2.css 令牌；旧 pages.css / v55.css /
+   arena.css 里有大量高优先级规则（含 !important），本文件统一用
+   `body.hero-page ...`（必要时加 #main / html.light-site）前缀逐项覆盖。
+   ========================================================================== */
+
+/* ==========================================================================
+   0. 页面基底
+   ========================================================================== */
+html.v55 body.hero-page {
+  background: var(--v2-bg) !important;
+  color: var(--v2-ink);
+  font-family: var(--v2-sans);
+}
+body.hero-page #main { margin-top: 26px !important; min-width: 0; }
+body.hero-page main > section { min-width: 0; }
+body.hero-page img { max-width: 100%; }
+body.hero-page .reveal { opacity: 1 !important; transform: none !important; }
+body.hero-page .mono { font-family: var(--v2-mono) !important; font-variant-numeric: tabular-nums; }
+
+/* ==========================================================================
+   1. 头版：lg-hero + 英雄头像 + 档位 + 四个 KPI
+   ========================================================================== */
+body.hero-page .detail-hero { padding-bottom: clamp(30px, 3.4vw, 46px); }
+body.hero-page .detail-hero .v2-crumb { margin-bottom: clamp(16px, 2vw, 24px); }
+body.hero-page .detail-id {
+  display: flex;
+  align-items: center;
+  gap: clamp(14px, 2vw, 22px);
+  margin-top: clamp(12px, 1.6vw, 18px);
+  min-width: 0;
+}
+body.hero-page .detail-ava {
+  width: clamp(66px, 7vw, 92px);
+  height: clamp(66px, 7vw, 92px);
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 24px;
+  overflow: hidden;
+  background: var(--v2-card-soft);
+  border: 1px solid var(--v2-line);
+  box-shadow: var(--v2-shadow-sm);
+}
+body.hero-page .detail-ava img { width: 100%; height: 100%; object-fit: cover; }
+body.hero-page .detail-id-main { min-width: 0; }
+body.hero-page .detail-hero .v2-h1 {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 12px;
+  margin-bottom: 8px;
+}
+body.hero-page .detail-hero .v2-tag {
+  display: inline-flex;
+  align-items: center;
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 7px;
+  font-family: var(--v2-sans);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  color: var(--v2-ink-3);
+  border: 1px solid var(--v2-line);
+  text-transform: none;
+}
+body.hero-page .detail-hero .v2-tag.tier-S {
+  color: var(--v2-win);
+  border-color: rgba(var(--v2-gold-rgb), .45);
+  background: rgba(var(--v2-gold-rgb), .08);
+}
+body.hero-page .detail-hero .v2-tag.tier-A {
+  color: var(--v2-blue);
+  border-color: rgba(var(--v2-blue-rgb), .35);
+  background: rgba(var(--v2-blue-rgb), .06);
+}
+body.hero-page .detail-hero .v2-tag.tier-B { color: var(--v2-ink-2); border-color: var(--v2-line-2); }
+body.hero-page .detail-hero .v2-tag.tier-C { color: var(--v2-ink-3); }
+body.hero-page .detail-hero .v2-lead { max-width: 78ch; }
+body.hero-page .detail-stats { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+body.hero-page .detail-stats .v2-stat span { white-space: normal; }
+body.hero-page .detail-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+}
+body.hero-page .detail-actions:empty { display: none; }
+body.hero-page .detail-actions .share-fab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 !important;
+  height: 34px;
+  padding: 0 15px !important;
+  border: 1px solid var(--v2-line-2) !important;
+  border-radius: 9px !important;
+  background: transparent !important;
+  color: var(--v2-ink-2) !important;
+  font-family: var(--v2-sans);
+  font-size: 12.5px !important;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color .18s, border-color .18s, background-color .18s;
+}
+body.hero-page .detail-actions .share-fab:hover {
+  color: var(--v2-ink) !important;
+  border-color: var(--v2-ink-3) !important;
+  background: var(--v2-card) !important;
+}
+
+/* ==========================================================================
+   2. 面板 / 区块标题 / 注释
+   ========================================================================== */
+body.hero-page #main .panel {
+  margin: 0;
+  padding: clamp(16px, 1.7vw, 22px) !important;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 18px !important;
+  background: var(--v2-card) !important;
+  box-shadow: var(--v2-shadow-sm) !important;
+  min-width: 0;
+  overflow: visible;
+}
+body.hero-page #main > .panel { margin-top: 16px; }
+body.hero-page #main .hd-grid > .panel { margin-top: 0 !important; }
+body.hero-page #main .hd-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 16px;
+  align-items: start;
+}
+body.hero-page #main .panel-title {
+  display: flex !important;
+  align-items: baseline !important;
+  justify-content: space-between !important;
+  flex-wrap: wrap !important;
+  gap: 6px 12px !important;
+  margin: 0 0 14px !important;
+  padding: 0 0 10px !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--v2-line) !important;
+  color: var(--v2-ink) !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  letter-spacing: -.01em;
+  text-align: left !important;
+}
+body.hero-page #main .panel-title::before,
+body.hero-page #main .panel-title::after { display: none !important; content: none !important; }
+body.hero-page #main .panel-title em {
+  font-style: normal !important;
+  font-family: var(--v2-mono);
+  font-size: 9.5px !important;
+  font-weight: 400;
+  letter-spacing: .02em;
+  color: var(--v2-ink-3) !important;
+}
+body.hero-page #main .block-note {
+  font-family: var(--v2-mono);
+  font-size: 10px !important;
+  line-height: 1.8 !important;
+  letter-spacing: .01em;
+  color: var(--v2-ink-3) !important;
+}
+body.hero-page #main .block-note a { color: var(--v2-ink-2) !important; border-bottom: 1px solid var(--v2-line-2); }
+body.hero-page #main .empty-tip {
+  padding: 26px 12px !important;
+  text-align: center;
+  font-size: 12px !important;
+  color: var(--v2-ink-3) !important;
+}
+
+/* ==========================================================================
+   3. 逐年表现（yr-trend）
+   ========================================================================== */
+body.hero-page #main .yr-trend { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+body.hero-page #main .yr-row {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) 64px 64px 78px;
+  gap: 12px;
+  align-items: center;
+}
+body.hero-page #main .yr-row .y {
+  font-family: var(--v2-mono);
+  font-size: 11.5px !important;
+  font-weight: 600;
+  color: var(--v2-ink-2) !important;
+}
+body.hero-page #main .yr-row .bar {
+  height: 4px;
+  border: 0 !important;
+  border-radius: 999px !important;
+  background: var(--v2-line) !important;
+  overflow: hidden;
+}
+body.hero-page #main .yr-row .bar i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--v2-blue) !important;
+  opacity: .62 !important;
+}
+body.hero-page #main .yr-row .n,
+body.hero-page #main .yr-row .ban {
+  font-family: var(--v2-mono);
+  font-size: 10.5px !important;
+  color: var(--v2-ink-3) !important;
+  text-align: right;
+}
+body.hero-page #main .yr-row .wr {
+  font-family: var(--v2-mono);
+  font-size: 12px !important;
+  font-weight: 700;
+  color: var(--v2-ink) !important;
+  text-align: right;
+}
+
+/* ==========================================================================
+   4. 指标瓦片（hd-stats）：成长曲线 / 联赛级均值
+   ========================================================================== */
+body.hero-page #main .hd-stats {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+  margin-top: 4px !important;
+  border: 0 !important;
+  padding-top: 0 !important;
+}
+body.hero-page #main .hd-cell {
+  min-width: 0;
+  padding: 12px 14px !important;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 13px !important;
+  background: var(--v2-card-soft) !important;
+}
+body.hero-page #main .hd-cell .k { font-size: 10px !important; color: var(--v2-ink-3) !important; }
+body.hero-page #main .hd-cell .v {
+  margin-top: 2px !important;
+  font-family: var(--v2-mono);
+  font-size: clamp(17px, 1.7vw, 21px) !important;
+  font-weight: 700 !important;
+  line-height: 1.2;
+  letter-spacing: -.02em;
+  color: var(--v2-ink) !important;
+}
+body.hero-page #main .hd-cell.hl .v { color: var(--v2-gold) !important; }
+body.hero-page #main .hd-cell .s {
+  margin-top: 3px !important;
+  font-family: var(--v2-mono);
+  font-size: 9.5px !important;
+  line-height: 1.5;
+  color: var(--v2-ink-3) !important;
+}
+body.hero-page #main #heroGrowthChart { margin-top: 14px !important; }
+body.hero-page #main #heroGrowthChart svg { display: block; width: 100%; height: auto; }
+body.hero-page #main #heroGrowthChart svg path[stroke="#F02F55"],
+body.hero-page #main #heroGrowthChart svg path[stroke="#F07483"] { stroke: var(--v2-blue) !important; }
+body.hero-page #main #heroGrowthChart svg circle { stroke: var(--v2-blue) !important; fill: var(--v2-card) !important; }
+body.hero-page #main .hd-grid .block-note { margin-top: 10px !important; }
+
+/* ==========================================================================
+   5. 选手使用榜 / 战队使用 / 最近出场 / 三人组合 / 对位（行列表）
+   ========================================================================== */
+body.hero-page #main .usage { display: flex; flex-direction: column; margin-top: 2px; }
+body.hero-page #main .usage a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 6px !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--v2-line) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: var(--v2-ink-2) !important;
+}
+body.hero-page #main .usage a:last-child { border-bottom: 0 !important; }
+body.hero-page #main .usage a:hover { background: var(--v2-inset) !important; }
+body.hero-page #main .usage img {
+  width: 24px;
+  height: 24px;
+  flex: none;
+  border-radius: 50%;
+  object-fit: contain;
+  border: 1px solid var(--v2-line);
+  background: var(--v2-inset);
+}
+body.hero-page #main .usage .nm {
+  flex: 1;
+  min-width: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--v2-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+body.hero-page #main .usage .em { font-size: 9.5px; font-weight: 400; color: var(--v2-ink-3); }
+body.hero-page #main .usage .n {
+  width: 52px;
+  font-family: var(--v2-mono);
+  font-size: 10px;
+  color: var(--v2-ink-3);
+  text-align: right;
+}
+body.hero-page #main .usage .wr {
+  width: 54px;
+  font-family: var(--v2-mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--v2-ink) !important;
+  text-align: right;
+}
+
+body.hero-page #main .recent-row {
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr) 92px 32px;
+  gap: 10px;
+  align-items: center;
+  padding: 9px 6px !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--v2-line) !important;
+  border-radius: 0 !important;
+  color: var(--v2-ink-2) !important;
+}
+body.hero-page #main .recent-row:last-child { border-bottom: 0 !important; }
+body.hero-page #main .recent-row:hover { background: var(--v2-inset) !important; }
+body.hero-page #main .recent-row .d { font-family: var(--v2-mono); font-size: 10px; color: var(--v2-ink-3); }
+body.hero-page #main .recent-row .vs {
+  min-width: 0;
+  font-size: 12px;
+  color: var(--v2-ink-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+body.hero-page #main .recent-row .pl {
+  min-width: 0;
+  font-size: 10.5px;
+  color: var(--v2-ink-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+body.hero-page #main .recent-row .res {
+  display: inline-grid;
+  place-items: center;
+  height: 20px;
+  border-radius: 5px;
+  font-family: var(--v2-mono);
+  font-size: 10px;
+  font-weight: 700;
+}
+body.hero-page #main .recent-row .res.w { color: var(--v2-blue) !important; background: rgba(var(--v2-blue-rgb), .10) !important; }
+body.hero-page #main .recent-row .res.l { color: var(--v2-red) !important; background: rgba(var(--v2-red-rgb), .08) !important; }
+
+body.hero-page #main .combo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 6px !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--v2-line) !important;
+  font-size: 12px;
+  color: var(--v2-ink-2);
+}
+body.hero-page #main .combo:last-child { border-bottom: 0 !important; }
+body.hero-page #main .combo:hover { background: var(--v2-inset); }
+body.hero-page #main .combo .c { flex: 1; min-width: 0; }
+body.hero-page #main .combo .c .em { font-size: 9.5px !important; color: var(--v2-ink-3) !important; }
+body.hero-page #main .combo .n {
+  font-family: var(--v2-mono);
+  font-size: 10px;
+  color: var(--v2-ink-3);
+  white-space: nowrap;
+}
+body.hero-page #main .combo .wr {
+  width: 56px;
+  font-family: var(--v2-mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--v2-ink) !important;
+  text-align: right;
+}
+body.hero-page #main .combo .team-cell { display: inline-flex; align-items: center; gap: 7px; }
+body.hero-page #main .combo .team-cell img { border-radius: 50%; object-fit: contain; background: var(--v2-inset); }
+
+/* ==========================================================================
+   6. 常见出装 / 职业哥同款
+   ========================================================================== */
+body.hero-page #main .eq-row { display: flex; flex-wrap: wrap; gap: 8px; }
+body.hero-page #main .eq-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+body.hero-page #main .eq-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 10px !important;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 999px !important;
+  background: var(--v2-card-soft) !important;
+  color: var(--v2-ink-2) !important;
+  font-size: 10.5px;
+  white-space: nowrap;
+}
+body.hero-page #main .eq-chip img {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  border-radius: 6px;
+  object-fit: cover;
+  border: 1px solid var(--v2-line);
+  background: var(--v2-inset);
+}
+body.hero-page #main .eq-chip b {
+  font-family: var(--v2-mono);
+  font-size: 9.5px;
+  font-weight: 700;
+  color: var(--v2-gold) !important;
+}
+body.hero-page #main .eq-lead {
+  font-family: var(--v2-mono);
+  font-size: 9.5px;
+  color: var(--v2-ink-3);
+  align-self: center;
+}
+
+body.hero-page #main .pro-warn {
+  margin: 8px 0 12px;
+  padding: 9px 13px;
+  border: 0 !important;
+  border-left: 2px solid var(--v2-gold) !important;
+  border-radius: 0 10px 10px 0 !important;
+  background: rgba(var(--v2-gold-rgb), .06) !important;
+  color: var(--v2-ink-3) !important;
+  font-size: 10.5px;
+  line-height: 1.8;
+}
+body.hero-page #main .pro-row {
+  padding: 13px 0 !important;
+  border: 0 !important;
+  border-top: 1px solid var(--v2-line) !important;
+  background: transparent !important;
+}
+body.hero-page #main .pro-row:first-of-type { border-top: 0 !important; }
+body.hero-page #main .pro-head {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+body.hero-page #main .pro-name {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--v2-ink) !important;
+  border-bottom: 1px solid transparent;
+}
+body.hero-page #main .pro-name:hover { color: var(--v2-blue) !important; border-bottom-color: var(--v2-blue); }
+body.hero-page #main .pro-head .em { font-size: 10px; color: var(--v2-ink-3); }
+body.hero-page #main .pro-stat {
+  margin-left: auto;
+  font-family: var(--v2-mono);
+  font-size: 10px;
+  color: var(--v2-ink-3);
+  white-space: nowrap;
+}
+body.hero-page #main .pro-reps { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+body.hero-page #main .pro-reps .em { font-size: 10px; color: var(--v2-ink-3); }
+body.hero-page #main .rep-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 999px;
+  background: var(--v2-card) !important;
+  color: var(--v2-ink-3) !important;
+  font-size: 10px;
+  white-space: nowrap;
+}
+body.hero-page #main .rep-chip:hover { border-color: var(--v2-line-2) !important; color: var(--v2-ink-2) !important; }
+body.hero-page #main .rep-chip b.w { color: var(--v2-blue) !important; font-weight: 700; }
+body.hero-page #main .rep-chip b.l { color: var(--v2-red) !important; font-weight: 700; }
+body.hero-page #main .rep-chip em { font-style: normal; font-family: var(--v2-mono); font-size: 9px; color: var(--v2-ink-3); }
+
+/* ==========================================================================
+   7. 响应式
+   ========================================================================== */
+@media (max-width: 1000px) {
+  body.hero-page #main .hd-grid { grid-template-columns: minmax(0, 1fr) !important; }
+}
+
+@media (max-width: 900px) {
+  body.hero-page .detail-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    row-gap: 18px !important;
+  }
+  body.hero-page .detail-stats .v2-stat:nth-child(odd) { padding-left: 0; border-left: 0; }
+  body.hero-page #main .hd-stats { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+}
+
+@media (max-width: 760px) {
+  body.hero-page #main { margin-top: 20px !important; }
+  body.hero-page #main .panel { padding: 16px !important; border-radius: 16px !important; }
+  body.hero-page #main .yr-row {
+    grid-template-columns: 44px minmax(0, 1fr) 50px 50px 62px;
+    gap: 8px;
+  }
+  body.hero-page #main .yr-row .n,
+  body.hero-page #main .yr-row .ban { font-size: 9.5px !important; }
+  body.hero-page #main .eq-cols { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  body.hero-page #main .recent-row { grid-template-columns: 46px minmax(0, 1fr) 30px; }
+  body.hero-page #main .recent-row .pl { display: none; }
+  body.hero-page #main #heroGrowthChart { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  body.hero-page #main #heroGrowthChart::before {
+    content: "← 左右滑动查看完整曲线 →";
+    display: block;
+    margin: 0 0 6px;
+    font-family: var(--v2-mono);
+    font-size: 9px;
+    letter-spacing: .02em;
+    color: var(--v2-ink-3);
+  }
+  body.hero-page #main #heroGrowthChart svg { min-width: 640px; }
+}
+
+@media (max-width: 640px) {
+  body.hero-page .detail-stats {
+    grid-template-columns: minmax(0, 1fr) !important;
+    row-gap: 0 !important;
+  }
+  body.hero-page .detail-stats .v2-stat {
+    padding: 12px 0 !important;
+    border-left: 0 !important;
+    border-top: 1px solid var(--v2-line);
+  }
+  body.hero-page .detail-stats .v2-stat:first-child { padding-top: 0 !important; border-top: 0 !important; }
+  body.hero-page .detail-id { align-items: flex-start; }
+  body.hero-page .detail-ava { width: 60px; height: 60px; border-radius: 18px; }
+  body.hero-page .detail-hero .v2-h1 { font-size: clamp(26px, 8.6vw, 36px); }
+  body.hero-page #main .hd-stats { grid-template-columns: minmax(0, 1fr) !important; }
+  body.hero-page #main .pro-stat { margin-left: 0; white-space: normal; }
+}
+
+/* ==========================================================================
+   8. 覆盖 light.css 的 html.v55.light-site :is(.panel,...) !important
+   ========================================================================== */
+html.light-site body.hero-page.v2-page #main .panel {
+  padding: clamp(16px, 1.7vw, 22px) !important;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 18px !important;
+  background: var(--v2-card) !important;
+  box-shadow: var(--v2-shadow-sm) !important;
+}
+@media (max-width: 760px) {
+  html.light-site body.hero-page.v2-page #main .panel {
+    padding: 16px !important;
+    border-radius: 16px !important;
+  }
+}

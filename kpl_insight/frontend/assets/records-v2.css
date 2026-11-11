@@ -1,0 +1,916 @@
+/* ==========================================================================
+   KPL 赛研 · 赛事纪录（records）V2
+   —— 只换视觉层：DOM 结构、数据口径、筛选 / 分享 / 详情弹窗交互保持原样。
+   —— 旧主题（pages.css / v55.css / arena.css / records-page.css / light.css）
+      优先级很高（大量 !important + body[data-page] 前缀），本文件统一用
+      `html.v55 body.records-page.v2-page` 前缀 + !important 逐项覆盖，分组书写。
+   ========================================================================== */
+
+/* ---------- 0. 页面基底 --------------------------------------------------- */
+html.v55 body.records-page.v2-page {
+  background: var(--v2-bg) !important;
+  color: var(--v2-ink);
+  font-family: var(--v2-sans);
+  -webkit-font-smoothing: antialiased;
+}
+html.v55 body.records-page.v2-page main.records-main {
+  padding-bottom: clamp(40px, 5vw, 72px);
+  min-width: 0;
+}
+html.v55 body.records-page.v2-page main.records-main > * { min-width: 0; }
+/* 本地实时服务条（common.js 在 localhost 注入） */
+html.v55 body.records-page.v2-page #kplLocalRuntime { margin: 14px auto 16px !important; }
+
+/* ---------- 1. 头版 ------------------------------------------------------- */
+html.v55 body.records-page.v2-page .lg-hero .v2-lead b {
+  color: var(--v2-ink);
+  font-weight: 700;
+}
+html.v55 body.records-page.v2-page .records-kpis {
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+}
+html.v55 body.records-page.v2-page .records-kpis .v2-stat { min-width: 0; }
+html.v55 body.records-page.v2-page .records-kpis .v2-stat b {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-family: var(--v2-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: clamp(20px, 2.1vw, 29px);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -.02em;
+  color: var(--v2-ink);
+}
+html.v55 body.records-page.v2-page .records-kpis .v2-stat span {
+  white-space: normal;
+  font-size: 11px;
+  line-height: 1.55;
+  color: var(--v2-ink-3);
+}
+
+/* ---------- 2. 数据范围（scopebar，由内联脚本渲染） ----------------------- */
+html.v55 body.records-page.v2-page .scopebar {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: flex-end !important;
+  justify-content: flex-start !important;
+  flex-wrap: wrap !important;
+  gap: 12px 16px;
+  margin: 0 0 14px !important;
+  padding: 14px 16px !important;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 16px !important;
+  background: var(--v2-card) !important;
+  box-shadow: var(--v2-shadow-sm) !important;
+  min-width: 0;
+}
+html.v55 body.records-page.v2-page .scopebar > * { margin-left: 0 !important; }
+html.v55 body.records-page.v2-page .scopebar .scope-lab {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  padding-bottom: 11px;
+  font-family: var(--v2-mono) !important;
+  font-size: 9.5px !important;
+  font-weight: 500 !important;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--v2-ink-3) !important;
+}
+html.v55 body.records-page.v2-page .scopebar .fld {
+  display: flex !important;
+  flex-direction: column;
+  gap: 6px;
+  flex: 0 0 auto;
+  min-width: 0 !important;
+}
+html.v55 body.records-page.v2-page .scopebar .fld > span {
+  padding-left: 2px;
+  font-family: var(--v2-mono) !important;
+  font-size: 9px !important;
+  font-weight: 500 !important;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--v2-ink-3) !important;
+}
+html.v55 body.records-page.v2-page .scopebar .scope-meta {
+  margin-left: auto !important;
+  padding-bottom: 10px;
+  font-family: var(--v2-mono) !important;
+  font-size: 10px !important;
+  color: var(--v2-ink-3) !important;
+  white-space: nowrap;
+}
+
+/* 通用下拉框（数据范围 + 筛选条共用） */
+html.v55 body.records-page.v2-page :is(.scopebar, .filterbar) select {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  height: 38px;
+  min-width: 132px;
+  padding: 0 32px 0 12px;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 10px !important;
+  background:
+    linear-gradient(45deg, transparent 50%, var(--v2-ink-3) 50%) calc(100% - 15px) 16px / 4px 4px no-repeat,
+    linear-gradient(135deg, var(--v2-ink-3) 50%, transparent 50%) calc(100% - 11px) 16px / 4px 4px no-repeat,
+    var(--v2-card) !important;
+  color: var(--v2-ink) !important;
+  font-family: var(--v2-sans) !important;
+  font-size: 12.5px !important;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  outline: none;
+  box-shadow: none !important;
+}
+html.light-site body.records-page.v2-page :is(.scopebar, .filterbar) select { color-scheme: light !important; }
+html.dark-site body.records-page.v2-page :is(.scopebar, .filterbar) select { color-scheme: dark !important; }
+html.v55 body.records-page.v2-page :is(.scopebar, .filterbar) select:focus {
+  border-color: var(--v2-line-2) !important;
+  box-shadow: 0 0 0 3px rgba(var(--v2-blue-rgb), .12) !important;
+}
+html.v55 body.records-page.v2-page :is(.scopebar, .filterbar) select:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+html.light-site body.records-page.v2-page :is(.scopebar, .filterbar) select option {
+  background: var(--v2-card);
+  color: var(--v2-ink);
+}
+html.dark-site body.records-page.v2-page :is(.scopebar, .filterbar) select option {
+  background: #101a2b;
+  color: var(--v2-ink);
+}
+
+/* ---------- 3. 数据覆盖（#recordsCoverage 由内联脚本填充） ---------------- */
+html.v55 body.records-page.v2-page .records-coverage {
+  display: flex !important;
+  align-items: flex-start;
+  gap: 14px;
+  margin: 0 0 14px !important;
+  padding: 15px 18px !important;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 16px !important;
+  background: var(--v2-card-soft) !important;
+  color: var(--v2-ink-2) !important;
+  font-size: 11.5px !important;
+  line-height: 1.8 !important;
+}
+html.v55 body.records-page.v2-page .records-coverage .coverage-label {
+  flex: none;
+  padding-top: 2px;
+  font-family: var(--v2-mono) !important;
+  font-size: 9.5px !important;
+  font-weight: 600 !important;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--v2-ink-3) !important;
+  white-space: nowrap;
+}
+html.v55 body.records-page.v2-page .records-coverage .coverage-body { min-width: 0; }
+html.v55 body.records-page.v2-page .records-coverage strong {
+  display: block;
+  color: var(--v2-ink) !important;
+  font-size: 12.5px !important;
+  font-weight: 700 !important;
+  letter-spacing: -.01em;
+}
+html.v55 body.records-page.v2-page .records-coverage p {
+  margin: 3px 0 0 !important;
+  color: var(--v2-ink-2) !important;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- 4. 筛选条（#recTabs / #recMetric / #recDir / #recRandom） ------ */
+html.v55 body.records-page.v2-page .filterbar.records-controls {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: flex-end !important;
+  flex-wrap: wrap !important;
+  gap: 12px 16px !important;
+  margin: 0 0 12px !important;
+  padding: 12px 16px 14px !important;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 16px !important;
+  background: var(--v2-card) !important;
+  box-shadow: var(--v2-shadow-sm) !important;
+  min-width: 0;
+}
+html.v55 body.records-page.v2-page .filterbar.records-controls > * { margin-left: 0 !important; }
+
+/* 纪录分类：分段控件。注意 #recDir 会由内联脚本用 style.display 隐藏（主题模式），
+   这里不能写 display: ... !important，否则会压过内联样式。 */
+html.v55 body.records-page.v2-page #recTabs,
+html.v55 body.records-page.v2-page #recDir {
+  display: inline-flex;
+  flex-wrap: wrap !important;
+  gap: 2px;
+  flex: none;
+  width: auto !important;
+  max-width: 100%;
+  padding: 3px !important;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 11px !important;
+  background: var(--v2-inset) !important;
+  overflow: visible !important;
+}
+html.v55 body.records-page.v2-page #recTabs button,
+html.v55 body.records-page.v2-page #recDir button {
+  appearance: none;
+  -webkit-appearance: none;
+  min-height: 0 !important;
+  height: 32px;
+  padding: 0 13px !important;
+  border: 0 !important;
+  border-radius: 8px !important;
+  background: transparent !important;
+  background-image: none !important;
+  color: var(--v2-ink-3) !important;
+  font-family: var(--v2-sans) !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+  letter-spacing: 0;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color .16s, background-color .16s, box-shadow .16s;
+}
+html.v55 body.records-page.v2-page #recTabs button:hover,
+html.v55 body.records-page.v2-page #recDir button:hover { color: var(--v2-ink-2) !important; }
+html.v55 body.records-page.v2-page #recTabs button.on,
+html.v55 body.records-page.v2-page #recDir button.on,
+html.v55 body.records-page.v2-page #recTabs button[aria-pressed="true"],
+html.v55 body.records-page.v2-page #recDir button[aria-pressed="true"] {
+  color: var(--v2-ink) !important;
+  background: var(--v2-card) !important;
+  background-image: none !important;
+  box-shadow: var(--v2-shadow-sm), 0 0 0 1px var(--v2-line) !important;
+}
+html.dark-site body.records-page.v2-page #recTabs button.on,
+html.dark-site body.records-page.v2-page #recDir button.on,
+html.dark-site body.records-page.v2-page #recTabs button[aria-pressed="true"],
+html.dark-site body.records-page.v2-page #recDir button[aria-pressed="true"] {
+  background: #17233a !important;
+  box-shadow: 0 0 0 1px var(--v2-line-2) !important;
+}
+
+/* 纪录类型下拉 */
+html.v55 body.records-page.v2-page #metricWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1 1 240px;
+  max-width: 420px;
+  min-width: 180px !important;
+}
+html.v55 body.records-page.v2-page #metricWrap > span {
+  padding-left: 2px;
+  font-family: var(--v2-mono) !important;
+  font-size: 9px !important;
+  font-weight: 500 !important;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--v2-ink-3) !important;
+}
+html.v55 body.records-page.v2-page #metricWrap select { width: 100%; }
+
+/* 随机一条 */
+html.v55 body.records-page.v2-page #recRandom {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  height: 38px !important;
+  margin-left: auto !important;
+  padding: 0 16px !important;
+  border: 1px solid var(--v2-line-2) !important;
+  border-radius: 10px !important;
+  background: transparent !important;
+  color: var(--v2-ink-2) !important;
+  font-family: var(--v2-sans) !important;
+  font-size: 12.5px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color .18s, border-color .18s, background-color .18s;
+}
+html.v55 body.records-page.v2-page #recRandom:hover {
+  color: var(--v2-ink) !important;
+  border-color: var(--v2-ink-3) !important;
+  background: var(--v2-inset) !important;
+}
+html.v55 body.records-page.v2-page #recRandom:active { transform: translateY(1px); }
+
+/* 主题合集 */
+html.v55 body.records-page.v2-page #themeWrap {
+  flex: 1 1 100%;
+  margin-top: 2px !important;
+  padding-top: 12px !important;
+  border-top: 1px solid var(--v2-line) !important;
+}
+html.v55 body.records-page.v2-page .theme-chips {
+  display: flex !important;
+  flex-wrap: wrap;
+  gap: 8px !important;
+}
+html.v55 body.records-page.v2-page .theme-chips button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 0 !important;
+  height: 32px;
+  padding: 0 14px !important;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 999px !important;
+  background: var(--v2-card) !important;
+  color: var(--v2-ink-2) !important;
+  font-family: var(--v2-sans) !important;
+  font-size: 12.5px !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color .16s, border-color .16s, background-color .16s;
+}
+html.v55 body.records-page.v2-page .theme-chips button:hover {
+  border-color: var(--v2-ink-3) !important;
+  color: var(--v2-ink) !important;
+  background: var(--v2-inset) !important;
+}
+html.v55 body.records-page.v2-page .theme-chips button.on {
+  border-color: var(--v2-ink) !important;
+  background: var(--v2-ink) !important;
+  color: var(--v2-bg-elev) !important;
+  font-weight: 700 !important;
+  box-shadow: none !important;
+}
+html.dark-site body.records-page.v2-page .theme-chips button.on {
+  background: var(--v2-ink) !important;
+  color: #10141c !important;
+  border-color: var(--v2-ink) !important;
+}
+
+/* ---------- 5. 数据简报（#recBrief） -------------------------------------- */
+html.v55 body.records-page.v2-page .brief {
+  display: flex !important;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 0 0 14px !important;
+  padding: 12px 16px !important;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 14px !important;
+  background: var(--v2-card-soft) !important;
+  box-shadow: none !important;
+  color: var(--v2-ink-3) !important;
+  font-size: 11.5px !important;
+  line-height: 1.78 !important;
+  overflow-wrap: anywhere;
+}
+html.v55 body.records-page.v2-page .brief .ico {
+  flex: none;
+  margin-top: 3px;
+  color: var(--v2-blue) !important;
+  font-family: var(--v2-mono) !important;
+  font-size: 9px !important;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+html.v55 body.records-page.v2-page .brief b {
+  color: var(--v2-ink-2) !important;
+  font-weight: 700;
+}
+html.v55 body.records-page.v2-page .brief div { min-width: 0; }
+
+/* ---------- 6. 纪录卡列表 ------------------------------------------------- */
+html.v55 body.records-page.v2-page .rec-list {
+  margin: 0;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 18px !important;
+  background: var(--v2-card) !important;
+  box-shadow: var(--v2-shadow) !important;
+  overflow: hidden;
+}
+html.v55 body.records-page.v2-page .rec-list:empty { display: none; }
+html.v55 body.records-page.v2-page .rec-row {
+  display: grid !important;
+  grid-template-columns: 46px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 22px !important;
+  border: 0 !important;
+  border-top: 1px solid var(--v2-line) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: inherit;
+  text-decoration: none;
+  transition: background-color .16s;
+}
+html.v55 body.records-page.v2-page .rec-row:first-child { border-top: 0 !important; }
+html.v55 body.records-page.v2-page .rec-row:hover { background: var(--v2-inset) !important; }
+html.v55 body.records-page.v2-page .rec-row.top1 {
+  background: linear-gradient(90deg, rgba(var(--v2-gold-rgb), .085), transparent 62%) !important;
+  box-shadow: inset 3px 0 0 var(--v2-gold);
+}
+html.v55 body.records-page.v2-page .rec-row.top1:hover {
+  background: linear-gradient(90deg, rgba(var(--v2-gold-rgb), .12), var(--v2-inset) 70%) !important;
+}
+html.v55 body.records-page.v2-page .rec-row .rank {
+  font-family: var(--v2-mono) !important;
+  font-variant-numeric: tabular-nums;
+  font-size: 12.5px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0;
+  text-align: center;
+  color: var(--v2-ink-3) !important;
+}
+html.v55 body.records-page.v2-page .rec-row.top1 .rank { color: var(--v2-win) !important; }
+html.v55 body.records-page.v2-page .rec-who { min-width: 0; }
+html.v55 body.records-page.v2-page .rec-who b {
+  display: block;
+  font-size: 14.5px !important;
+  font-weight: 700 !important;
+  line-height: 1.45;
+  letter-spacing: -.01em;
+  color: var(--v2-ink) !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+html.v55 body.records-page.v2-page .rec-who em {
+  display: block;
+  margin-top: 3px;
+  font-style: normal;
+  font-size: 11.5px !important;
+  line-height: 1.6;
+  color: var(--v2-ink-2) !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+html.v55 body.records-page.v2-page .rec-val {
+  font-family: var(--v2-mono) !important;
+  font-variant-numeric: tabular-nums;
+  font-size: 26px !important;
+  font-weight: 800 !important;
+  line-height: 1.1;
+  letter-spacing: -.02em;
+  text-align: right;
+  white-space: nowrap;
+  color: var(--v2-ink) !important;
+}
+html.v55 body.records-page.v2-page .rec-row.top1 .rec-val { color: var(--v2-win) !important; }
+html.v55 body.records-page.v2-page .rec-val small {
+  margin-left: 5px;
+  font-family: var(--v2-mono);
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0;
+  color: var(--v2-ink-3) !important;
+}
+/* 可点开的条目：虚线下划线提示，hover 变金 */
+html.v55 body.records-page.v2-page .rec-row.openable .rec-who b {
+  border-bottom: 1px dashed rgba(var(--v2-blue-rgb), .38);
+}
+html.v55 body.records-page.v2-page .rec-row.openable:hover .rec-who b {
+  border-bottom-color: var(--v2-gold);
+}
+html.v55 body.records-page.v2-page .rec-row:focus-visible {
+  outline: 2px solid var(--v2-blue);
+  outline-offset: -2px;
+}
+html.v55 body.records-page.v2-page .rec-list .empty-tip {
+  padding: 36px 18px !important;
+  text-align: center;
+  font-size: 12px !important;
+  color: var(--v2-ink-3) !important;
+}
+
+/* ---------- 7. 口径说明 --------------------------------------------------- */
+html.v55 body.records-page.v2-page .records-notes {
+  margin-top: clamp(30px, 3.6vw, 44px) !important;
+}
+html.v55 body.records-page.v2-page .records-notes .block-head {
+  display: flex !important;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 10px 20px;
+  flex-wrap: wrap;
+  margin: 0 0 14px !important;
+  padding: 0 !important;
+  border: 0 !important;
+}
+html.v55 body.records-page.v2-page .records-notes .block-head h2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-family: var(--v2-sans) !important;
+  font-size: 17px !important;
+  font-weight: 800 !important;
+  letter-spacing: -.02em !important;
+  color: var(--v2-ink) !important;
+}
+html.v55 body.records-page.v2-page .records-notes .block-head h2 i {
+  display: inline-block;
+  width: 3px !important;
+  height: 15px !important;
+  margin: 0 !important;
+  border-radius: 2px !important;
+  background: var(--v2-gold) !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+html.v55 body.records-page.v2-page .records-notes .block-head .block-note {
+  margin: 0 0 1px;
+  padding: 0;
+  font-family: var(--v2-mono) !important;
+  font-size: 10px !important;
+  letter-spacing: 0;
+  color: var(--v2-ink-3) !important;
+}
+html.v55 body.records-page.v2-page .records-note-card {
+  padding: 18px 22px !important;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 18px !important;
+  background: var(--v2-card) !important;
+  box-shadow: var(--v2-shadow-sm) !important;
+}
+html.v55 body.records-page.v2-page .records-note-list {
+  margin: 0 !important;
+  padding-left: 22px !important;
+  list-style: decimal !important;
+  color: var(--v2-ink-2) !important;
+  font-size: 11.5px !important;
+  line-height: 1.85 !important;
+}
+html.v55 body.records-page.v2-page .records-note-list li {
+  margin: 0 0 6px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  color: var(--v2-ink-2) !important;
+}
+html.v55 body.records-page.v2-page .records-note-list li:last-child { margin-bottom: 0 !important; }
+html.v55 body.records-page.v2-page .records-note-list li::marker {
+  font-family: var(--v2-mono);
+  font-size: 10px;
+  color: var(--v2-ink-3);
+}
+html.v55 body.records-page.v2-page .records-note-list b {
+  color: var(--v2-ink) !important;
+  font-weight: 700;
+}
+
+/* ---------- 8. 详情弹窗（同场十人抽屉，内联脚本动态创建） ---------------- */
+html.v55 body.records-page.v2-page .rec-modal { z-index: 200; }
+html.v55 body.records-page.v2-page .rec-modal-bg {
+  background: rgba(8, 13, 22, .58) !important;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+html.light-site body.records-page.v2-page .rec-modal-bg { background: rgba(23, 28, 38, .44) !important; }
+html.v55 body.records-page.v2-page .rec-modal-panel {
+  display: flex !important;
+  flex-direction: column;
+  width: min(920px, calc(100% - 40px));
+  max-width: 920px;
+  margin: 5vh auto !important;
+  max-height: 90vh;
+  padding: 0 !important;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 20px !important;
+  background: var(--v2-card) !important;
+  color: var(--v2-ink) !important;
+  box-shadow: var(--v2-shadow-lg) !important;
+  overflow: hidden;
+}
+html.v55 body.records-page.v2-page .rec-modal.on .rec-modal-panel {
+  animation: recModalIn .22s var(--v2-ease);
+}
+@keyframes recModalIn {
+  from { opacity: 0; transform: translateY(12px) scale(.99); }
+  to { opacity: 1; transform: none; }
+}
+html.v55 body.records-page.v2-page #recModalBody {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1;
+  overflow: hidden;
+}
+html.v55 body.records-page.v2-page .rm-close {
+  position: absolute;
+  right: 16px;
+  top: 15px;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid var(--v2-line) !important;
+  border-radius: 10px !important;
+  background: transparent !important;
+  color: var(--v2-ink-3) !important;
+  font-family: var(--v2-sans);
+  font-size: 19px;
+  font-weight: 400;
+  line-height: 1;
+  cursor: pointer;
+  transition: color .16s, background-color .16s, border-color .16s;
+}
+html.v55 body.records-page.v2-page .rm-close:hover {
+  border-color: var(--v2-line-2) !important;
+  background: var(--v2-inset) !important;
+  color: var(--v2-ink) !important;
+}
+
+/* 弹窗头 */
+html.v55 body.records-page.v2-page .rec-modal-head {
+  position: relative;
+  padding: 22px 26px 16px !important;
+  border-bottom: 1px solid var(--v2-line) !important;
+  background: transparent !important;
+}
+html.v55 body.records-page.v2-page .rec-modal-head .rm-kicker {
+  font-family: var(--v2-mono) !important;
+  font-size: 9.5px !important;
+  font-weight: 500;
+  letter-spacing: .13em !important;
+  text-transform: uppercase;
+  color: var(--v2-ink-2) !important;
+}
+html.v55 body.records-page.v2-page .rec-modal-head h3 {
+  margin: 7px 0 6px !important;
+  padding-right: 44px;
+  font-family: var(--v2-sans) !important;
+  font-size: clamp(18px, 2vw, 23px) !important;
+  font-weight: 800 !important;
+  line-height: 1.3;
+  letter-spacing: -.02em !important;
+  color: var(--v2-ink) !important;
+}
+html.v55 body.records-page.v2-page .rec-modal-head h3 span {
+  margin: 0 6px !important;
+  font-family: var(--v2-mono);
+  font-size: .72em;
+  font-weight: 500 !important;
+  letter-spacing: .04em;
+  color: var(--v2-ink-3) !important;
+}
+html.v55 body.records-page.v2-page .rec-modal-head .rm-sub {
+  margin: 0;
+  font-size: 12px !important;
+  line-height: 1.7;
+  color: var(--v2-ink-2) !important;
+}
+html.v55 body.records-page.v2-page .rec-modal-head .rm-sub b {
+  color: var(--v2-win) !important;
+  font-family: var(--v2-mono);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+html.v55 body.records-page.v2-page .rec-modal-head + .rm-body,
+html.v55 body.records-page.v2-page .rm-body {
+  flex: 1;
+  min-height: 0;
+  padding: 6px 26px 18px !important;
+  overflow: auto !important;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--v2-line-2) transparent;
+}
+html.v55 body.records-page.v2-page .rm-team {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 16px 0 7px !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  letter-spacing: -.01em;
+  color: var(--v2-ink) !important;
+}
+html.v55 body.records-page.v2-page .rm-team:first-child { margin-top: 8px !important; }
+html.v55 body.records-page.v2-page .rm-team img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  border-radius: 5px;
+  background: var(--v2-inset);
+}
+html.v55 body.records-page.v2-page .rm-tbl {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px !important;
+}
+html.v55 body.records-page.v2-page .rm-tbl th {
+  padding: 8px 8px !important;
+  border-bottom: 1px solid var(--v2-line-2) !important;
+  background: none !important;
+  font-family: var(--v2-mono) !important;
+  font-size: 9px !important;
+  font-weight: 500 !important;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  text-align: right;
+  white-space: nowrap;
+  color: var(--v2-ink-3) !important;
+}
+html.v55 body.records-page.v2-page .rm-tbl th:first-child,
+html.v55 body.records-page.v2-page .rm-tbl td:first-child { text-align: left; }
+html.v55 body.records-page.v2-page .rm-tbl td {
+  padding: 8px !important;
+  border-bottom: 1px solid var(--v2-line) !important;
+  font-size: 11.5px !important;
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  color: var(--v2-ink-2) !important;
+}
+html.v55 body.records-page.v2-page .rm-tbl tbody tr:last-child td { border-bottom: 0 !important; }
+html.v55 body.records-page.v2-page .rm-tbl tbody tr:hover td { background: var(--v2-inset) !important; }
+html.v55 body.records-page.v2-page .rm-tbl tr.hl td {
+  background: rgba(var(--v2-gold-rgb), .12) !important;
+  color: var(--v2-ink) !important;
+  font-weight: 700 !important;
+}
+html.dark-site body.records-page.v2-page .rm-tbl tr.hl td {
+  background: rgba(var(--v2-gold-rgb), .16) !important;
+}
+html.v55 body.records-page.v2-page .rm-player { display: flex; align-items: center; gap: 8px; min-width: 0; }
+html.v55 body.records-page.v2-page .rm-player img {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  border-radius: 50%;
+  object-fit: cover;
+  background: transparent;
+}
+html.v55 body.records-page.v2-page .rm-player span {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--v2-ink) !important;
+  font-weight: 600;
+  text-overflow: ellipsis;
+}
+html.v55 body.records-page.v2-page .rm-player small {
+  margin-left: 2px;
+  font-size: 10.5px !important;
+  font-weight: 400;
+  color: var(--v2-ink-3) !important;
+}
+html.v55 body.records-page.v2-page .rm-loading {
+  padding: 46px 24px !important;
+  text-align: center;
+  font-family: var(--v2-mono);
+  font-size: 11.5px;
+  color: var(--v2-ink-3) !important;
+}
+html.v55 body.records-page.v2-page .rec-modal .empty-tip {
+  padding: 46px 20px !important;
+  text-align: center;
+  font-size: 12px !important;
+  color: var(--v2-ink-3) !important;
+}
+html.v55 body.records-page.v2-page .rm-foot {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 14px 26px 18px !important;
+  border-top: 1px solid var(--v2-line) !important;
+  background: var(--v2-card-softer, transparent);
+}
+/* 弹窗按钮：JS 用旧 .btn.ghost.sm / .btn.primary.sm 生成，这里统一成 V2 按钮 */
+html.v55 body.records-page.v2-page .rec-modal .btn {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  height: 36px !important;
+  padding: 0 16px !important;
+  border: 1px solid var(--v2-line-2) !important;
+  border-radius: 10px !important;
+  background: transparent !important;
+  color: var(--v2-ink-2) !important;
+  font-family: var(--v2-sans) !important;
+  font-size: 12.5px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: none !important;
+  transition: color .18s, border-color .18s, background-color .18s;
+}
+html.v55 body.records-page.v2-page .rec-modal .btn.ghost:hover {
+  color: var(--v2-ink) !important;
+  border-color: var(--v2-ink-3) !important;
+  background: var(--v2-inset) !important;
+}
+html.v55 body.records-page.v2-page .rec-modal .btn.primary {
+  border-color: transparent !important;
+  background: var(--v2-ink) !important;
+  color: var(--v2-bg-elev) !important;
+  font-weight: 700 !important;
+}
+html.v55 body.records-page.v2-page .rec-modal .btn.primary:hover {
+  background: var(--v2-blue) !important;
+  color: #fff !important;
+}
+html.dark-site body.records-page.v2-page .rec-modal .btn.primary { color: #10141c !important; }
+html.dark-site body.records-page.v2-page .rec-modal .btn.primary:hover { color: #fff !important; }
+
+/* ---------- 9. 覆盖旧主题的圆角 / 底色残留 --------------------------------- */
+html.v55 body.records-page.v2-page .panel,
+html.v55 body.records-page.v2-page .filterbar,
+html.v55 body.records-page.v2-page .scopebar,
+html.v55 body.records-page.v2-page .brief { background-clip: padding-box; }
+html.v55 body.records-page.v2-page .motion-card,
+html.v55 body.records-page.v2-page .motion-surface { transform: none !important; }
+html.v55 body.records-page.v2-page .reveal { opacity: 1 !important; transform: none !important; }
+html.v55 body.records-page.v2-page .motion-tabs::before,
+html.v55 body.records-page.v2-page .motion-tabs::after { display: none !important; }
+
+/* ---------- 10. 响应式 ---------------------------------------------------- */
+@media (max-width: 1180px) {
+  html.v55 body.records-page.v2-page .records-kpis { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; }
+}
+@media (max-width: 900px) {
+  html.v55 body.records-page.v2-page .records-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    row-gap: 18px;
+  }
+  html.v55 body.records-page.v2-page .records-kpis .v2-stat:nth-child(odd) {
+    padding-left: 0 !important;
+    border-left: 0 !important;
+  }
+  html.v55 body.records-page.v2-page .scopebar .scope-meta {
+    margin-left: 0 !important;
+    padding-bottom: 0;
+  }
+  html.v55 body.records-page.v2-page #recRandom { margin-left: 0 !important; }
+}
+@media (max-width: 760px) {
+  html.v55 body.records-page.v2-page .filterbar.records-controls { padding: 12px !important; gap: 10px 12px !important; }
+  html.v55 body.records-page.v2-page #metricWrap { flex: 1 1 100%; max-width: none; }
+  html.v55 body.records-page.v2-page #recTabs { width: 100% !important; }
+  html.v55 body.records-page.v2-page #recTabs button { flex: 1 1 auto; justify-content: center; padding: 0 8px !important; }
+  html.v55 body.records-page.v2-page #recRandom { flex: 1 1 auto; margin-left: 0 !important; }
+  /* 数据范围：标签独占一行，年份 / 赛事 两列，统计量单独一行 */
+  html.v55 body.records-page.v2-page .scopebar .scope-lab { flex: 1 1 100%; padding-bottom: 0; }
+  html.v55 body.records-page.v2-page .scopebar .fld { flex: 1 1 calc(50% - 8px); }
+  html.v55 body.records-page.v2-page .scopebar .fld select { width: 100%; min-width: 0; }
+  html.v55 body.records-page.v2-page .scopebar .scope-meta {
+    flex: 1 1 100%;
+    margin-left: 0 !important;
+    padding-bottom: 0;
+    white-space: normal;
+  }
+  html.v55 body.records-page.v2-page .rec-row {
+    grid-template-columns: 30px minmax(0, 1fr) auto !important;
+    gap: 10px 12px !important;
+    padding: 14px 16px !important;
+  }
+  html.v55 body.records-page.v2-page .rec-val { font-size: 22px !important; }
+  html.v55 body.records-page.v2-page .records-coverage { flex-direction: column; gap: 6px; padding: 14px 16px !important; }
+  html.v55 body.records-page.v2-page .records-coverage .coverage-label { padding-top: 0; }
+  html.v55 body.records-page.v2-page .records-note-card { padding: 16px !important; }
+  html.v55 body.records-page.v2-page .records-notes .block-head .block-note { flex-basis: 100%; margin: 0; }
+}
+@media (max-width: 620px) {
+  /* 6 列参数表在 390 内放不下：承伤列隐藏（与旧皮肤行为一致），其余列收紧 */
+  html.v55 body.records-page.v2-page .rec-modal-panel {
+    width: 100% !important;
+    max-width: none !important;
+    height: 100vh !important;
+    max-height: 100vh !important;
+    margin: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+  }
+  html.v55 body.records-page.v2-page .rec-modal-head { padding: 18px 16px 13px !important; }
+  html.v55 body.records-page.v2-page .rm-body { padding: 4px 16px 14px !important; }
+  html.v55 body.records-page.v2-page .rm-close { right: 12px; top: 12px; }
+  html.v55 body.records-page.v2-page .rm-tbl th,
+  html.v55 body.records-page.v2-page .rm-tbl td { padding: 7px 4px !important; }
+  html.v55 body.records-page.v2-page .rm-tbl th:nth-child(5),
+  html.v55 body.records-page.v2-page .rm-tbl td:nth-child(5) { display: none !important; }
+  html.v55 body.records-page.v2-page .rm-foot { padding: 12px 16px 16px !important; }
+  html.v55 body.records-page.v2-page .rm-foot .btn { flex: 1 1 auto; }
+  html.v55 body.records-page.v2-page .theme-chips button { flex: 1 1 auto; justify-content: center; }
+}
+@media (max-width: 560px) {
+  html.v55 body.records-page.v2-page .records-kpis .v2-stat { padding: 0 12px; }
+  html.v55 body.records-page.v2-page .records-kpis .v2-stat b { font-size: 20px; }
+  html.v55 body.records-page.v2-page .rec-row .rank { font-size: 11.5px !important; }
+  html.v55 body.records-page.v2-page .rec-who b { font-size: 13.5px !important; }
+  html.v55 body.records-page.v2-page .rec-val { font-size: 20px !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html.v55 body.records-page.v2-page .rec-modal.on .rec-modal-panel { animation: none !important; }
+  html.v55 body.records-page.v2-page .rec-row,
+  html.v55 body.records-page.v2-page .theme-chips button,
+  html.v55 body.records-page.v2-page .rec-modal .btn { transition: none !important; }
+}

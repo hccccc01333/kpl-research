@@ -1,0 +1,186 @@
+/* ==========================================================================
+   KPL 赛研 · 智能找局（find.html）V2 视觉迁移
+   只作用于 body.find-page；共享样式一律用「更高特异度 + !important」覆盖，
+   不改 site-v2 / board-v2 / pages / arena / light 等共享文件。
+   ========================================================================== */
+
+html.v55 body.v2-page.find-page {
+  background: var(--v2-bg) !important;
+  color: var(--v2-ink);
+  /* 旧样式/JS 里仍有内联 var(--muted)/var(--card2) 之类，这里对齐 V2 令牌 */
+  --muted: var(--v2-ink-3);
+  --ink: var(--v2-ink);
+  --ink2: var(--v2-ink-2);
+  --line: var(--v2-line);
+  --line2: var(--v2-line-2);
+  --card: var(--v2-card);
+  --card2: var(--v2-card-soft);
+  --inset: var(--v2-inset);
+  --mono: var(--v2-mono);
+}
+
+.find-page .find-main { padding-bottom: 64px; }
+
+/* ---- 筛选条 ------------------------------------------------------------ */
+html.v55 body.v2-page.find-page .filterbar {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: flex-end !important;
+  justify-content: flex-start !important;
+  flex-wrap: wrap !important;
+  gap: 12px 14px;
+  margin: 0 0 2px;
+  padding: 14px 16px !important;
+  border-radius: 16px !important;
+  border: 1px solid var(--v2-line) !important;
+  background: var(--v2-card) !important;
+  box-shadow: var(--v2-shadow-sm) !important;
+}
+.find-page .filterbar > * { margin-left: 0 !important; }
+.find-page .filterbar .fld { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.find-page .filterbar .fld > span:first-child {
+  padding-left: 2px;
+  font-family: var(--v2-mono);
+  font-size: 9px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--v2-ink-3);
+  white-space: nowrap;
+}
+html.v55 body.v2-page.find-page .filterbar select {
+  appearance: none;
+  height: 36px;
+  min-width: 138px;
+  padding: 0 30px 0 11px;
+  border-radius: 9px !important;
+  border: 1px solid var(--v2-line) !important;
+  background:
+    linear-gradient(45deg, transparent 50%, var(--v2-ink-3) 50%) calc(100% - 14px) 15px / 4px 4px no-repeat,
+    linear-gradient(135deg, var(--v2-ink-3) 50%, transparent 50%) calc(100% - 10px) 15px / 4px 4px no-repeat,
+    var(--v2-card) !important;
+  color: var(--v2-ink) !important;
+  font-family: var(--v2-sans);
+  font-size: 12.5px;
+  cursor: pointer;
+}
+html.v55.dark-site body.v2-page.find-page .filterbar select { color-scheme: dark; }
+html.v55 body.v2-page.find-page .filterbar input.search {
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 9px !important;
+  border: 1px solid var(--v2-line) !important;
+  background: var(--v2-card) !important;
+  color: var(--v2-ink) !important;
+  font-family: var(--v2-sans);
+  font-size: 12.5px;
+  outline: none;
+}
+html.v55 body.v2-page.find-page .filterbar input.search::placeholder { color: var(--v2-ink-3); }
+html.v55 body.v2-page.find-page .filterbar input.search:focus {
+  border-color: var(--v2-line-2) !important;
+  box-shadow: 0 0 0 3px rgba(var(--v2-blue-rgb), .12);
+}
+/* 时长区间：两个输入框并排 */
+.find-page .filterbar .fld > span:not(:first-child) { display: flex; gap: 6px; }
+.find-page .filterbar .fld > span:not(:first-child) input.search { width: 86px; }
+.find-page .filterbar .v2-btn.solid { height: 36px; padding: 0 20px; }
+.find-page .filterbar #fReset { height: 36px; }
+.find-page #fCount {
+  margin-left: auto !important;
+  padding-bottom: 10px;
+  font-family: var(--v2-mono);
+  font-size: 10px;
+  color: var(--v2-ink-3);
+  white-space: nowrap;
+}
+
+/* ---- 口径说明 ---------------------------------------------------------- */
+.find-page #findNote {
+  margin: 12px 2px 10px !important;
+  font-family: var(--v2-mono);
+  font-size: 10.5px;
+  line-height: 1.75;
+  color: var(--v2-ink-3);
+}
+
+/* ---- 结果表容器 -------------------------------------------------------- */
+html.v55 body.v2-page.find-page .q-wrap {
+  margin-top: 0;
+  padding: 4px 6px;
+  border-radius: 16px !important;
+  border: 1px solid var(--v2-line) !important;
+  background: var(--v2-card) !important;
+  box-shadow: var(--v2-shadow-sm) !important;
+  overflow: auto !important;
+  max-height: min(74vh, 820px);
+  overscroll-behavior: contain;
+}
+.find-page .q-table {
+  width: 100%;
+  min-width: 1000px;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.find-page .q-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding: 10px 14px;
+  text-align: left;
+  font-family: var(--v2-mono);
+  font-size: 9.5px;
+  font-weight: 500;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--v2-ink-3);
+  background: var(--v2-card);
+  border-bottom: 1px solid var(--v2-line-2) !important;
+  white-space: nowrap;
+}
+.find-page .q-table th.num,
+.find-page .q-table th:last-child { text-align: right; }
+.find-page .q-table tbody td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--v2-line) !important;
+  color: var(--v2-ink-2);
+  white-space: nowrap;
+  vertical-align: middle;
+}
+.find-page .q-table tbody tr:last-child td { border-bottom: 0 !important; }
+.find-page .q-table tbody tr:hover { background: var(--v2-inset) !important; }
+.find-page .q-table td:first-child {
+  font-family: var(--v2-mono);
+  font-size: 11px;
+  color: var(--v2-ink-3);
+}
+.find-page .q-table td.num {
+  text-align: right;
+  font-family: var(--v2-mono);
+  font-variant-numeric: tabular-nums;
+}
+.find-page .q-table td:nth-child(3) { color: var(--v2-ink); font-weight: 600; }
+.find-page .q-table td:nth-child(6) { color: var(--v2-ink); }
+.find-page .q-table a { color: var(--v2-ink); text-decoration: none; }
+.find-page .q-table a:hover { color: var(--v2-blue); }
+.find-page .q-table td:last-child { text-align: right; }
+.find-page .q-table td:last-child a {
+  font-family: var(--v2-mono);
+  font-size: 10.5px;
+  color: var(--v2-blue);
+  font-weight: 600;
+}
+.find-page .q-table td[colspan] { text-align: center !important; color: var(--v2-ink-3) !important; padding: 34px 16px !important; }
+
+/* ---- 响应式 ------------------------------------------------------------ */
+@media (max-width: 900px) {
+  .find-page #fCount { margin-left: 0 !important; padding-bottom: 0; }
+}
+@media (max-width: 760px) {
+  html.v55 body.v2-page.find-page .filterbar { gap: 12px; padding: 12px 14px !important; }
+  .find-page .filterbar .fld { flex: 1 1 140px; }
+  .find-page .filterbar select { width: 100%; min-width: 0; }
+  .find-page .filterbar .fld > span:not(:first-child) input.search { width: auto; flex: 1; min-width: 0; }
+  html.v55 body.v2-page.find-page .q-wrap { max-height: min(70vh, 640px); }
+  html.v55 body.v2-page.find-page .filterbar .v2-btn.solid,
+  .find-page .filterbar #fReset { height: 36px; }
+}

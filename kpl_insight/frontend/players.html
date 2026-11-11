@@ -8,34 +8,33 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='5' fill='%230A111C'/%3E%3Crect x='3' y='3' width='26' height='26' rx='4' fill='none' stroke='%23F6C021' stroke-width='2'/%3E%3Ctext x='16' y='22' font-family='Arial,sans-serif' font-size='16' font-weight='bold' fill='%23F6C021' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="assets/style.css?v=20261102-brand">
 <link rel="stylesheet" href="assets/pages.css?v=20261102-brand">
-<link rel="stylesheet" href="assets/v55.css?v=87">
+<link rel="stylesheet" href="assets/v55.css?v=92">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="KPL赛研">
 <meta property="og:title" content="选手 · KPL赛研">
-<meta property="og:description" content="KPL 赛事数据产品：赛程比分、战队/选手/英雄数据、BP 分析、逐局复盘与实时胜率预测。2019–2026 全历史。">
+<meta property="og:description" content="KPL 赛事数据产品：赛程比分、战队/选手/英雄数据、BP 分析、逐局复盘与实时胜率预测。2016–2026 全历史。">
 <meta property="og:image" content="https://hccccc01333.github.io/KPLdata-site/assets/brand/kpl-research-social.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="assets/arena.css?v=1">
-<link rel="stylesheet" href="assets/arena-world.css?v=20261026">
-<script src="assets/arena-world.js?v=20261030a" type="module"></script>
-<link rel="stylesheet" href="assets/card-motion.css?v=1">
-<script src="assets/card-motion.js?v=1" type="module"></script>
 <link rel="stylesheet" href="assets/light.css?v=20261030a">
 <link rel="stylesheet" href="assets/theme.css?v=20261030b">
+<link rel="stylesheet" href="assets/site-v2.css?v=20261112a">
+<link rel="stylesheet" href="assets/board-v2.css?v=20261112a">
+<link rel="stylesheet" href="assets/players-v2.css?v=20261112a">
 </head>
-<body data-page="players.html">
+<body data-page="players.html" class="v2-page board-page players-page">
 <header id="siteHeader" class="topbar"></header>
 
-<header class="page-hero">
-  <div class="wrap">
-    <div class="ph-kicker mono">PLAYERS · 选手</div>
-    <h1>选手数据榜</h1>
-    <p>2019–2026 全部选手的比赛数据，可按年份 / 赛事、位置和排序方式自由筛选。
-      所有排名只统计已打完的比赛。</p>
-    <div class="ph-meta mono">
-      <span>入榜选手 <b id="pCount">—</b></span><i>/</i>
-      <span>范围 <b id="pScope">—</b></span><i>/</i>
-      <span>数据时钟 <b id="genAt">—</b></span>
+<header class="lg-hero">
+  <div class="lg-hero-gridlines" aria-hidden="true"></div>
+  <div class="v2-wrap">
+    <div class="v2-kicker"><i></i>PLAYERS<b>·</b>选手</div>
+    <h1 class="v2-h1">选手数据榜</h1>
+    <p class="v2-lead">2016–2026 全部选手的比赛数据，可按年份 / 赛事、位置和排序方式自由筛选。所有排名只统计已打完的比赛。</p>
+    <div class="v2-stats lg-kpis" style="margin-top:26px">
+      <div class="v2-stat"><b class="v2-mono" id="pCount">—</b><span>入榜选手</span></div>
+      <div class="v2-stat"><b class="v2-mono" id="pScope">—</b><span>数据范围</span></div>
+      <div class="v2-stat"><b class="v2-mono" id="genAt">—</b><span>数据时钟</span></div>
     </div>
   </div>
 </header>
@@ -77,7 +76,7 @@
 
 <script src="assets/data.js?v=85"></script>
 <script src="assets/seasons.js?v=85"></script>
-<script src="assets/common.js?v=20261102-brand"></script>
+<script src="assets/common.js?v=20261110-curve"></script>
 <script>
 (function () {
   "use strict";
@@ -97,8 +96,11 @@
                 wr: { v: K.pct(p.wr, 0), l: "胜率" },
                 games: { v: String(p.games), l: "局数" },
                 dmg: { v: K.mpct(p.dmg, 0), l: "输出" } }[$("#fSort").value];
+    var rank = (i || 0) + 1;
+    var rankCls = "p-rank" + (rank <= 3 ? " top t" + rank : "");
     return '<a class="player reveal" href="player.html?id=' + encodeURIComponent(p.name) + '" style="transition-delay:' +
-      Math.min((i || 0) * 22, 240) + 'ms">' + ava +
+      Math.min((i || 0) * 22, 240) + 'ms">' +
+      '<span class="' + rankCls + '" title="当前排序第 ' + rank + ' 名">' + rank + "</span>" + ava +
       '<div class="p-main"><div class="p-top">' +
       '<span class="p-name"><span class="nm">' + K.esc(p.name) + "</span>" +
       (p.pos ? "<em>" + K.esc(p.pos) + "</em>" : "") + "</span>" +

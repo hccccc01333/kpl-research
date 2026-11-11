@@ -8,24 +8,21 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='5' fill='%230A111C'/%3E%3Crect x='3' y='3' width='26' height='26' rx='4' fill='none' stroke='%23F6C021' stroke-width='2'/%3E%3Ctext x='16' y='22' font-family='Arial,sans-serif' font-size='16' font-weight='bold' fill='%23F6C021' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="assets/style.css?v=20261102-brand">
 <link rel="stylesheet" href="assets/pages.css?v=20261102-brand">
-<link rel="stylesheet" href="assets/v55.css?v=87">
+<link rel="stylesheet" href="assets/v55.css?v=92">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="KPL赛研">
 <meta property="og:title" content="战队详情 · KPL赛研">
 <meta property="og:description" content="KPL 赛事数据产品：战队战力分、能力雷达、赛季时间轴、冠军墙、近期比赛与交手记录。">
 <link rel="stylesheet" href="assets/arena.css?v=1">
-<link rel="stylesheet" href="assets/arena-world.css?v=20261026">
-<script src="assets/arena-world.js?v=20261030a" type="module"></script>
-<link rel="stylesheet" href="assets/card-motion.css?v=1">
-<script src="assets/card-motion.js?v=1" type="module"></script>
 <link rel="stylesheet" href="assets/light.css?v=20261030a">
 <link rel="stylesheet" href="assets/theme.css?v=20261030b">
+<link rel="stylesheet" href="assets/site-v2.css?v=20261112a">
+<link rel="stylesheet" href="assets/team-v2.css?v=20261112a">
 </head>
-<body data-page="teams.html">
+<body data-page="teams.html" class="v2-page team-page">
 <header id="siteHeader" class="topbar"></header>
 <div id="heroHead"></div>
-<div class="wrap" style="margin-top:16px"><div class="scopebar" id="scopeBar"></div></div>
-<main class="wrap" id="main" style="margin-top:6px"></main>
+<main class="wrap" id="main" style="margin-top:26px"><div class="scopebar" id="scopeBar"></div><div id="teamBody"></div></main>
 <footer id="siteFooter" class="footer"></footer>
 
 <script src="assets/data.js?v=85"></script>
@@ -36,7 +33,7 @@
 <script src="assets/team_data.js?v=85"></script>
 <script src="assets/power.js?v=85"></script>
 <script src="assets/deep.js?v=85"></script>
-<script src="assets/common.js?v=20261102-brand"></script>
+<script src="assets/common.js?v=20261110-curve"></script>
 <script src="assets/share.js?v=20261102-brand"></script>
 <script>
 (function () {
@@ -50,10 +47,13 @@
   var team = null;
   for (var i = 0; i < ALL.length; i++) if (ALL[i].team === id) { team = ALL[i]; break; }
   if (!team) {
-    $("#heroHead").innerHTML = '<header class="page-hero"><div class="wrap">' +
-      '<div class="ph-kicker mono">TEAM · 战队</div><h1>未找到该战队</h1>' +
-      "<p>战队名单覆盖 2019–2026 全部 " + ALL.length + " 支队伍；请从战队页或站内搜索进入。</p>" +
-      '<div class="slide-cta" style="margin-top:18px"><a class="btn primary" href="teams.html">返回战队页</a></div></div></header>';
+    $("#heroHead").innerHTML = '<header class="lg-hero detail-hero"><div class="lg-hero-gridlines" aria-hidden="true"></div>' +
+      '<div class="v2-wrap"><nav class="v2-crumb"><a href="teams.html">战队战力榜</a><span class="sep">/</span><b>未找到</b></nav>' +
+      '<div class="v2-kicker"><i></i>TEAM<b>·</b>战队</div>' +
+      '<h1 class="v2-h1">未找到该战队</h1>' +
+      "<p class=\"v2-lead\">战队名单覆盖 2016–2026 全部 " + ALL.length + " 支队伍；请从战队页或站内搜索进入，或检查链接里的 id 是否正确。</p>" +
+      '<div class="v2-actions" style="margin-top:24px"><a class="v2-btn solid" href="teams.html">返回战队页 <span class="arr">→</span></a></div>' +
+      "</div></header>";
     return;
   }
 
@@ -285,15 +285,31 @@
     var ci = wilson(row.gw, row.g);
     var rk = rankOf(curScope, team.team);
 
-    $("#heroHead").innerHTML = '<header class="page-hero"><div class="wrap"><div class="hd-top">' +
-      (team.icon ? '<img class="hd-ava" src="' + K.esc(team.icon) + '" alt="">' : "") +
-      '<div><div class="hd-name">' + K.esc(team.team) +
+    $("#heroHead").innerHTML = '<header class="lg-hero detail-hero"><div class="lg-hero-gridlines" aria-hidden="true"></div><div class="v2-wrap">' +
+      '<nav class="v2-crumb"><a href="teams.html">战队战力榜</a><span class="sep">/</span><b>' + K.esc(team.team) + "</b></nav>" +
+      '<div class="v2-kicker"><i></i>TEAM<b>·</b>战队档案</div>' +
+      '<div class="detail-id">' +
+      (team.icon ? '<span class="detail-ava team-logo"><img src="' + K.esc(team.icon) + '" alt=""></span>' : "") +
+      '<div class="detail-id-main"><h1 class="v2-h1">' + K.esc(team.team) +
       " " + K.favBtn({ kind: "team", id: team.team, label: team.team, icon: team.icon,
-                        href: "team.html?id=" + encodeURIComponent(team.team) }) + "</div>" +
-      '<div class="hd-sub">' + K.scopeName(curScope) + " · 大场 " + row.mw + "-" + row.ml +
-      " · 单局 " + row.gw + "-" + row.gl + " · 近况 " + (form || "—") + "</div></div></div></div></header>";
+                        href: "team.html?id=" + encodeURIComponent(team.team) }) + "</h1>" +
+      '<p class="v2-lead">' + K.scopeName(curScope) + " · 大场 " + row.mw + "-" + row.ml +
+      " · 单局 " + row.gw + "-" + row.gl + " · 95% 胜率区间 " + K.pct(ci[0], 0) + "–" + K.pct(ci[1], 0) +
+      " · 近况 " + (form || "—") + "</p></div></div>" +
+      '<div class="v2-stats detail-stats detail-stats-6" style="margin-top:26px">' +
+      '<div class="v2-stat"><b class="v2-mono">' + (row.score !== undefined ? row.score : "—") + "</b><span>多维战力分" +
+      (rk ? " · 第 " + rk.rank + "/" + rk.of : " · 样本不足") + "</span></div>" +
+      '<div class="v2-stat"><b class="v2-mono">' + K.pct(row.wr) + "</b><span>单局胜率 · " + K.fmtInt(row.g) + " 局</span></div>" +
+      '<div class="v2-stat"><b class="v2-mono">' + row.mw + "-" + row.ml + "</b><span>大场战绩 · 校正 " + K.pct(row.adjWR) + "</span></div>" +
+      '<div class="v2-stat"><b class="v2-mono">' + K.signed(row.gold) + "</b><span>场均经济差</span></div>" +
+      '<div class="v2-stat"><b class="v2-mono">' + K.signed(row.kill, 1) + "</b><span>场均击杀差</span></div>" +
+      '<div class="v2-stat"><b class="v2-mono">' + K.signed(row.tower, 1) + "</b><span>场均推塔差 · 资源 " + K.signed(row.res, 2) + "</span></div>" +
+      "</div>" +
+      (fallback ? '<p class="v2-note hero-note">当前数据范围该队未出场，以上数字已回退到历史基准。</p>' : "") +
+      '<div class="detail-actions"></div>' +
+      "</div></header>";
 
-    SHARE.mount($("#heroHead"), function () {
+    SHARE.mount($("#heroHead .detail-actions"), function () {
       return {
         kind: "战队档案",
         title: team.team,
@@ -311,23 +327,6 @@
         url: "kpldata-site.hccccc01333.workers.dev/team.html?id=" + encodeURIComponent(team.team)
       };
     }, "kpldata-team.png");
-
-    /* 第一层：总览 */
-    var kpis = '<div class="hd-stats">' +
-      '<div class="hd-cell hl"><div class="k">多维战力分' + (rk ? " · 第 " + rk.rank + "/" + rk.of : "") +
-      '</div><div class="v">' + (row.score !== undefined ? row.score : "—") + '</div><div class="s">' +
-      K.scopeName(curScope) + " 基准" + (fallback ? "（当前范围未出场，回退历史基准）" : "") + "</div></div>" +
-      '<div class="hd-cell"><div class="k">单局胜率</div><div class="v">' + K.pct(row.wr) + '</div><div class="s">' +
-      row.gw + " 胜 / " + row.g + " 局 · 95% " + K.pct(ci[0], 0) + "–" + K.pct(ci[1], 0) + "</div></div>" +
-      '<div class="hd-cell"><div class="k">大场战绩</div><div class="v">' + row.mw + "-" + row.ml +
-      '</div><div class="s">' + row.m + " 大场 · 校正胜率 " + K.pct(row.adjWR) + "</div></div>" +
-      '<div class="hd-cell"><div class="k">场均经济差</div><div class="v">' + K.signed(row.gold) +
-      '</div><div class="s">每局金币净差</div></div>' +
-      '<div class="hd-cell"><div class="k">场均击杀差</div><div class="v">' + K.signed(row.kill, 1) +
-      '</div><div class="s">每局击杀净差</div></div>' +
-      '<div class="hd-cell"><div class="k">场均推进 / 资源差</div><div class="v">' + K.signed(row.tower, 1) +
-      '</div><div class="s">推塔差 · 资源差 ' + K.signed(row.res, 2) + "</div></div>" +
-      "</div>";
 
     var recent = SCHED.slice(0, 12).map(function (r) {
       var home = r.team1 === team.team;
@@ -409,7 +408,7 @@
         }).join("") + "</div>" + '<div class="block-note mono">' + poolLabel + "</div>"
       : '<div class="empty-tip">暂无英雄池数据</div>';
 
-    $("#main").innerHTML = kpis +
+    $("#teamBody").innerHTML =
       '<div class="hd-grid" style="margin-top:18px">' +
       radarPanel() +
       seriesPanel +

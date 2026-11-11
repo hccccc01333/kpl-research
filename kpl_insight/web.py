@@ -28,7 +28,6 @@ class LocalHandler(SimpleHTTPRequestHandler):
         allowed = {f"127.0.0.1:{self.server.server_port}", f"localhost:{self.server.server_port}"}
         origin = self.headers.get("Origin")
         return host in allowed and (origin is None or origin == "http://" + host)
-
     def _json(self, status, value):
         body = json.dumps(value, ensure_ascii=False).encode("utf-8")
         self.send_response(status)
@@ -68,6 +67,19 @@ class LocalHandler(SimpleHTTPRequestHandler):
             return self._json(500, {"error": f"操作失败：{exc}"})
 
 
+class SiteServer(ThreadingHTTPServer):
+    """本地预览服务。
+
+    socketserver 默认 listen backlog 只有 5；浏览器对同一域名会并发约 6 条连接，
+    连续翻页/多标签时会出现偶发 ERR_CONNECTION_REFUSED（页面白屏、资源丢失）。
+    这里把 backlog 放宽到 128，避免本地预览被瞬时并发打满。
+    """
+
+    request_queue_size = 128
+    daemon_threads = True
+    allow_reuse_address = True
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="启动KPL赛研前端（无需模型或第三方依赖）")
     parser.add_argument("--port", type=int, default=8000)
@@ -81,7 +93,7 @@ def main(argv: list[str] | None = None) -> int:
         parser.error(f"缺少前端首页：{site / 'index.html'}")
     handler = partial(LocalHandler, directory=str(site))
     try:
-        server = ThreadingHTTPServer(("127.0.0.1", args.port), handler)
+        server = SiteServer(("127.0.0.1", args.port), handler)
     except OSError as exc:
         parser.exit(1, f"无法启动网站：{exc}。可用 --port 8001 更换端口。\n")
     server.control = RuntimeControl(site)

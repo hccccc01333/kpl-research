@@ -5,19 +5,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>翻盘路径研究所 · KPL赛研</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230A111C'/%3E%3Ctext x='16' y='22' font-family='Arial,sans-serif' font-size='16' font-weight='bold' fill='%23F6C021' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='5' fill='%230A111C'/%3E%3Crect x='3' y='3' width='26' height='26' rx='4' fill='none' stroke='%23F6C021' stroke-width='2'/%3E%3Ctext x='16' y='22' font-family='Arial,sans-serif' font-size='16' font-weight='bold' fill='%23F6C021' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="assets/style.css?v=20261102-brand">
 <link rel="stylesheet" href="assets/pages.css?v=20261102-brand">
-<link rel="stylesheet" href="assets/v55.css?v=87">
-<style>
-/* 只在本页使用的分布条：label + 条 + 计数 */
-.cb-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:12.5px}
-.cb-row > .k{flex:none;width:74px;color:var(--muted)}
-.cb-bar{flex:1;height:12px;border-radius:4px;background:var(--inset);overflow:hidden}
-.cb-bar i{display:block;height:100%;background:var(--brand)}
-.cb-row > .v{flex:none;width:74px;text-align:right;font-variant-numeric:tabular-nums;color:var(--ink2)}
-.cb-two{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
-</style>
+<link rel="stylesheet" href="assets/v55.css?v=92">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="KPL赛研">
 <meta property="og:title" content="翻盘路径研究所 · KPL赛研">
@@ -25,30 +16,27 @@
 <meta property="og:image" content="https://hccccc01333.github.io/KPLdata-site/assets/brand/kpl-research-social.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="assets/arena.css?v=1">
-<link rel="stylesheet" href="assets/arena-world.css?v=20261026">
-<script src="assets/arena-world.js?v=20261030a" type="module"></script>
-<link rel="stylesheet" href="assets/card-motion.css?v=1">
-<script src="assets/card-motion.js?v=1" type="module"></script>
 <link rel="stylesheet" href="assets/light.css?v=20261030a">
 <link rel="stylesheet" href="assets/theme.css?v=20261030b">
+<link rel="stylesheet" href="assets/site-v2.css?v=20261112a">
+<link rel="stylesheet" href="assets/comeback-v2.css?v=20261112a">
 </head>
-<body data-page="comeback.html">
+<body data-page="comeback.html" class="v2-page comeback-page">
 <header id="siteHeader" class="topbar"></header>
 
-<header class="page-hero">
-  <div class="wrap">
-    <div class="ph-kicker mono">ANALYSIS · 翻盘路径研究所</div>
-    <h1>翻盘路径研究所</h1>
-    <p>用站内已有的分钟级胜率序列，回答一个问题：<b>最终赢下这局的一方，有多少次曾在第 <span id="cbWin">8</span> 分钟之后被模型判到 25% 胜率以下？</b>
-       低点出现在什么时段、典型翻盘是哪几局，都列在下面。只对有分钟级快照的对局成立。</p>
+<header class="lg-hero">
+  <div class="lg-hero-gridlines" aria-hidden="true"></div>
+  <div class="v2-wrap">
+    <div class="v2-kicker"><i></i>ANALYSIS<b>·</b>翻盘路径研究所</div>
+    <h1 class="v2-h1">翻盘路径研究所</h1>
+    <p class="v2-lead">用站内已有的分钟级胜率序列，回答一个问题：<strong>最终赢下这局的一方，有多少次曾在第 <span id="cbWin">8</span> 分钟之后被模型判到 25% 胜率以下？</strong>
+      低点出现在什么时段、典型翻盘是哪几局，都列在下面。只对有分钟级快照的对局成立。</p>
+    <div class="v2-stats lg-kpis cb-stats" id="cbKpi" style="margin-top:26px"></div>
+    <div class="v2-actions cb-share" id="cbShare"></div>
   </div>
 </header>
 
-<main class="wrap" style="margin-top:24px">
-  <div class="panel" style="margin-bottom:16px">
-    <div class="panel-title">样本概览</div>
-    <div class="hd-stats" id="cbKpi"></div>
-  </div>
+<main class="wrap" style="margin-top:26px">
 
   <div class="cb-two">
     <section class="block">
@@ -72,15 +60,19 @@
       <h2><i></i>典型翻盘榜</h2>
       <span class="block-note mono">按「低点胜率越低越靠前」排序 · 点复盘回到那一局</span>
     </div>
-    <div class="panel table-panel"><table class="tbl">
-      <thead><tr><th>日期</th><th>对局</th><th>胜方</th><th class="num">低点胜率</th>
-      <th class="num">低点时刻</th><th class="num">时长</th><th class="num">复盘</th></tr></thead>
-      <tbody id="cbRows"></tbody>
-    </table></div>
+    <div class="panel table-panel">
+      <div class="table-scroll">
+        <table class="tbl">
+          <thead><tr><th>日期</th><th>对局</th><th>胜方</th><th class="num">低点胜率</th>
+          <th class="num">低点时刻</th><th class="num">时长</th><th class="num">复盘</th></tr></thead>
+          <tbody id="cbRows"></tbody>
+        </table>
+      </div>
+    </div>
   </section>
 
-  <div class="panel">
-    <div class="panel-title">口径说明</div>
+  <div class="panel note-panel">
+    <div class="panel-title">口径说明 <em class="mono">先看边界，再看数字</em></div>
     <div class="block-note" id="cbNote"></div>
   </div>
 </main>
@@ -88,7 +80,7 @@
 <footer id="siteFooter" class="footer"></footer>
 
 <script src="assets/data.js?v=85"></script>
-<script src="assets/common.js?v=20261102-brand"></script>
+<script src="assets/common.js?v=20261110-curve"></script>
 <script src="assets/comeback.js?v=85"></script>
 <script src="assets/share.js?v=20261102-brand"></script>
 <script>
@@ -128,13 +120,13 @@
   $("#cbRows").innerHTML = list.length ? list.map(function (c) {
     var href = "match.html?id=" + encodeURIComponent(c.mid) + "&g=" + c.seq + "&m=" + Math.round(c.lowMin);
     return "<tr><td class='mono'>" + K.esc(c.date) + "</td>" +
-      "<td>" + K.esc(c.t1) + " vs " + K.esc(c.t2) + " <span class='mono' style='color:var(--muted)'>G" + c.seq + "</span></td>" +
+      "<td>" + K.esc(c.t1) + " vs " + K.esc(c.t2) + " <span class='mono' style='color:var(--v2-ink-3)'>G" + c.seq + "</span></td>" +
       "<td><span class='team-cell'>" + K.esc(c.winner) + "</span></td>" +
-      '<td class="num mono" style="color:var(--red)">' + pct1(c.lowP * 100) + "</td>" +
+      '<td class="num mono cb-low">' + pct1(c.lowP * 100) + "</td>" +
       '<td class="num mono">' + c.lowMin + "′</td>" +
       '<td class="num mono">' + c.dur + "′</td>" +
-      '<td class="num"><a class="go" href="' + href + '" style="color:var(--gold);font-weight:700">复盘 →</a></td></tr>';
-  }).join("") : "<tr><td colspan='7' style='color:var(--muted)'>样本内没有低点低于门槛的对局</td></tr>";
+      '<td class="num"><a class="go" href="' + href + '">复盘 →</a></td></tr>';
+  }).join("") : "<tr><td colspan='7' style='color:var(--v2-ink-3)'>样本内没有低点低于门槛的对局</td></tr>";
 
   $("#cbNote").innerHTML = K.esc(M.note || "") +
     "<br>1. 胜率是<b>模型视角</b>的胜率（camp1 视角换算到胜方视角），不是客观实力差；低点低只说明模型当时把胜方判得很死；<br>" +
@@ -143,7 +135,7 @@
     "4. 样本只有覆盖率 " + pct1(M.coverPct) + "，<b>不能代表全部 KPL 对局</b>，也不做跨样本外推。";
 
   if (window.SHARE) {
-    SHARE.mount($("#cbKpi"), function () {
+    SHARE.mount($("#cbShare"), function () {
       return {
         kind: "翻盘研究所",
         title: "翻盘路径研究所 · " + K.fmtInt(M.battles || 0) + " 局样本",
